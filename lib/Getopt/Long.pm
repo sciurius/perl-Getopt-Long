@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Apr  4 18:21:45 2003
-# Update Count    : 1102
+# Last Modified On: Fri May  9 12:21:35 2003
+# Update Count    : 1196
 # Status          : Released
 
 ################ Copyright ################
@@ -35,10 +35,10 @@ use 5.004;
 use strict;
 
 use vars qw($VERSION);
-$VERSION        =  2.3201;
+$VERSION        =  2.3202;
 # For testing versions only.
 use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.32_01";
+$VERSION_STRING = "2.32_02";
 
 use Exporter;
 
@@ -903,7 +903,15 @@ sub FindOption ($$$$) {
     my $key;
     if ($ctl->[CTL_DEST] == CTL_DEST_HASH && defined $arg) {
 	($key, $arg) = ($arg =~ /^([^=]*)=(.*)$/s) ? ($1, $2)
-	  : ($arg, defined($ctl->[CTL_DEFAULT]) ? $ctl->[CTL_DEFAULT] : 1);
+	  : ($arg, defined($ctl->[CTL_DEFAULT]) ? $ctl->[CTL_DEFAULT] :
+	     ($mand ? undef : ($type eq 's' ? "" : 1)));
+	if (! defined $arg) {
+	    warn ("Option $opt, key \"$key\", requires a value\n");
+	    $error++;
+	    # Push back.
+	    unshift (@ARGV, $starter.$rest) if defined $rest;
+	    return (1, undef);
+	}
     }
 
     #### Check if the argument is valid for this option ####
@@ -1114,6 +1122,8 @@ sub Configure (@) {
 sub config (@) {
     Configure (@_);
 }
+
+1;
 
 ################ Documentation ################
 
@@ -2023,6 +2033,14 @@ program:
     print STDERR (join("|",@ARGV),"\n");
 
 to verify how your CLI passes the arguments to the program.
+
+=head2 Undefined subroutine &main::GetOptions called
+
+Are you running Windows, and did you write
+
+    use GetOpt::Long;
+
+(note the capital 'O')?
 
 =head2 How do I put a "-?" option into a Getopt::Long?
 
