@@ -11,8 +11,8 @@ The README document is attached to this message.
 
 The best way to download from CPAN is to use a Web browser and point
 it to http://www.perl.com/CPAN/ (include the final slash!). It will
-automagically be redirected to a CPAN site in your neighborhood. URL:
-http://www.perl.com/CPAN/authors/Johan_Vromans
+automagically be redirected to a CPAN site in your neighborhood. 
+URL: http://www.perl.com/CPAN/authors/Johan_Vromans
 
 Changes in version 2.15
 -----------------------
