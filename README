@@ -1,0 +1,160 @@
+Module Getopt::Long - extended processing of command line options
+=================================================================
+
+Module Getopt::Long implements an extended getopt function called
+GetOptions(). This function implements the POSIX standard for command
+line options, with GNU extensions, while still capable of handling
+the traditional one-letter options.
+In general, this means that command line options can have long names
+instead of single letters, and are introduced with a double dash `--'.
+
+Optionally, Getopt::Long can support the traditional bundling of
+single-letter command line options.
+
+Getopt::Long::GetOptions() comes with the Perl 5 distribution. It is
+the successor of newgetopt.pl that came with Perl 4. It is fully
+upward compatible. In fact, the Perl 5 version of newgetopt.pl is just
+a wrapper around the module.
+
+* Long option names
+
+Major advantage of using long option names is that it is much easier
+to memorize the option names. Using single-letter names one quickly
+runs into the problem that there is no logical relationship between
+the semantics of the selected option and its option letter.
+Disadvantage is that it requires more typing. Getopt::Long provides
+for option name abbreviation, so option names may be abbreviated to
+uniqueness. Also, modern shells like Cornell's tcsh support option
+name completion. As a rule of thumb, you can use abbreviations freely
+while running commands interactively but always use the full names in
+scripts. 
+
+Examples (POSIX):
+
+    --long --width=80 --height=24
+
+Extensions:
+
+    -long (convenience) +width=80 (deprecated) -height 24 (traditional)
+
+By default, long option names are case insensitive.
+
+* Single-letter options and bundling
+
+When single-letter options are requested, Getopt::Long allows the
+option names to be bundled, e.g. "-abc" is equivalent to "-a -b -c".
+In this case, long option names must be introduced with the POSIX "--"
+introducer.
+
+Examples:
+
+    -lgAd (bundle) -xw 80 (bundle, w takes a value) -xw80 (same)
+
+By default, single-letter option names are case sensitive.
+
+* Flexibility:
+
+  - options can have alternative names, using an alternative name
+    will behave as if the primary name was used;
+  - options can be negatable, e.g. "debug" will switch it on, while
+    "nodebug" will switch it off.    
+  - options can set values, but also add values producing an array
+    of values instead of a single scalar value.
+
+* Options linkage
+
+Using Getopt::Long gives the programmer ultimate control over the
+command line options and how they must be handled:
+
+  - by setting a global variable in the calling program;
+  - by setting a specified variable;
+  - by entering the option name and the value in an associative array
+    (hash);
+  - by calling a user-specified subroutine with the option name and
+    the value as arguments;
+  - combinations of the above.
+
+* Customization:
+
+A couple of configuration variables can be used to activate (or
+de-activate) specific behavior:
+
+  - $Getopt::Long::autoabbrev      
+
+	Allow option names to be abbreviated to uniqueness. 
+	Default is 1 unless environment variable POSIXLY_CORRECT
+	has been set.
+
+  - $Getopt::Long::getopt_compat   
+
+	Allow '+' to start options.
+	Default is 1 unless environment variable POSIXLY_CORRECT
+	has been set.
+
+  - $Getopt::Long::order           
+
+	Whether non-options are allowed to be mixed with options.
+	Default is $REQUIRE_ORDER if environment variable
+	POSIXLY_CORRECT has been set, $PERMUTE otherwise.
+
+	$PERMUTE means that 
+
+	    -foo arg1 -bar arg2 arg3
+
+	is equivalent to
+
+	    -foo -bar arg1 arg2 arg3
+
+	(provided -foo does not take an argument value).
+
+	If $Getopt::Long::order is $REQUIRE_ORDER, options processing
+	terminates when the first non-option is encountered.
+
+	    -foo arg1 -bar arg2 arg3
+
+	is equivalent to
+
+	    -foo -- arg1 -bar arg2 arg3
+
+  - $Getopt::Long::bundling
+
+	Setting this variable to a non-zero value will allow 
+	single-character options to be bundled. To distinguish bundles
+	from long option names, long options must be introduced with 
+	"--" and single-character options (and bundles) with "-".
+
+  - $Getopt::Long::ignorecase      
+
+	Ignore case when matching options. Default is 1. When bundling
+	is in effect, case is ignored on single-character options only
+	if $Getopt::Long::ignorecase is greater than 1.
+
+  - $Getopt::Long::error
+
+	Internal error flag. May be incremented from a call-back
+	routine to cause options parsing to fail.
+
+  - $Getopt::Long::debug           
+
+	Enable copious debugging output. Default is 0.
+
+* Availability
+
+The official version for module Getopt::Long comes with the Perl 5
+distribution. 
+Newer versions will be made available on the Comprehensive Perl Archive
+Network (CPAN), see "http://www.perl.com/CPAN/authors/Johan_Vromans".
+
+* Copyright and disclaimer
+
+Module Getopt::Long is Copyright 1990,1996 by Johan Vromans.
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+-------------------------------------------------------------------
+Johan Vromans                                  jvromans@squirrel.nl
+Squirrel Consultancy                       Boskoop, the Netherlands
+http://www.xs4all.nl/~jvromans        http://www.xxlink.nl/squirrel
+------------------ "Arms are made for hugging" --------------------
