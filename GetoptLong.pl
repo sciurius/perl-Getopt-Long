@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Jan 19 14:29:36 1997
-# Update Count    : 515
+# Last Modified On: Thu Feb 20 21:49:27 1997
+# Update Count    : 563
 # Status          : Released
 
 package Getopt::Long;
@@ -14,9 +14,10 @@ require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(&GetOptions $REQUIRE_ORDER $PERMUTE $RETURN_IN_ORDER);
-$VERSION = sprintf("%d.%02d", '$Revision$ ' =~ /(\d+)\.(\d+)/);
+@EXPORT_OK = qw(config);
+$VERSION = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
 use vars qw($autoabbrev $getopt_compat $ignorecase $bundling $order
-	    $passthrough $error $debug 
+	    $passthrough $error $debug &config &config_defaults
 	    $REQUIRE_ORDER $PERMUTE $RETURN_IN_ORDER
 	    $VERSION $major_version $minor_version);
 use strict;
@@ -229,7 +230,7 @@ of this option. If no linkage is specified, options "foo", "bar" and
 "blech" all will set $opt_foo.
 
 Option names may be abbreviated to uniqueness, depending on
-configuration variable $Getopt::Long::autoabbrev.
+configuration option B<auto_abbrev>.
 
 =head2 Non-option call-back routine
 
@@ -237,7 +238,9 @@ A special option specifier, E<lt>E<gt>, can be used to designate a subroutine
 to handle non-option arguments. GetOptions will immediately call this
 subroutine for every non-option it encounters in the options list.
 This subroutine gets the name of the non-option passed.
-This feature requires $Getopt::Long::order to have the value $PERMUTE.
+This feature requires configuration option B<permute>, see section
+CONFIGURATION OPTIONS.
+
 See also the examples.
 
 =head2 Option starters
@@ -273,10 +276,10 @@ setting the element of the hash %opt_name with key "name" to "value"
 (if the "=value" portion is omitted it defaults to 1). If explicit
 linkage is supplied, this must be a reference to a HASH.
 
-If configuration variable $Getopt::Long::getopt_compat is set to a
-non-zero value, options that start with "+" or "-" may also include their
-arguments, e.g. "+foo=bar". This is for compatiblity with older
-implementations of the GNU "getopt" routine.
+If configuration option B<getopt_compat> is set (see section
+CONFIGURATION OPTIONS), options that start with "+" or "-" may also
+include their arguments, e.g. "+foo=bar". This is for compatiblity
+with older implementations of the GNU "getopt" routine.
 
 If the first argument to GetOptions is a string consisting of only
 non-alphanumeric characters, it is taken to specify the option starter
@@ -340,33 +343,59 @@ This will leave the non-options in @ARGV:
    $myfoo -> 2
    @ARGV -> qw(bar blech)
 
-=head1 CONFIGURATION VARIABLES
+=head1 CONFIGURATION OPTIONS
 
-The following variables can be set to change the default behaviour of
-GetOptions():
+B<GetOptions> can be configured by calling subroutine
+B<Getopt::Long::config>. This subroutine takes a list of quoted
+strings, each specifying a configuration option to be set, e.g.
+B<ignore_case>. Options can be reset by prefixing with B<no_>, e.g.
+B<no_ignore_case>. Case does not matter. Multiple calls to B<config>
+are possible.
+
+Previous versions of Getopt::Long used variables for the purpose of
+configuring. Although manipulating these variables still work, it
+is strongly encouraged to use the new B<config> routine. Besides, it
+is much easier.
+
+The following options are available:
 
 =over 12
 
-=item $Getopt::Long::autoabbrev      
+=item default
+
+This option causes all configuration options to be reset to their
+default values.
+
+=item auto_abbrev
 
 Allow option names to be abbreviated to uniqueness.
-Default is 1 unless environment variable
-POSIXLY_CORRECT has been set.
+Default is set unless environment variable
+POSIXLY_CORRECT has been set, in which case B<auto_abbrev> is reset.
 
-=item $Getopt::Long::getopt_compat   
+=item getopt_compat   
 
 Allow '+' to start options.
-Default is 1 unless environment variable
-POSIXLY_CORRECT has been set.
+Default is set unless environment variable
+POSIXLY_CORRECT has been set, in which case B<getopt_compat> is reset.
 
-=item $Getopt::Long::order           
+=item require_order
 
 Whether non-options are allowed to be mixed with
 options.
-Default is $REQUIRE_ORDER if environment variable
-POSIXLY_CORRECT has been set, $PERMUTE otherwise.
+Default is set unless environment variable
+POSIXLY_CORRECT has been set, in which case b<require_order> is reset.
 
-$PERMUTE means that 
+See also B<permute>, which is the opposite of B<require_order>.
+
+=item permute
+
+Whether non-options are allowed to be mixed with
+options.
+Default is set unless environment variable
+POSIXLY_CORRECT has been set, in which case B<permute> is reset.
+Note that B<permute> is the opposite of B<require_order>.
+
+If B<permute> is set, this means that 
 
     -foo arg1 -bar arg2 arg3
 
@@ -383,7 +412,7 @@ processed, except when B<--> is used:
 will call the call-back routine for arg1 and arg2, and terminate
 leaving arg2 in @ARGV.
 
-If $Getopt::Long::order is $REQUIRE_ORDER, options processing
+If B<require_order> is set, options processing
 terminates when the first non-option is encountered.
 
     -foo arg1 -bar arg2 arg3
@@ -392,9 +421,7 @@ is equivalent to
 
     -foo -- arg1 -bar arg2 arg3
 
-$RETURN_IN_ORDER is not supported by GetOptions().
-
-=item $Getopt::Long::bundling
+=item bundling (default: reset)
 
 Setting this variable to a non-zero value will allow single-character
 options to be bundled. To distinguish bundles from long option names,
@@ -419,28 +446,51 @@ is equivalent to
 
     scale -h 24 -w 80
 
-If $Getopt::Long::bundling is set to the value 2, long option names
-override option bundles. In the above example, B<-vax> would be
-interpreted as the option "vax", not the bundle "v", "a", "x".
+Note: resetting B<bundling> also resets B<bundling_override>.
+
+=item bundling_override (default: reset)
+
+If B<bundling_override> is set, bundling is enabled as with
+B<bundling> but now long option names override option bundles. In the
+above example, B<-vax> would be interpreted as the option "vax", not
+the bundle "v", "a", "x".
+
+Note: resetting B<bundling_override> also resets B<bundling>.
 
 B<Note:> Using option bundling can easily lead to unexpected results,
 especially when mixing long options and bundles. Caveat emptor.
 
-=item $Getopt::Long::ignorecase
+=item ignore_case  (default: set)
 
-Ignore case when matching options. Default is 1. When bundling is in
-effect, case is ignored on single-character options only if
-$Getopt::Long::ignorecase is greater than 1.
+If set, case is ignored when matching options.
 
-=item $Getopt::Long::passthrough
+Note: resetting B<ignore_case> also resets B<ignore_case_always>.
+
+=item ignore_case_always (default: reset)
+
+When bundling is in effect, case is ignored on single-character
+options also. 
+
+Note: resetting B<ignore_case_always> also resets B<ignore_case>.
+
+=item pass_through (default: reset)
 
 Unknown options are passed through in @ARGV instead of being flagged
 as errors. This makes it possible to write wrapper scripts that
 process only part of the user supplied options, and passes the
 remaining options to some other program.
 
-This can be very confusing, especially when $Getopt::Long::order is
-set to $PERMUTE.
+This can be very confusing, especially when B<permute> is also set.
+
+=item debug (default: reset)
+
+Enable copious debugging output.
+
+=back
+
+=head1 OTHER USEFUL VARIABLES
+
+=over 12
 
 =item $Getopt::Long::VERSION
 
@@ -448,7 +498,7 @@ The version number of this Getopt::Long implementation in the format
 C<major>.C<minor>. This can be used to have Exporter check the
 version, e.g.
 
-    use Getopt::Long 2.00;
+    use Getopt::Long 3.00;
 
 You can inspect $Getopt::Long::major_version and
 $Getopt::Long::minor_version for the individual components.
@@ -458,17 +508,13 @@ $Getopt::Long::minor_version for the individual components.
 Internal error flag. May be incremented from a call-back routine to
 cause options parsing to fail.
 
-=item $Getopt::Long::debug           
-
-Enable copious debugging output. Default is 0.
-
 =back
 
 =cut
 
 ################ Introduction ################
 #
-# This program is Copyright 1990,1996 by Johan Vromans.
+# This program is Copyright 1990,1997 by Johan Vromans.
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
@@ -489,49 +535,40 @@ Enable copious debugging output. Default is 0.
 ($REQUIRE_ORDER, $PERMUTE, $RETURN_IN_ORDER) = (0..2);
 
 my $gen_prefix;			# generic prefix (option starters)
+my $argend;			# option list terminator
+my %opctl;			# table of arg.specs (long and abbrevs)
+my %bopctl;			# table of arg.specs (bundles)
+my @opctl;			# the possible long option names
+my $pkg;			# current context. Needed if no linkage.
+my %aliases;			# alias table
+my $genprefix;			# so we can call the same module more 
+my $opt;			# current option
+my $arg;			# current option value, if any
+my $array;			# current option is array typed
+my $hash;			# current option is hash typed
+my $key;			# hash key for a hash option
+				# than once in differing environments
 
-# Handle POSIX compliancy.
-if ( defined $ENV{"POSIXLY_CORRECT"} ) {
-    $gen_prefix = "(--|-)";
-    $autoabbrev = 0;		# no automatic abbrev of options
-    $bundling = 0;		# no bundling of single letter switches
-    $getopt_compat = 0;		# disallow '+' to start options
-    $order = $REQUIRE_ORDER;
-}
-else {
-    $gen_prefix = "(--|-|\\+)";
-    $autoabbrev = 1;		# automatic abbrev of options
-    $bundling = 0;		# bundling off by default
-    $getopt_compat = 1;		# allow '+' to start options
-    $order = $PERMUTE;
-}
-
-# Other configurable settings.
-$debug = 0;			# for debugging
-$error = 0;			# error tally
-$ignorecase = 1;		# ignore case when matching options
-$passthrough = 0;		# leave unrecognized options alone
+config_defaults ();
 ($major_version, $minor_version) = $VERSION =~ /^(\d+)\.(\d+)/;
 
-use vars qw($genprefix %opctl @opctl %bopctl $opt $arg $argend $array);
-use vars qw(%aliases $hash $key);
+use vars qw( @opctl );
 
 ################ Subroutines ################
 
 sub GetOptions {
 
     my @optionlist = @_;	# local copy of the option descriptions
-    local ($argend) = '--';		# option list terminator
-    local (%opctl);			# table of arg.specs (long and abbrevs)
-    local (%bopctl);			# table of arg.specs (bundles)
-    my $pkg = (caller)[0];	# current context
+    $argend = '--';		# option list terminator
+    %opctl = ();		# table of arg.specs (long and abbrevs)
+    %bopctl = ();		# table of arg.specs (bundles)
+    $pkg = (caller)[0];		# current context
 				# Needed if linkage is omitted.
-    local (%aliases);		# alias table
+    %aliases= ();		# alias table
     my @ret = ();		# accum for non-options
     my %linkage;		# linkage
     my $userlinkage;		# user supplied HASH
-    local ($genprefix) = $gen_prefix; # so we can call the same module more 
-				# than once in differing environments
+    $genprefix = $gen_prefix;	# so we can call the same module many times
     $error = 0;
 
     print STDERR ('GetOptions $Revision$ ',
@@ -706,7 +743,7 @@ sub GetOptions {
     return 0 if $error;
 
     # Sort the possible long option names.
-    local (@opctl) = sort(keys (%opctl)) if $autoabbrev;
+    @opctl = sort(keys (%opctl)) if $autoabbrev;
 
     # Show the options tables if debugging.
     if ( $debug ) {
@@ -722,12 +759,6 @@ sub GetOptions {
 	    $arrow = "   ";
 	}
     }
-
-    local ($opt);			# current option
-    local ($arg);			# current option value, if any
-    local ($array);			# current option is array typed
-    local ($hash);			# current option is hash typed
-    local ($key);			# hash key for a hash option
 
     # Process argument list
     while ( @ARGV > 0 ) {
@@ -1072,6 +1103,98 @@ sub find_option {
 	die ("GetOpt::Long internal error (Can't happen)\n");
     }
     return 1;
+}
+
+sub config {
+    my (@options) = @_;
+    my $opt;
+    foreach $opt ( @options ) {
+	my $try = lc ($opt);
+	my $action = 1;
+	if ( $try =~ /^no_?/ ) {
+	    $action = 0;
+	    $try = $';
+	}
+	if ( $try eq 'default' or $try eq 'defaults' ) {
+	    config_defaults () if $action;
+	}
+	elsif ( $try eq 'auto_abbrev' or $try eq 'autoabbrev' ) {
+	    $autoabbrev = $action;
+	}
+	elsif ( $try eq 'getopt_compat' ) {
+	    $getopt_compat = $action;
+	}
+	elsif ( $try eq 'ignorecase' or $try eq 'ignore_case' ) {
+	    $ignorecase = $action;
+	}
+	elsif ( $try eq 'ignore_case_always' ) {
+	    $ignorecase = $action ? 2 : 0;
+	}
+	elsif ( $try eq 'bundling' ) {
+	    $bundling = $action;
+	}
+	elsif ( $try eq 'bundling_override' ) {
+	    $bundling = $action ? 2 : 0;
+	}
+	elsif ( $try eq 'require_order' ) {
+	    $order = $action ? $REQUIRE_ORDER : $PERMUTE;
+	}
+	elsif ( $try eq 'permute' ) {
+	    $order = $action ? $PERMUTE : $REQUIRE_ORDER;
+	}
+	elsif ( $try eq 'pass_through' or $try eq 'passthrough' ) {
+	    $passthrough = $action;
+	}
+	elsif ( $try eq 'debug' ) {
+	    $debug = $action;
+	}
+	else {
+	    $Carp::CarpLevel = 1;
+	    Carp::croak("Getopt::Long: unknown config parameter \"$opt\"")
+	}
+    }
+}
+
+sub config_defaults {
+    # Handle POSIX compliancy.
+    if ( defined $ENV{"POSIXLY_CORRECT"} ) {
+	$gen_prefix = "(--|-)";
+	$autoabbrev = 0;		# no automatic abbrev of options
+	$bundling = 0;			# no bundling of single letter switches
+	$getopt_compat = 0;		# disallow '+' to start options
+	$order = $REQUIRE_ORDER;
+    }
+    else {
+	$gen_prefix = "(--|-|\\+)";
+	$autoabbrev = 1;		# automatic abbrev of options
+	$bundling = 0;			# bundling off by default
+	$getopt_compat = 1;		# allow '+' to start options
+	$order = $PERMUTE;
+    }
+    # Other configurable settings.
+    $debug = 0;			# for debugging
+    $error = 0;			# error tally
+    $ignorecase = 1;		# ignore case when matching options
+    $passthrough = 0;		# leave unrecognized options alone
+}
+
+# Modified from Exporter. This one handles 2.001 and 2.01 etc just like 2.1.
+sub require_version {
+    no strict;
+    my ($self, $wanted) = @_;
+    my $pkg = ref $self || $self;
+    my $version = $ {"${pkg}::VERSION"} || "(undef)";
+
+    $wanted .= '.0' unless $wanted =~ /\./;
+    $wanted = $1 * 1000 + $2 if $wanted =~ /^(\d+)\.(\d+)$/;
+    $version = $1 * 1000 + $2 if $version =~ /^(\d+)\.(\d+)$/;
+    if ( $version < $wanted ) {
+	$version =~ s/^(\d+)(\d\d\d)$/$1.'.'.(0+$2)/e;
+	$wanted =~ s/^(\d+)(\d\d\d)$/$1.'.'.(0+$2)/e;
+	$Carp::CarpLevel = 1;
+	Carp::croak("$pkg $wanted required--this is only version $version")
+    }
+    $version;
 }
 
 ################ Package return ################
