@@ -1,5 +1,12 @@
 #!./perl -w
 
+BEGIN {
+    if ($ENV{PERL_CORE}) {
+	@INC = '../lib';
+	chdir 't';
+    }
+}
+
 require "newgetopt.pl";
 
 print "1..9\n";

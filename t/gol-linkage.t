@@ -1,5 +1,12 @@
 #!./perl -w
 
+BEGIN {
+    if ($ENV{PERL_CORE}) {
+	@INC = '../lib';
+	chdir 't';
+    }
+}
+
 use Getopt::Long;
 
 print "1..18\n";
