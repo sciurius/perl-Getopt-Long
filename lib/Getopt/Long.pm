@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Sep 25 22:54:37 2001
-# Update Count    : 881
+# Last Modified On: Wed Sep 26 16:54:53 2001
+# Update Count    : 886
 # Status          : Released
 
 ################ Copyright ################
@@ -35,10 +35,10 @@ use 5.004;
 use strict;
 
 use vars qw($VERSION);
-$VERSION        =  2.26_01;
+$VERSION        =  2.26_02;
 # For testing versions only.
 use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.26_01";
+$VERSION_STRING = "2.26_02";
 
 use Exporter;
 
@@ -67,9 +67,9 @@ sub GetOptions;
 
 # Private subroutines.
 sub ConfigDefaults ();
-sub ParseOptionSpec ($$$$);
+sub ParseOptionSpec ($$$);
 sub OptCtl ($);
-sub FindOption ($$$$$$$);
+sub FindOption ($$$$$$);
 sub Croak (@);			# demand loading the real Croak
 
 ################ Local Variables ################
@@ -243,8 +243,7 @@ sub GetOptions {
 
     my @optionlist = @_;	# local copy of the option descriptions
     my $argend = '--';		# option list terminator
-    my %opctl = ();		# table of arg.specs (long and abbrevs)
-    my %bopctl = ();		# table of arg.specs (bundles)
+    my %opctl = ();		# table of option specs
     my $pkg = $caller || (caller)[0];	# current context
 				# Needed if linkage is omitted.
     my %aliases= ();		# alias table
@@ -300,7 +299,6 @@ sub GetOptions {
 
     # Verify correctness of optionlist.
     %opctl = ();
-    %bopctl = ();
     while ( @optionlist ) {
 	my $opt = shift (@optionlist);
 
@@ -324,8 +322,7 @@ sub GetOptions {
 	}
 
 	# Parse option spec.
-	my ($o, $linko, $c) =
-	  ParseOptionSpec ($opt, \%opctl, \%bopctl, \%aliases);
+	my ($o, $linko, $c) = ParseOptionSpec ($opt, \%opctl, \%aliases);
 	unless ( defined $o ) {
 	    # Failed. $linko contains the error message.
 	    $error .= $linko;
@@ -362,13 +359,10 @@ sub GetOptions {
 	    }
 	    elsif ( ref($optionlist[0]) eq "ARRAY" ) {
 		$linkage{$linko} = shift (@optionlist);
-		# $opctl{$o} and $bopctl{$o} point to the same array ref.
-		# So it is sufficient to change only one.
 		$opctl{$o}[CTL_DEST] = CTL_DEST_ARRAY;
 	    }
 	    elsif ( ref($optionlist[0]) eq "HASH" ) {
 		$linkage{$linko} = shift (@optionlist);
-		# See comment above.
 		$opctl{$o}[CTL_DEST] = CTL_DEST_HASH;
 	    }
 	    else {
@@ -413,11 +407,6 @@ sub GetOptions {
 	    print STDERR ($arrow, "\$opctl{\"$k\"} = ", OptCtl($v), "\n");
 	    $arrow = "   ";
 	}
-	$arrow = "=> ";
-	while ( ($k,$v) = each(%bopctl) ) {
-	    print STDERR ($arrow, "\$bopctl{\"$k\"} = ", OptCtl($v), "\n");
-	    $arrow = "   ";
-	}
     }
 
     # Process argument list
@@ -447,7 +436,7 @@ sub GetOptions {
 
 	($found, $opt, $ctl, $arg, $key) =
 	  FindOption ($genprefix, $argend, $opt,
-		      \%opctl, \%bopctl, \@opctl, \%aliases);
+		      \%opctl, \@opctl, \%aliases);
 
 	if ( $found ) {
 
@@ -616,8 +605,8 @@ sub GetOptions {
     return ($error == 0);
 }
 
+# A readable representation of what's in an optbl.
 sub OptCtl ($) {
-    # A readable representation of what's in an optbl.
     my ($v) = @_;
     "[".
       "\"$v->[0]\",".
@@ -626,8 +615,9 @@ sub OptCtl ($) {
 	    "]";
 }
 
-sub ParseOptionSpec ($$$$) {
-    my ($opt, $opctl, $bopctl, $aliases) = @_;
+# Parse an option specification and fill the tables.
+sub ParseOptionSpec ($$$) {
+    my ($opt, $opctl, $aliases) = @_;
 
     # Match option spec. Allow '?' as an alias only.
     if ( $opt !~ /^((\w+[-\w]*)(\|(\?|\w[-\w]*)?)*)?([!+]|[=:][ionfse][@%]?)?$/ ) {
@@ -647,7 +637,7 @@ sub ParseOptionSpec ($$$$) {
     if ( ! defined $o ) {
 	# empty -> '-' option
 	$linko = $o = '';
-	$opctl->{''} = $bopctl->{''} = [$c,0,CTL_DEST_SCALAR];
+	$opctl->{''} = [$c,0,CTL_DEST_SCALAR];
     }
     else {
 	# Handle alias names
@@ -681,7 +671,6 @@ sub ParseOptionSpec ($$$$) {
 		  : $dest eq '%' ? CTL_DEST_HASH : CTL_DEST_SCALAR;
 		$opctl->{$_} = [$type, $mand eq '=', $dest];
 	    }
-	    $bopctl->{$_} = $opctl->{$_} if $bundling && length($_) == 1;
 
 	    if ( defined $a ) {
 		# Note alias.
@@ -697,13 +686,13 @@ sub ParseOptionSpec ($$$$) {
 }
 
 # Option lookup.
-sub FindOption ($$$$$$$) {
+sub FindOption ($$$$$$) {
 
     # returns (1, $opt, $ctl, $arg, $key) if okay,
     # returns (1, undef) if option in error,
     # returns (0) otherwise.
 
-    my ($prefix, $argend, $opt, $opctl, $bopctl, $names, $aliases) = @_;
+    my ($prefix, $argend, $opt, $opctl, $names, $aliases) = @_;
 
     print STDERR ("=> find \"$opt\", prefix=\"$prefix\"\n") if $debug;
 
@@ -732,7 +721,6 @@ sub FindOption ($$$$$$$) {
     #### Look it up ###
 
     my $tryopt;			# option to try
-    my $optbl = $opctl;		# table to look it up (long names)
 
     if ( $bundling && $starter eq '-' ) {
 
@@ -753,7 +741,6 @@ sub FindOption ($$$$$$$) {
 	    print STDERR ("=> $starter$tryopt unbundled from ",
 			  "$starter$tryopt$rest\n") if $debug;
 	    $rest = undef unless $rest ne '';
-	    $optbl = $bopctl;	# look it up in the short names table
 	}
     }
 
@@ -803,7 +790,7 @@ sub FindOption ($$$$$$$) {
     }
 
     # Check validity by fetching the info.
-    my $ctl = $optbl->{$tryopt};
+    my $ctl = $opctl->{$tryopt};
     unless  ( defined $ctl ) {
 	return (0) if $passthrough;
 	warn ("Unknown option: ", $opt, "\n");
