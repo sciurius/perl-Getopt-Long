@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Mar 27 11:50:30 1998
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Mar 17 09:00:09 2000
-# Update Count    : 55
+# Last Modified On: Fri May 12 11:09:39 2000
+# Update Count    : 71
 # Status          : Released
 
 sub GetOptions {
@@ -92,7 +92,7 @@ sub GetOptions {
 	    next;
 	}
 
-	# Match option spec. Allow '?' as an alias.
+	# Match option spec. Allow '?' as an alias only.
 	if ( $opt !~ /^((\w+[-\w]*)(\|(\?|\w[-\w]*)?)*)?([!~+]|[=:][infse][@%]?)?$/ ) {
 	    $error .= "Error in option spec: \"$opt\"\n";
 	    next;
@@ -100,14 +100,22 @@ sub GetOptions {
 	my ($o, $c, $a) = ($1, $5);
 	$c = '' unless defined $c;
 
+	# $linko keeps track of the primary name the user specified.
+	# This name will be used for the internal or external linkage.
+	# In other words, if the user specifies "FoO|BaR", it will
+	# match any case combinations of 'foo' and 'bar', but if a global
+	# variable needs to be set, it will be $opt_FoO in the exact case
+	# as specified.
+	my $linko;
+
 	if ( ! defined $o ) {
 	    # empty -> '-' option
-	    $opctl{$o = ''} = $c;
+	    $opctl{$linko = $o = ''} = $c;
 	}
 	else {
 	    # Handle alias names
 	    my @o =  split (/\|/, $o);
-	    my $linko = $o = $o[0];
+	    $linko = $o = $o[0];
 	    # Force an alias if the option name is not locase.
 	    $a = $o unless $o eq lc($o);
 	    $o = lc ($o)
@@ -146,18 +154,18 @@ sub GetOptions {
 		    $a = $_;
 		}
 	    }
-	    $o = $linko;
 	}
 
 	# If no linkage is supplied in the @optionlist, copy it from
 	# the userlinkage if available.
 	if ( defined $userlinkage ) {
 	    unless ( @optionlist > 0 && ref($optionlist[0]) ) {
-		if ( exists $userlinkage->{$o} && ref($userlinkage->{$o}) ) {
-		    print STDERR ("=> found userlinkage for \"$o\": ",
-				  "$userlinkage->{$o}\n")
+		if ( exists $userlinkage->{$linko} &&
+		     ref($userlinkage->{$linko}) ) {
+		    print STDERR ("=> found userlinkage for \"$linko\": ",
+				  "$userlinkage->{$linko}\n")
 			if $debug;
-		    unshift (@optionlist, $userlinkage->{$o});
+		    unshift (@optionlist, $userlinkage->{$linko});
 		}
 		else {
 		    # Do nothing. Being undefined will be handled later.
@@ -168,13 +176,13 @@ sub GetOptions {
 
 	# Copy the linkage. If omitted, link to global variable.
 	if ( @optionlist > 0 && ref($optionlist[0]) ) {
-	    print STDERR ("=> link \"$o\" to $optionlist[0]\n")
+	    print STDERR ("=> link \"$linko\" to $optionlist[0]\n")
 		if $debug;
 	    if ( ref($optionlist[0]) =~ /^(SCALAR|CODE)$/ ) {
-		$linkage{$o} = shift (@optionlist);
+		$linkage{$linko} = shift (@optionlist);
 	    }
 	    elsif ( ref($optionlist[0]) =~ /^(ARRAY)$/ ) {
-		$linkage{$o} = shift (@optionlist);
+		$linkage{$linko} = shift (@optionlist);
 		$opctl{$o} .= '@'
 		  if $opctl{$o} ne '' and $opctl{$o} !~ /\@$/;
 		$bopctl{$o} .= '@'
@@ -182,7 +190,7 @@ sub GetOptions {
 		    $bopctl{$o} ne '' and $bopctl{$o} !~ /\@$/;
 	    }
 	    elsif ( ref($optionlist[0]) =~ /^(HASH)$/ ) {
-		$linkage{$o} = shift (@optionlist);
+		$linkage{$linko} = shift (@optionlist);
 		$opctl{$o} .= '%'
 		  if $opctl{$o} ne '' and $opctl{$o} !~ /\%$/;
 		$bopctl{$o} .= '%'
@@ -196,22 +204,22 @@ sub GetOptions {
 	else {
 	    # Link to global $opt_XXX variable.
 	    # Make sure a valid perl identifier results.
-	    my $ov = $o;
+	    my $ov = $linko;
 	    $ov =~ s/\W/_/g;
 	    if ( $c =~ /@/ ) {
-		print STDERR ("=> link \"$o\" to \@$pkg","::opt_$ov\n")
+		print STDERR ("=> link \"$linko\" to \@$pkg","::opt_$ov\n")
 		    if $debug;
-		eval ("\$linkage{\$o} = \\\@".$pkg."::opt_$ov;");
+		eval ("\$linkage{\$linko} = \\\@".$pkg."::opt_$ov;");
 	    }
 	    elsif ( $c =~ /%/ ) {
-		print STDERR ("=> link \"$o\" to \%$pkg","::opt_$ov\n")
+		print STDERR ("=> link \"$linko\" to \%$pkg","::opt_$ov\n")
 		    if $debug;
-		eval ("\$linkage{\$o} = \\\%".$pkg."::opt_$ov;");
+		eval ("\$linkage{\$linko} = \\\%".$pkg."::opt_$ov;");
 	    }
 	    else {
-		print STDERR ("=> link \"$o\" to \$$pkg","::opt_$ov\n")
+		print STDERR ("=> link \"$linko\" to \$$pkg","::opt_$ov\n")
 		    if $debug;
-		eval ("\$linkage{\$o} = \\\$".$pkg."::opt_$ov;");
+		eval ("\$linkage{\$linko} = \\\$".$pkg."::opt_$ov;");
 	    }
 	}
     }
@@ -274,7 +282,11 @@ sub GetOptions {
 	    next unless defined $opt;
 
 	    if ( defined $arg ) {
-		$opt = $aliases{$opt} if defined $aliases{$opt};
+		if ( defined $aliases{$opt} ) {
+		    print STDERR ("=> alias \"$opt\" -> \"$aliases{$opt}\"\n")
+		      if $debug;
+		    $opt = $aliases{$opt};
+		}
 
 		if ( defined $linkage{$opt} ) {
 		    print STDERR ("=> ref(\$L{$opt}) -> ",
@@ -538,7 +550,7 @@ sub FindOption ($$$$$$$) {
     }
     # Apparently valid.
     $opt = $tryopt;
-    print STDERR ("=> found \"$type\" for ", $opt, "\n") if $debug;
+    print STDERR ("=> found \"$type\" for \"", $opt, "\"\n") if $debug;
 
     #### Determine argument status ####
 
