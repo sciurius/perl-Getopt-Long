@@ -6,13 +6,13 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Mar  9 18:38:09 1998
-# Update Count    : 658
+# Last Modified On: Fri Mar 13 11:05:28 1998
+# Update Count    : 659
 # Status          : Released
 
 ################ Copyright ################
 
-# This program is Copyright 1990,1997 by Johan Vromans.
+# This program is Copyright 1990,1998 by Johan Vromans.
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
