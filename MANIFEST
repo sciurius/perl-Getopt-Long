@@ -2,8 +2,13 @@ Announce          Getopt::Long Announcement
 MANIFEST          List of files in this kit
 README            Introductionary text
 INSTALL           Installation information
-GetoptLong.pm     version 2.12 of Getopt::Long (subroutine GetOptions)
-newgetopt.pl      version 1.17 of newgetopt.pl (subroutine NGetOpt)
+GetoptLong.pl     Resident part Getopt::Long
+GetoptLongAl.pl	  Autoloading part of (subroutine GetOptions)
+GetoptLong.pod	  Documentation
+newgetopt.pl      newgetopt.pl (subroutine NGetOpt)
 Makefile.PL       Makefile for installation
 skel.pl           Skeleton program to use Getopt::Long
 skel2.pl          Skeleton program to use Getopt::Long with Pod::Usage
+t/basic.t	  Test basic functionality
+t/compat.t	  Test compatibility
+t/linkage.t	  Test user linkage
