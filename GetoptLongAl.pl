@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Mar 27 11:50:30 1998
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri May 12 11:09:39 2000
-# Update Count    : 71
+# Last Modified On: Fri Jul 28 19:12:29 2000
+# Update Count    : 97
 # Status          : Released
 
 sub GetOptions {
@@ -36,6 +36,7 @@ sub GetOptions {
 		  "autoabbrev=$autoabbrev,".
 		  "bundling=$bundling,",
 		  "getopt_compat=$getopt_compat,",
+		  "gnu_compat=$gnu_compat,",
 		  "order=$order,",
 		  "\n  ",
 		  "ignorecase=$ignorecase,",
@@ -579,7 +580,16 @@ sub FindOption ($$$$$$$) {
     ($mand, $type, $dsttype, $key) = $type =~ /^(.)(.)([@%]?)$/;
 
     # Check if there is an option argument available.
-    if ( defined $optarg ? ($optarg eq '')
+    if ( $gnu_compat ) {
+	return (1, $opt, $optarg, $dsttype, $incr, $key)
+	  if defined $optarg;
+	return (1, $opt, $type eq "s" ? '' : 0, $dsttype, $incr, $key)
+	  if $mand eq ':';
+    }
+
+    # Check if there is an option argument available.
+    if ( defined $optarg
+	 ? ($optarg eq '')
 	 : !(defined $rest || @ARGV > 0) ) {
 	# Complain if this option needs an argument.
 	if ( $mand eq "=" ) {
@@ -588,10 +598,7 @@ sub FindOption ($$$$$$$) {
 	    $error++;
 	    undef $opt;
 	}
-	if ( $mand eq ":" ) {
-	    $arg = $type eq "s" ? '' : 0;
-	}
-	return (1, $opt,$arg,$dsttype,$incr,$key);
+	return (1, $opt, $type eq "s" ? '' : 0, $dsttype, $incr, $key);
     }
 
     # Get (possibly optional) argument.
@@ -699,12 +706,12 @@ sub Configure (@) {
     my $prevconfig =
       [ $error, $debug, $major_version, $minor_version,
 	$autoabbrev, $getopt_compat, $ignorecase, $bundling, $order,
-	$passthrough, $genprefix ];
+	$gnu_compat, $passthrough, $genprefix ];
 
     if ( ref($options[0]) eq 'ARRAY' ) {
 	( $error, $debug, $major_version, $minor_version,
 	  $autoabbrev, $getopt_compat, $ignorecase, $bundling, $order,
-	  $passthrough, $genprefix ) = @{shift(@options)};
+	  $gnu_compat, $passthrough, $genprefix ) = @{shift(@options)};
     }
 
     my $opt;
@@ -715,14 +722,30 @@ sub Configure (@) {
 	    $action = 0;
 	    $try = $+;
 	}
-	if ( $try eq 'default' or $try eq 'defaults' ) {
-	    ConfigDefaults () if $action;
+	if ( ($try eq 'default' or $try eq 'defaults') && $action ) {
+	    ConfigDefaults ();
+	}
+	elsif ( ($try eq 'posix_default' or $try eq 'posix_defaults') ) {
+	    local $ENV{POSIXLY_CORRECT};
+	    $ENV{POSIXLY_CORRECT} = 1 if $action;
+	    ConfigDefaults ();
 	}
 	elsif ( $try eq 'auto_abbrev' or $try eq 'autoabbrev' ) {
 	    $autoabbrev = $action;
 	}
 	elsif ( $try eq 'getopt_compat' ) {
 	    $getopt_compat = $action;
+	}
+	elsif ( $try eq 'gnu_getopt' ) {
+	    if ( $action ) {
+		$gnu_compat = 1;
+		$bundling = 1;
+		$getopt_compat = 0;
+		$permute = 1;
+	    }
+	}
+	elsif ( $try eq 'gnu_compat' ) {
+	    $gnu_compat = $action;
 	}
 	elsif ( $try eq 'ignorecase' or $try eq 'ignore_case' ) {
 	    $ignorecase = $action;
@@ -745,14 +768,14 @@ sub Configure (@) {
 	elsif ( $try eq 'pass_through' or $try eq 'passthrough' ) {
 	    $passthrough = $action;
 	}
-	elsif ( $try =~ /^prefix=(.+)$/ ) {
+	elsif ( $try =~ /^prefix=(.+)$/ && $action ) {
 	    $genprefix = $1;
 	    # Turn into regexp. Needs to be parenthesized!
 	    $genprefix = "(" . quotemeta($genprefix) . ")";
 	    eval { '' =~ /$genprefix/; };
 	    Croak ("Getopt::Long: invalid pattern \"$genprefix\"") if $@;
 	}
-	elsif ( $try =~ /^prefix_pattern=(.+)$/ ) {
+	elsif ( $try =~ /^prefix_pattern=(.+)$/ && $action ) {
 	    $genprefix = $1;
 	    # Parenthesize if needed.
 	    $genprefix = "(" . $genprefix . ")"
