@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Mar 13 12:51:59 2002
-# Update Count    : 334
+# Last Modified On: Tue Jun 11 17:28:37 2002
+# Update Count    : 336
 # Status          : In progress
 
 ################ No args ################
@@ -1429,6 +1429,12 @@ T: Hashes
 P: hi=i \\%h1
 A: -hi x1= bar
 W: Value "" invalid for option hi (number expected)
+
+T: Hash with default
+P: gsx:5 \\%h1
+A: -gsx foo bar
+   %h1 foo 5
+   @ARGV bar
 
 ################ Increments ################
 
