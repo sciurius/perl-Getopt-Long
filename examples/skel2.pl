@@ -4,8 +4,8 @@ my $RCS_Id = '$Id$ ';
 # Author          : Johan Vromans
 # Created On      : Sun Sep 15 18:39:01 1996
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Sep 16 20:31:18 1996
-# Update Count    : 9
+# Last Modified On: Wed Sep 17 12:53:59 1997
+# Update Count    : 10
 # Status          : Unknown, Use with caution!
 
 ################ Documentation ################
@@ -73,7 +73,7 @@ $my_version .= '*' if length('$Locker$ ') > 12;
 
 my $verbose = 0;
 my ($debug, $trace, $test) = (0, 0, 0);
-&options;
+options();
 
 ################ Presets ################
 
@@ -85,7 +85,7 @@ exit 0;
 
 ################ Subroutines ################
 
-sub options {
+sub options () {
     my $help = 0;		# handled locally
     my $ident = 0;		# handled locally
     my $man = 0;		# handled locally
@@ -95,12 +95,13 @@ sub options {
 	# The next require / import is equivalent to "use Getopt::Long".
 	require "Getopt/Long.pm";
 	import Getopt::Long 2.0;
-	&GetOptions ('ident' => \$ident,
-		     'verbose' => \$verbose,
-		     'trace' => \$trace,
-		     'help' => \$help,
-		     'man' => \$man,
-		     'debug' => \$debug) or pod2usage (2);
+	GetOptions('ident'	=> \$ident,
+		   'verbose'	=> \$verbose,
+		   'trace'	=> \$trace,
+		   'help'	=> \$help,
+		   'man'	=> \$man,
+		   'debug'	=> \$debug)
+	  or pod2usage(2);
     }
     if ( $ident or $help or $man ) {
 	print STDERR ("This is $my_package [$my_name $my_version]\n");
@@ -109,7 +110,7 @@ sub options {
 	# Load Pod::Usage only if needed.
 	require "Pod/Usage.pm";
 	import Pod::Usage;
-	pod2usage (1) if $help;
-	pod2usage (VERBOSE => 2) if $man;
+	pod2usage(1) if $help;
+	pod2usage(VERBOSE => 2) if $man;
     }
 }
