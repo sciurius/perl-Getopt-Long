@@ -8,8 +8,8 @@ package MyTest;			# not main
 # Author          : Johan Vromans
 # Created On      : Mon Aug  6 11:53:07 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Sep 26 17:03:46 2001
-# Update Count    : 382
+# Last Modified On: Thu Sep 27 17:53:42 2001
+# Update Count    : 395
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -36,6 +36,10 @@ require "newgetopt.pl";
 # Command line options.
 my $verbose = 0;		# verbose processing
 my $fatal = 0;			# quit after first error
+my $line = 0;			# only the test at this line
+
+my $only;			# run only one test set
+my $only_style;			# in this style
 
 # Development options (not shown with -help).
 my $debug = 0;			# debugging
@@ -46,6 +50,14 @@ app_options();
 
 # Post-processing.
 $trace |= ($debug);
+
+if ( $line ) {
+    if ( $line =~ /^(\d+)\@(\d+)/ ) {
+	$only_style = $2;
+	$line = $1;
+    }
+    $only = -1;
+}
 
 ################ Presets ################
 
@@ -102,9 +114,6 @@ $refmap{'&finish'}  = \&cb4;
 my $test = 0;
 my $variants = 0;
 my $phase = "";
-
-my $only;			# run only one test set
-my $only_style;			# in this style
 
 # Test call styles.
 use constant S_PLAIN	=> 1;
@@ -219,7 +228,16 @@ sub gather {
 	$t->{styles}    = [ @sticky_styles ];
 	$t->{version}   = $sticky_version;
 
-	if ( $only ) {
+	if ( $line ) {
+	    if ( $line > $. ) {
+		$t->{done}++;
+	    }
+	    else {
+		$only = $test;
+		$line = 0;
+	    }
+	}
+	elsif ( $only ) {
 	    if ( $only != $test ) {
 		$t->{done}++;
 	    }
@@ -428,7 +446,9 @@ sub exec_plain {
 
     {
 	local ($SIG{__DIE__})  = sub { push (@$errors,   "@_"); };
-	local ($SIG{__WARN__}) = sub { push (@$warnings, "@_"); };
+	local ($SIG{__WARN__}) = sub { push (@$warnings, "@_");
+				       print STDERR "@_" if $only;
+				     };
 	local (@ARGV) = @{$t->{argv}};
 
 	if ( $call & S_OO ) {
@@ -634,6 +654,7 @@ sub app_options {
 		     'ident'	=> \$ident,
 		     'verbose'	=> \$verbose,
 		     'trace'	=> \$trace,
+		     'line=s'	=> \$line,
 		     'fatal'	=> \$fatal,
 		     'help|?'	=> \$help,
 		     'debug'	=> \$debug,
@@ -653,6 +674,8 @@ sub app_usage {
     app_ident();
     print STDERR <<EndOfUsage;
 Usage: $0 [options] [file ...] [test[\@variant]]
+    -fatal		stop after first error
+    -line NN[\@variant] only one test after this line
     -help		this message
     -ident		show identification
     -verbose		verbose information
