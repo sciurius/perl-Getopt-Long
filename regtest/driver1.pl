@@ -8,8 +8,8 @@ package MyTest;			# not main
 # Author          : Johan Vromans
 # Created On      : Mon Aug  6 11:53:07 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Sep 20 17:58:45 2001
-# Update Count    : 337
+# Last Modified On: Fri Sep 21 14:49:07 2001
+# Update Count    : 348
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -91,6 +91,11 @@ my %refmap = ( '$v1'	  => \$v1,
 
 # Default verification set: all variables must be undef.
 my @def_vfy = ( map { $_, [] } sort keys %refmap );
+
+$refmap{'&ok'}	    = \&cb1;
+$refmap{'&warn'}    = \&cb2;
+$refmap{'&die'}	    = \&cb3;
+$refmap{'&finish'}  = \&cb4;
 
 my $test = 0;
 my $variants = 0;
@@ -205,9 +210,6 @@ sub gather {
 	    if ( $only != $test ) {
 		$t->{done}++;
 	    }
-	    else {
-		unshift (@{$t->{config}}, "debug");
-	    }
 	}
     }
 
@@ -253,7 +255,8 @@ sub gather {
 	    $t->{opts} = [] if $1 eq ":";
 	}
 	foreach ( @a ) {
-	    if ( /^\\((\$v|\@a|\%h)[123])$/ && exists($refmap{$1}) ) {
+	    if ( /^\\(((\$v|\@a|\%h)[123])|(\&(ok|warn|die|finish)))$/
+		 && exists($refmap{$1}) ) {
 		$_ = $refmap{$1};
 	    }
 	}
@@ -331,6 +334,9 @@ sub hdr {
 
 # Run all variants of a test set.
 sub do_test {
+    if ( $only ) {
+	unshift (@{$t->{config}}, "debug");
+    }
     if ( defined $only_style ) {
 	exec_plain ($only_style);
     }
@@ -534,6 +540,26 @@ sub vfy_array {
 		  !defined($soll) ? "undef" :
 		  (@$soll ? ("'".join("' '",@$soll)."'") : "()"),
 		  "\n");
+}
+
+sub cb1 {
+    $v1 = @_ > 1 ? $_[1] : 'x';
+}
+
+sub cb2 {
+    &cb1;
+    warn ("Callback warning for \"$_[0]\"\n");
+    $Getopt::Long::error++;
+}
+
+sub cb3 {
+    &cb1;
+    die ("Callback died for \"$_[0]\"\n");
+}
+
+sub cb4 {
+    &cb1;
+    die ("!FINISH");
 }
 
 ################ Subroutines ################
