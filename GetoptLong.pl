@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Jun 14 13:17:22 1998
-# Update Count    : 705
+# Last Modified On: Sun Jun 14 21:21:07 1998
+# Update Count    : 706
 # Status          : Released
 
 ################ Copyright ################
@@ -35,8 +35,7 @@ BEGIN {
     require 5.004;
     use Exporter ();
     use vars     qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-#   $VERSION     = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
-    $VERSION     = "2.1602";
+    $VERSION     = "2.17";
 
     @ISA         = qw(Exporter);
     @EXPORT      = qw(&GetOptions $REQUIRE_ORDER $PERMUTE $RETURN_IN_ORDER);
