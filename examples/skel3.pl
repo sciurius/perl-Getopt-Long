@@ -4,8 +4,8 @@ my $RCS_Id = '$Id$ ';
 # Author          : Johan Vromans
 # Created On      : Tue Sep 15 15:59:04 1992
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Feb  6 11:41:10 1998
-# Update Count    : 34
+# Last Modified On: Sat May 29 16:14:17 1999
+# Update Count    : 35
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -61,7 +61,7 @@ sub app_options() {
     # Process options, if any.
     # Make sure defaults are set before returning!
     return unless @ARGV > 0;
-    
+
     if ( !GetOptions(
 		     'ident'	=> \$ident,
 		     'verbose'	=> \$verbose,
