@@ -1,6 +1,6 @@
-Version 2.3beta1 of module Getopt::Long is now available via CPAN. It
+Version 2.3beta2 of module Getopt::Long is now available via CPAN. It
 should soon appear in directory authors/Johan_Vromans as file
-GetoptLong-2.3b1.tar.gz.
+GetoptLong-2.3b2.tar.gz.
 
 Module Getopt::Long implements an extended getopt function called
 GetOptions(). This function implements the POSIX standard for command
@@ -10,7 +10,7 @@ the traditional one-letter options.
 The kit contains:
 
   README         -- Introductionary text
-  GetoptLong.pm  -- version 2.3b1 of Getopt::Long (subroutine GetOptions)
+  GetoptLong.pm  -- version 2.3b2 of Getopt::Long (subroutine GetOptions)
   newgetopt.pl   -- version 1.15 of newgetopt.pl (subroutine NGetOpt)
   Makefile.PL    -- Makefile for installation
   skel.pl        -- Skeleton program to use Getopt::Long
