@@ -1,3 +1,11 @@
+Changes in version 2.31
+-----------------------
+
+* Fix a bug where calling the configure method on a
+Getopt::Long::Parser object would bail out with 
+Undefined subroutine &Getopt::Long::Parser::Configure called at
+Getopt/Long.pm line 186.
+
 Changes in version 2.30
 -----------------------
 

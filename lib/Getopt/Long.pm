@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Apr 30 12:48:49 2002
-# Update Count    : 1078
+# Last Modified On: Fri May  3 17:01:26 2002
+# Update Count    : 1080
 # Status          : Released
 
 ################ Copyright ################
@@ -35,10 +35,10 @@ use 5.004;
 use strict;
 
 use vars qw($VERSION);
-$VERSION        =  2.30;
+$VERSION        =  2.31;
 # For testing versions only.
 use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.30";
+$VERSION_STRING = "2.31";
 
 use Exporter;
 
@@ -183,7 +183,7 @@ sub configure {
     my $save = Getopt::Long::Configure ($self->{settings}, @_);
 
     # Restore orig config and save the new config.
-    $self->{settings} = Configure ($save);
+    $self->{settings} = Getopt::Long::Configure ($save);
 }
 
 sub getoptions {
