@@ -8,8 +8,8 @@ package MyTest;			# not main
 # Author          : Johan Vromans
 # Created On      : Mon Aug  6 11:53:07 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Dec 21 13:16:06 2001
-# Update Count    : 404
+# Last Modified On: Wed Mar 13 10:25:30 2002
+# Update Count    : 411
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -31,7 +31,7 @@ $my_version .= '*' if length('$Locker$ ') > 12;
 ################ Command line parameters ################
 
 use Getopt::Long;
-require "newgetopt.pl";
+#require "newgetopt.pl";
 
 # Command line options.
 my $verbose = 0;		# verbose processing
@@ -547,8 +547,9 @@ sub exec_plain {
 sub xp_check {
 
     my ($tag, $expected, $got) = @_;
-
-    foreach my $msg ( split(/\n/, join("\n", @$got)) ) {
+    $got = join("\n", @$got);
+    $got =~ s/\n\t/ /g;
+    foreach my $msg ( split(/\n/, $got) ) {
 	next unless $msg;
 	my $ok = 0;
 	foreach ( @$expected ) {
