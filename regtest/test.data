@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Sep 20 18:32:03 2001
-# Update Count    : 158
+# Last Modified On: Fri Sep 21 14:45:44 2001
+# Update Count    : 183
 # Status          : In progress
 
 ################ No args ################
@@ -1047,7 +1047,44 @@ P: v1 <> \\$v3 v2
 E: Option spec <> requires a reference to a subroutine
 E: /^Error in option spec: "SCALAR\(0x
 
+################ Callbacks ################
 
+T: Callbacks
+P: xx \\&ok
+A: -xx foo
+   $v1 1
+   @ARGV foo
+
+T: Callbacks (non-option)
+P: <> \\&ok
+A: xx foo
+   $v1 x
+
+T: Callbacks (using warn (obsolete))
+P: xx \\&warn yy \\&warn
+A: -xx -yy foo 
+W: Callback warning for "xx"
+W: Callback warning for "yy"
+
+T: Callbacks (using die)
+P: xx \\&die yy \\&die
+A: -xx -yy foo 
+W: Callback died for "xx"
+W: Callback died for "yy"
+
+T: Callbacks (using !FINISH)
+P: xx \\&finish yy \\&finish
+A: -xx -yy foo 
+   $v1 1
+   @ARGV -yy foo
+
+T: Callbacks (using !FINISH, Merijn Brand special)
+O: bundling
+P: x \\$v2 y \\&finish z \\$v3
+A: -xyzzy -yy foo 
+   $v1 1
+   $v2 1
+   @ARGV -zzy -yy foo
 
 ################ Miscellaneous ################
 
