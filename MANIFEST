@@ -9,5 +9,6 @@ Makefile.PL           Makefile for installation
 t/gol-basic.t         Test basic functionality
 t/gol-compat.t        Test compatibility
 t/gol-linkage.t       Test user linkage
+t/gol-oo.t            Test OO interface
 examples/skel.pl      Skeleton program to use Getopt::Long
 examples/skel2.pl     Skeleton program to use Getopt::Long with Pod::Usage
