@@ -4,8 +4,8 @@ my $RCS_Id = '$Id$ ';
 # Author          : Johan Vromans
 # Created On      : Tue Sep 15 15:59:04 1992
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Jun 14 14:56:09 1998
-# Update Count    : 42
+# Last Modified On: Fri Oct 22 15:41:10 1999
+# Update Count    : 44
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -29,6 +29,7 @@ $my_version .= '*' if length('$Locker$ ') > 12;
 use Getopt::Long 2.13;
 sub app_options();
 
+my $make = 1;			# run perl/make
 my $verbose = 0;		# verbose processing
 
 # Development options (not shown with -help).
@@ -54,8 +55,10 @@ foreach ( qw (GetoptLong.pl GetoptLongAl.pl GetoptLong.pod) ) {
 }
 close (OUT);
 
-system "perl", "Makefile.PL";
-exec "make", "dist";
+if ( $make ) {
+    system "perl", "Makefile.PL";
+    exec "make", "dist";
+}
 
 ################ Subroutines ################
 
@@ -93,6 +96,7 @@ sub app_options() {
     return unless @ARGV > 0;
     
     if ( !GetOptions(
+		     'make!'	=> \$make,
 		     'ident'	=> \$ident,
 		     'verbose'	=> \$verbose,
 		     'trace'	=> \$trace,
@@ -114,6 +118,7 @@ sub app_usage($) {
     app_ident;
     print STDERR <<EndOfUsage;
 Usage: $0 [options] [file ...]
+    -[no]make		run make
     -help		this message
     -ident		show identification
     -verbose		verbose information
