@@ -4,8 +4,8 @@ my $RCS_Id = '$Id$ ';
 # Author          : Johan Vromans
 # Created On      : Tue Sep 15 15:59:04 1992
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Dec 25 16:22:23 1997
-# Update Count    : 31
+# Last Modified On: Fri Feb  6 11:41:10 1998
+# Update Count    : 34
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -27,9 +27,19 @@ $my_version .= '*' if length('$Locker$ ') > 12;
 ################ Command line parameters ################
 
 use Getopt::Long 2.13;
-my $verbose = 0;
-my ($debug, $trace, $test) = (0, 0, 0);
+sub app_options();
+
+my $verbose = 0;		# verbose processing
+
+# Development options (not shown with -help).
+my $debug = 0;			# debugging
+my $trace = 0;			# trace (show process)
+my $test = 0;			# test (no actual processing)
+
 app_options();
+
+# Options post-processing.
+$trace |= ($debug || $test);
 
 ################ Presets ################
 
@@ -44,7 +54,7 @@ exit 0;
 sub app_ident;
 sub app_usage($);
 
-sub app_options {
+sub app_options() {
     my $help = 0;		# handled locally
     my $ident = 0;		# handled locally
 
