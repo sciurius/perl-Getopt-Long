@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Oct 19 16:46:23 1996
-# Update Count    : 504
+# Last Modified On: Sat Jan 11 13:11:35 1997
+# Update Count    : 506
 # Status          : Released
 
 package Getopt::Long;
@@ -925,6 +925,11 @@ sub find_option {
 	    print STDERR ("=> option \"$opt\" -> \"$tryopt\"\n")
 		if $debug;
 	}
+    }
+
+    # Map to all lowercase if ignoring case.
+    elsif ( $ignorecase ) {
+	$tryopt = lc ($opt);
     }
 
     # Check validity by fetching the info.
