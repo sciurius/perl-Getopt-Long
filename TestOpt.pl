@@ -5,12 +5,14 @@
 # Author          : Johan Vromans
 # Created On      : ***
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Oct  8 17:32:23 1997
-# Update Count    : 3
+# Last Modified On: Fri Mar 27 13:29:55 1998
+# Update Count    : 9
 # Status          : Internal use only
 
 package foo;
-BEGIN { require "./GetoptLong.pm"; import Getopt::Long; }
+use blib;
+use Getopt::Long;
+
 $newgetopt::REQUIRE_ORDER = $Getopt::Long::REQUIRE_ORDER;
 $newgetopt::REQUIRE_ORDER = $Getopt::Long::REQUIRE_ORDER;
 $newgetopt::PERMUTE = $Getopt::Long::PERMUTE;
@@ -65,18 +67,18 @@ sub NGetOpt {
 	    push (@config, "ignore_case_always");
 	}
     }
-    Getopt::Long::config (@config);
+    Getopt::Long::Configure (@config);
 
     unless ( defined $main::use_linkage ) {
-	return &GetOptions (@_);
+	return GetOptions (@_);
     }
     unless ( defined $main::use_linkage ) {
-	return &GetOptions (@_);
+	return GetOptions (@_);
     }
 
     my $ret;
     my %link;
-    $ret = &GetOptions (\%link, @_);
+    $ret = GetOptions (\%link, @_);
     while ( ($k,$v) = each(%link) ) {
 	my $K;
 	($K = $k) =~ tr/-/_/;
