@@ -1,0 +1,508 @@
+# test.data -- 
+# RCS Info        : $Id$
+# Author          : Johan Vromans
+# Created On      : Fri Aug 24 11:23:46 2001
+# Last Modified By: Johan Vromans
+# Last Modified On: Fri Aug 24 11:24:03 2001
+# Update Count    : 1
+# Status          : In progress
+
+################ No args ################
+
+T: No args
+P:
+A:
+
+################ Non-opt args ################
+
+T: Non-opt arg
+A: foo
+	@ARGV	foo
+
+T: Non-opt arg with --
+A: -- foo
+P:
+	@ARGV	foo
+
+################ Simple args ################
+
+T: Simple args
+P: v1
+A: -v1 foo
+   $opt_v1 1
+   @ARGV foo
+
+T:
+P: v1
+A: -v1 -- foo
+   $opt_v1 1
+   @ARGV foo
+
+T:
+P: one \\$v1
+A: -one foo
+   $v1 1
+   @ARGV foo
+
+T:
+P: one \\$v1
+A: -one -- foo
+   $v1 1
+   @ARGV foo
+
+T: Basic case ignoring
+P: one \\$v1
+A: -oNe -- foo
+   $v1 1
+   @ARGV foo
+
+T: Basic no case ignore
+O: no_ignore_case
+A: -oNe -- foo
+W: Unknown option: oNe
+   @ARGV foo
+
+T: Basic case ignoring
+A: -oNe -- foo
+   $v1 1
+   @ARGV foo
+
+T:
+P: one \\$v1 One \\$v2 oNe \\$v3
+#  Due to case ignoring, one becomes an alias for oNe...
+A: -oNe -one foo
+   $v3 1
+   @ARGV foo
+
+T:
+O: no_ignore_case
+P: one \\$v1 One \\$v2 oNe \\$v3
+A: -oNe -one foo
+   $v1 1
+   $v3 1
+   @ARGV foo
+
+T: No arguments allowed
+P: one
+A: --one= foo
+W: Option one does not take an argument
+   @ARGV foo
+
+T: More than once
+P: one \\$v1
+A: -one -one foo
+   $v1 1
+   @ARGV foo
+
+T: Negation
+P: one! \\$v1
+A: -one -noone foo
+   $v1 0
+   @ARGV foo
+
+T: Negation with aliases 
+P: one|two! \\$v1
+A: -one -two foo
+   $v1 1
+   @ARGV foo
+
+T: Aliases 
+P: one|two \\$v1
+A: -one -two foo
+   $v1 1
+   @ARGV foo
+
+T: 
+P: one|two! \\$v1
+A: -one -notwo foo
+   $v1 0
+   @ARGV foo
+
+################ String opt (mandatory) ################
+
+T: String opt (mandatory)
+P: v2=s
+A: -v2 bar foo
+   $opt_v2 bar
+   @ARGV foo
+
+T: String opt (mandatory)
+A: -v2 -bar foo
+   $opt_v2 -bar
+   @ARGV foo
+
+T: String opt (mandatory)
+A: -v2 -bar -v2 blech foo
+   $opt_v2 blech
+   @ARGV foo
+
+T: String opt (mandatory)
+A: --v2=-bar --v2=blech foo
+   $opt_v2 blech
+   @ARGV foo
+
+T: String opt (mandatory)
+A: -v2 -- foo
+   $opt_v2 --
+   @ARGV foo
+
+T: String opt (mandatory)
+A: --v2=-- foo
+   $opt_v2 --
+   @ARGV foo
+
+T: String opt (mandatory)
+A: -v2
+W: Option v2 requires an argument
+
+T: String opt (mandatory)
+A: --v2=
+W: Option v2 requires an argument
+
+T: String opt (mandatory, multiple)
+P: a1=s@
+A: -a1 -bar -a1 blech foo
+   @opt_a1 -bar blech
+   @ARGV foo
+
+################ String opt (optional) ################
+
+P: v3:s v1
+
+T: String opt (optional)
+A: -v3 bar foo
+   $opt_v3 bar
+   @ARGV foo
+
+T: String opt (optional)
+A: -v3 -v1 foo
+   $opt_v1 1
+   $opt_v3 ''
+   @ARGV foo
+
+T: String opt (optional)
+A: -v3 xx -v3 -v1 foo
+   $opt_v1 1
+   $opt_v3 ''
+   @ARGV foo
+
+T: String opt (optional)
+A: -v3 --
+   $opt_v3 ''
+
+T: String opt (optional)
+A: -v3
+   $opt_v3 ''
+
+T: String opt (optional, multiple)
+P: a3:s@ v1
+A: -a3 xx -a3 -v1 foo
+   @opt_a3 xx ''
+   $opt_v1 1
+   @ARGV foo
+
+################ Int opt (mandatory) ################
+
+P: v1=i
+
+T: Int opt (mandatory)
+A: -v1 327 foo
+   $opt_v1 == 327
+   @ARGV foo
+
+T: Int opt (mandatory)
+A: -v1 327
+   $opt_v1 == 327
+
+T: Int opt (mandatory)
+A: -v1 -6 foo
+   $opt_v1 == -6
+   @ARGV foo
+
+T: Int opt (mandatory)
+A: -v1 bar foo
+W: Value "bar" invalid for option v1 (number expected)
+
+T: Int opt (mandatory)
+A: -v1 -bar foo
+W: Value "-bar" invalid for option v1 (number expected)
+
+T: Int opt (mandatory)
+A: -v1 --
+W: Value "--" invalid for option v1 (number expected)
+
+T: Int opt (mandatory)
+A: -v1
+W: Option v1 requires an argument
+
+T: Int opt (mandatory, multiple)
+P: a1=i@
+A: -a1 -24 -a1 12 foo
+   @opt_a1 -24 12
+   @ARGV foo
+
+################ Int opt (optional) ################
+
+P: v2:i v1
+
+T: Int opt (optinal)
+A: -v2 foo
+   $opt_v2 0
+   @ARGV foo
+
+T: Int opt (optinal)
+A: -v2 12 foo
+   $opt_v2 12
+   @ARGV foo
+
+T: Int opt (optinal)
+A: -v2 12
+   $opt_v2 12
+
+T: Int opt (optinal)
+A: -v2 -12 foo
+   $opt_v2 -12
+   @ARGV foo
+
+T: Int opt (optinal)
+A: -v2 +12 foo
+   $opt_v2 12
+   @ARGV foo
+
+T: Int opt (optinal)
+A: -v2 -12
+   $opt_v2 -12
+
+T: Int opt (optinal)
+A: -v2 12 -v2 -v1 foo
+   $opt_v2 0
+   $opt_v1 == 1
+   @ARGV foo
+
+T: Int opt (optinal)
+A: -v2 --
+   $opt_v2 0
+
+T: Int opt (optinal)
+A: -v2
+   $opt_v2 0
+
+T: Int opt (optinal, multiple)
+P: a2:i@ v1
+A: -a2 -24 -a2 -v1 foo
+   $opt_v1 1
+   @opt_a2 -24 0
+   @ARGV foo
+
+################ Ext Int opt (mandatory) ################
+
+P: v1=o
+
+T: Ext Int opt (mandatory)
+A: -v1 327 foo
+   $opt_v1 == 327
+   @ARGV foo
+
+T: Ext Int opt (mandatory)
+A: -v1 0327 foo
+   $opt_v1 == 0327
+   @ARGV foo
+
+T: Ext Int opt (mandatory)
+A: -v1 0b00101001 foo
+   $opt_v1 == 0b00101001
+   @ARGV foo
+
+T: Ext Int opt (mandatory)
+A: -v1 0x327 foo
+   $opt_v1 == 0x327
+   @ARGV foo
+
+T: Ext Int opt (mandatory)
+A: -v1 0xBadBad foo
+   $opt_v1 == 0xBADBAD
+   @ARGV foo
+
+T: Ext Int opt (mandatory)
+A: -v1 -6 foo
+   $opt_v1 == -6
+   @ARGV foo
+
+T: Ext Int opt (mandatory)
+A: -v1 019 foo
+W: Value "019" invalid for option v1 (extended number expected)
+
+T: Ext Int opt (mandatory)
+A: -v1 0xefg foo
+W: Value "0xefg" invalid for option v1 (extended number expected)
+
+T: Ext Int opt (mandatory)
+A: -v1 0b012 foo
+W: Value "0b012" invalid for option v1 (extended number expected)
+
+################ Float opt (mandatory) ################
+
+P: v3=f
+
+T: Float opt (mandatory)
+A: -v3 327 foo
+   $opt_v3 327
+   @ARGV foo
+
+T: Float opt (mandatory)
+A: -v3 3.27 foo
+   $opt_v3 == 3.27
+   @ARGV foo
+
+T: Float opt (mandatory)
+A: -v3 3.18e2 foo
+   $opt_v3 == 318
+   @ARGV foo
+
+T: Float opt (mandatory)
+A: -v3 +3.18e2 foo
+   $opt_v3 == 318
+   @ARGV foo
+
+T: Float opt (mandatory)
+A: -v3 3.18e2 
+   $opt_v3 == 318
+
+T: Float opt (mandatory)
+A: -v3 +3.18e2 
+   $opt_v3 == 318
+
+T: Float opt (mandatory)
+A: -v3 -6 foo
+   $opt_v3 == -6
+   @ARGV foo
+
+T: Float opt (mandatory)
+A: -v3 -6.4 foo
+   $opt_v3 == -6.4
+   @ARGV foo
+
+T: Float opt (mandatory)
+A: -v3 -6.4e-1 foo
+   $opt_v3 == -0.64
+   @ARGV foo
+
+T: Float opt (mandatory)
+A: -v3 bar foo
+W: Value "bar" invalid for option v3 (real number expected)
+
+T: Float opt (mandatory)
+A: -v3 -bar foo
+W: Value "-bar" invalid for option v3 (real number expected)
+
+T: Float opt (mandatory)
+A: -v3 -- foo
+W: Value "--" invalid for option v3 (real number expected)
+
+T: Float opt (mandatory)
+A: -v3 
+W: Option v3 requires an argument
+
+T: Float opt (mandatory, multiple)
+P: a3=f@
+A: -a3 -.24 -a3 1.2 foo
+   @opt_a3 -.24 1.2
+   @ARGV foo
+
+################ Float opt (optional) ################
+
+P: v1:f a1:f@ v2
+
+T: Float opt (optional)
+A: -v1 foo
+   $opt_v1 == 0
+   @ARGV foo
+
+T: Float opt (optional)
+A: -v1 12 foo
+   $opt_v1 == 12
+   @ARGV foo
+
+T: Float opt (optional)
+A: -v1 12
+   $opt_v1 == 12
+
+T: Float opt (optional)
+A: -v1 1.2 foo
+   $opt_v1 == 1.2
+   @ARGV foo
+
+T: Float opt (optional)
+A: -v1 -12 foo
+   $opt_v1 == -12
+   @ARGV foo
+
+T: Float opt (optional)
+A: -v1 -1.42 foo
+   $opt_v1 == -1.42
+   @ARGV foo
+
+T: Float opt (optional)
+A: -v1 -1.32
+   $opt_v1 == -1.32
+
+T: Float opt (optional)
+A: -v1 1.3 -v1 -v2 foo
+   $opt_v1 == 0.0
+   $opt_v2 1
+   @ARGV foo
+
+T: Float opt (optional)
+A: -v1 --
+   $opt_v1 == 0.0
+
+T: Float opt (optional)
+A: -v1
+   $opt_v1 == 0.0
+
+T: Float opt (optional, multiple)
+A: -a1 -2.74 -a1 -v2 foo
+   $opt_v2 1
+   @opt_a1 -2.74 0
+   @ARGV foo
+
+################ Empty option ################
+
+P: v1:f a1:f@ v2
+
+T: Lonely dash
+A: - foo
+   @ARGV - foo
+
+T: Lonely dash
+O: bundling
+A: - foo
+   @ARGV - foo
+
+P+ ''
+
+T: Lonely dash
+A: -v1 -1.42 - foo
+   $opt_v1 == -1.42
+   $opt_ 1
+   @ARGV foo
+
+T: Lonely dash
+A: -a1 -1.42 -a1 - -v2 -- foo
+   @opt_a1 -1.42 0
+   $opt_v2 1
+   $opt_ 1
+   @ARGV foo
+
+T: Lonely dash
+A: - foo
+   $opt_ 1
+   @ARGV foo
+
+T: Lonely dash
+O: bundling
+A: - foo
+   $opt_ 1
+   @ARGV foo
+
+--
