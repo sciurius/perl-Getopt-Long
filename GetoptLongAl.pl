@@ -8,8 +8,8 @@ use strict;
 # Author          : Johan Vromans
 # Created On      : Fri Mar 27 11:50:30 1998
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Aug  4 10:02:57 2001
-# Update Count    : 104
+# Last Modified On: Sat Aug  4 17:32:13 2001
+# Update Count    : 128
 # Status          : Released
 
 sub GetOptions {
@@ -98,7 +98,7 @@ sub GetOptions {
 	}
 
 	# Match option spec. Allow '?' as an alias only.
-	if ( $opt !~ /^((\w+[-\w]*)(\|(\?|\w[-\w]*)?)*)?([!~+]|[=:][infse][@%]?)?$/ ) {
+	if ( $opt !~ /^((\w+[-\w]*)(\|(\?|\w[-\w]*)?)*)?([!~+]|[=:][ionfse][@%]?)?$/ ) {
 	    $error .= "Error in option spec: \"$opt\"\n";
 	    next;
 	}
@@ -641,13 +641,23 @@ sub FindOption ($$$$$$$) {
 	}
     }
 
-    elsif ( $type eq "n" || $type eq "i" ) { # numeric/integer
-	if ( $bundling && defined $rest && $rest =~ /^([-+]?[0-9]+)(.*)$/s ) {
+    elsif ( $type eq "n" || $type eq "i" # numeric/integer
+	    || $type eq "o" ) { # dec/oct/hex/bin value
+
+	my $o_valid =
+	  $type eq "o" ? "[-+]?[1-9][0-9]*|0x[0-9a-f]+|0b[01]+|0[0-7]*"
+	    : "[-+]?[0-9]+";
+
+	if ( $bundling && defined $rest && $rest =~ /^($o_valid)(.*)$/si ) {
 	    $arg = $1;
 	    $rest = $2;
+	    $arg = ($type eq "o" && $arg =~ /^0/) ? oct($arg) : 0+$arg;
 	    unshift (@ARGV, $starter.$rest) if defined $rest && $rest ne '';
 	}
-	elsif ( $arg !~ /^[-+]?[0-9]+$/ ) {
+	elsif ( $arg =~ /^($o_valid)$/si ) {
+	    $arg = ($type eq "o" && $arg =~ /^0/) ? oct($arg) : 0+$arg;
+	}
+	else {
 	    if ( defined $optarg || $mand eq "=" ) {
 		if ( $passthrough ) {
 		    unshift (@ARGV, defined $rest ? $starter.$rest : $arg)
@@ -655,7 +665,9 @@ sub FindOption ($$$$$$$) {
 		    return (0);
 		}
 		warn ("Value \"", $arg, "\" invalid for option ",
-		      $opt, " (number expected)\n");
+		      $opt, " (",
+		      $type eq "o" ? "extended " : "",
+		      "number expected)\n");
 		$error++;
 		undef $opt;
 		# Push back.
