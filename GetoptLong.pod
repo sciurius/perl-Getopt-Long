@@ -534,13 +534,18 @@ It goes without saying that bundling can be quite confusing.
 
 =head2 The lonesome dash
 
-Some applications require the option C<-> (that's a lone dash). This
-can be achieved by adding an option specification with an empty name:
+Normally, a lone dash C<-> on the command line will not be considered
+an option. Option processing will terminate (unless "permute" is
+configured) and the dash will be left in C<@ARGV>.
+
+It is possible to get special treatment for a lone dash. This can be
+achieved by adding an option specification with an empty name, for
+example:
 
     GetOptions ('' => \$stdio);
 
-A lone dash on the command line will now be legal, and set options
-variable C<$stdio>.
+A lone dash on the command line will now be a legal option, and using
+it will set variable C<$stdio>.
 
 =head2 Argument call-back
 
@@ -662,6 +667,10 @@ is equivalent to
 
     --foo -- arg1 --bar arg2 arg3
 
+If C<pass_through> is also enabled, options processing will terminate
+at the first unrecognized option, or non-option, whichever comes
+first.
+
 =item bundling (default: disabled)
 
 Enabling this option will allow single-character options to be bundled.
@@ -703,7 +712,9 @@ errors. This makes it possible to write wrapper scripts that process
 only part of the user supplied command line arguments, and pass the
 remaining options to some other program.
 
-This can be very confusing, especially when C<permute> is also enabled.
+If C<require_order> is enabled, options processing will terminate at
+the first unrecognized option, or non-option, whichever comes first.
+However, if C<permute> is enabled instead, results can become confusing.
 
 =item prefix
 
@@ -848,6 +859,5 @@ MA 02139, USA.
 =cut
 
 # Local Variables:
-# mode: perl
 # eval: (load-file "pod.el")
 # End:
