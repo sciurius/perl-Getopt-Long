@@ -8,8 +8,8 @@ package MyTest;			# not main
 # Author          : Johan Vromans
 # Created On      : Mon Aug  6 11:53:07 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Jun 20 07:53:07 2002
-# Update Count    : 414
+# Last Modified On: Fri Jun 20 13:00:03 2003
+# Update Count    : 415
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -571,7 +571,7 @@ sub xp_check {
     }
     foreach ( @$expected ) {
 	next unless $_;
-	print STDERR (hdr(), "Expected error: $_\n");
+	print STDERR (hdr(), "Expected $tag: $_\n");
 	$retval = 1;
     }
 }
