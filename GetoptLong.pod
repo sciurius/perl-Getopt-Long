@@ -305,7 +305,11 @@ The argument specification can be
 
 The option does not take an argument and may be negated, i.e. prefixed
 by "no". E.g. C<"foo!"> will allow C<--foo> (a value of 1 will be
-assigned) and C<--nofoo> (a value of 0 will be assigned).
+assigned) and C<--nofoo> (a value of 0 will be assigned). If the
+option has aliases, this applies to the aliases as well.
+
+Using negation on a single letter option when bundling is in effect is
+pointless and will result in a warning.
 
 =item +
 
