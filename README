@@ -141,6 +141,16 @@ behavior. It can be called with one or more names of options:
 	Do not issue error messages for unknown options, but leave
 	them (pass-through) in @ARGV.
 
+  - prefix
+
+	The string that starts options. See also prefix_pattern.
+
+  - prefix_pattern
+
+	A Perl pattern that identifies the strings that introduce
+	options. Default is (--|-|\+) unless environment variable
+	POSIXLY_CORRECT has been set, in which case it is (--|-).
+
 * Usable variables
 
   - $Getopt::Long::error

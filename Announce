@@ -27,28 +27,5 @@ Changes in version 2.15
 
 Previous released version was 2.13.
 
-Changes in version 2.13
------------------------
-
-* All regexps are changed to avoid the use of $`, $& and $'. Using one
-  of these causes all pattern matches in the program to be much slower
-  than necessary.
-
-* Configuration errors are signalled using die() and will cause the
-  program to be terminated (unless eval{...} or $SIG{__DIE__} is
-  used).
-
-* Option parsing errors are now signalled with calls to warn().
-
-* In option bundles, numeric values may be embedded in the bundle
-  (e.g. -al24w80).
-
-* More 'perl -w' warnings eliminated for obscure cases of bundling.
-
-* Removed non-standard version number matching. Version 1.121 is now
-  more than 1.12 but less than 1.13. 
-
-Previous released version was 2.12.
-
 ---- README ----
 
