@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Sep 26 21:06:09 2001
-# Update Count    : 963
+# Last Modified On: Wed Sep 26 23:16:05 2001
+# Update Count    : 975
 # Status          : Released
 
 ################ Copyright ################
@@ -437,11 +437,11 @@ sub GetOptions {
 	    next unless defined $opt;
 
 	    if ( defined $arg ) {
-		if ( defined $ctl->[CTL_CNAME] ) {
-		    print STDERR ("=> alias \"$opt\" -> \"$ctl->[CTL_CNAME]\"\n")
-		      if $debug;
-		    $opt = $ctl->[CTL_CNAME];
-		}
+
+		# Get the canonical name.
+		print STDERR ("=> cname for \"$opt\" is ") if $debug;
+		$opt = $ctl->[CTL_CNAME];
+		print STDERR ("\"$ctl->[CTL_CNAME]\"\n") if $debug;
 
 		if ( defined $linkage{$opt} ) {
 		    print STDERR ("=> ref(\$L{$opt}) -> ",
@@ -636,7 +636,7 @@ sub ParseOptionSpec ($$) {
 	return (undef, "Error in option spec: \"$opt\"\n");
     }
 
-    my ($name, $spec) = ($1, $2);
+    my ($names, $spec) = ($1, $2);
     $spec = '' unless defined $spec;
 
     # $orig keeps track of the primary name the user specified.
@@ -648,22 +648,14 @@ sub ParseOptionSpec ($$) {
     my $orig;
 
     my @names;
-    if ( defined $name ) {
-	@names =  split (/\|/, $name);
-	$orig = $name = $names[0];
+    if ( defined $names ) {
+	@names =  split (/\|/, $names);
+	$orig = $names[0];
     }
     else {
 	@names = ('');
-	$name = $orig = '';
+	$orig = '';
     }
-
-    # Force an alias if the option name is not locase.
-    my $alias;
-    $alias = $name unless $name eq lc($name);
-    $name = lc ($name)
-	if $ignorecase > 1
-	    || ($ignorecase
-		&& ($bundling ? length($name) > 1  : 1));
 
     # Construct the opctl entries.
     my $entry;
@@ -679,20 +671,11 @@ sub ParseOptionSpec ($$) {
 	$entry = [$type,$mand eq '=',$dest,undef,undef,$orig];
     }
 
-    # Process all aliases.
+    # Process all names. First is canonical, the rest are aliases.
     foreach ( @names ) {
 
 	$_ = lc ($_)
 	  if $ignorecase > (($bundling && length($_) == 1) ? 1 : 0);
-
-	if ( defined $alias ) {
-	    # Note alias.
-	    $entry->[CTL_CNAME] = $alias;
-	}
-	else {
-	    # Set primary name.
-	    $alias = $_;
-	}
 
 	if ( $spec eq '!' ) {
 	    $opctl->{"no$_"} = $entry;
@@ -704,7 +687,7 @@ sub ParseOptionSpec ($$) {
 	}
     }
 
-    ($name, $orig);
+    ($names[0], $orig);
 }
 
 # Option lookup.
