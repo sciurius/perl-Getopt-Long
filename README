@@ -57,6 +57,7 @@ introducer.
 Examples:
 
     -lgAd (bundle) -xw 80 (bundle, w takes a value) -xw80 (same)
+    even -l24w80 (l = 24 and w = 80)
 
 By default, single-letter option names are case sensitive.
 
@@ -171,5 +172,5 @@ of the License, or (at your option) any later version.
 -------------------------------------------------------------------
 Johan Vromans                                  jvromans@squirrel.nl
 Squirrel Consultancy                       Haarlem, the Netherlands
-http://www.squirrel.nl               http://www.xs4all.nl/~jvromans
+http://www.squirrel.nl       http://www.squirrel.nl/people/jvromans
 ------------------ "Arms are made for hugging" --------------------

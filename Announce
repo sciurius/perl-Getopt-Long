@@ -1,6 +1,6 @@
-Version 2.12 of module Getopt::Long is now available via CPAN. It
+Version 2.13 of module Getopt::Long is now available via CPAN. It
 should soon appear in directory authors/Johan_Vromans as file
-GetoptLong-2.12.tar.gz. It will be standard part of Perl 5.004 or later.
+GetoptLong-2.13.tar.gz. It will be standard part of Perl 5.005 or later.
 
 Module Getopt::Long implements an extended getopt function called
 GetOptions(). This function implements the POSIX standard for command
@@ -14,14 +14,28 @@ it to http://www.perl.com/CPAN/ (include the final slash!). It will
 automagically be redirected to a CPAN site in your neighborhood. URL:
 http://www.perl.com/CPAN/authors/Johan_Vromans
 
-Changes in version 2.12
+Changes in version 2.13
 -----------------------
 
-* A single question mark is allowed as an alias to an option, e.g. 
+* All regexps are changed to avoid the use of $`, $& and $'. Using one
+  of these causes all pattern matches in the program to be much slower
+  than necessary.
 
-    GetOptions ("help|?", ...)
+* Configuration errors are signalled using die() and will cause the
+  program to be terminated (unless eval{...} or $SIG{__DIE__} is
+  used).
 
-Previous released version was 2.11.
+* Option parsing errors are now signalled with calls to warn().
+
+* In option bundles, numeric values may be embedded in the bundle
+  (e.g. -al24w80).
+
+* More 'perl -w' warnings eliminated for obscure cases of bundling.
+
+* Removed non-standard version number matching. Version 1.121 is now
+  more than 1.12 but less than 1.13. 
+
+Previous released version was 2.12.
 
 ---- README ----
 
