@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Mar 27 11:50:30 1998
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Feb 17 10:27:20 2001
-# Update Count    : 99
+# Last Modified On: Sat Feb 17 10:29:12 2001
+# Update Count    : 100
 # Status          : Released
 
 sub GetOptions {
@@ -131,7 +131,7 @@ sub GetOptions {
 		    $_ = lc ($_) if $ignorecase > 1;
 		    if ( $c eq '!' ) {
 			$opctl{"no$_"} = $c;
-			warn ("Ignoring '!' modifier for short option $_\n");
+			# warn ("Ignoring '!' modifier for short option $_\n");
 			$opctl{$_} = $bopctl{$_} = '';
 		    }
 		    else {
