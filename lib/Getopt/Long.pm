@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Sep 24 22:39:50 2001
-# Update Count    : 769
+# Last Modified On: Tue Sep 25 22:54:37 2001
+# Update Count    : 881
 # Status          : Released
 
 ################ Copyright ################
@@ -67,6 +67,8 @@ sub GetOptions;
 
 # Private subroutines.
 sub ConfigDefaults ();
+sub ParseOptionSpec ($$$$);
+sub OptCtl ($);
 sub FindOption ($$$$$$$);
 sub Croak (@);			# demand loading the real Croak
 
@@ -215,7 +217,27 @@ sub getoptions {
 
 package Getopt::Long;
 
-use constant CTL_TYPE => 0;
+# Indices in option control info.
+use constant CTL_TYPE   => 0;
+#use constant   CTL_TYPE_FLAG   => '';
+#use constant   CTL_TYPE_NEG    => '!';
+#use constant   CTL_TYPE_INCR   => '+';
+#use constant   CTL_TYPE_INT    => 'i';
+#use constant   CTL_TYPE_XINT   => 'o';
+#use constant   CTL_TYPE_FLOAT  => 'f';
+#use constant   CTL_TYPE_STRING => 's';
+
+use constant CTL_MAND   => 1;
+
+use constant CTL_DEST   => 2;
+ use constant   CTL_DEST_SCALAR => 0;
+ use constant   CTL_DEST_ARRAY  => 1;
+ use constant   CTL_DEST_HASH   => 2;
+ use constant   CTL_DEST_CODE   => 3;
+
+use constant CTL_RANGE  => 3;
+
+use constant CTL_REPEAT => 4;
 
 sub GetOptions {
 
@@ -236,8 +258,8 @@ sub GetOptions {
     $error = '';
 
     print STDERR ("GetOpt::Long $Getopt::Long::VERSION (",
-		  '$Revision$', ")",
-		  "Called from package \"$pkg\".",
+		  '$Revision$', ") ",
+		  "called from package \"$pkg\".",
 		  "\n  ",
 		  "ARGV: (@ARGV)",
 		  "\n  ",
@@ -301,70 +323,13 @@ sub GetOptions {
 	    next;
 	}
 
-	# Match option spec. Allow '?' as an alias only.
-	if ( $opt !~ /^((\w+[-\w]*)(\|(\?|\w[-\w]*)?)*)?([!~+]|[=:][ionfse][@%]?)?$/ ) {
-	    $error .= "Error in option spec: \"$opt\"\n";
+	# Parse option spec.
+	my ($o, $linko, $c) =
+	  ParseOptionSpec ($opt, \%opctl, \%bopctl, \%aliases);
+	unless ( defined $o ) {
+	    # Failed. $linko contains the error message.
+	    $error .= $linko;
 	    next;
-	}
-	my ($o, $c, $a) = ($1, $5);
-	$c = '' unless defined $c;
-
-	# $linko keeps track of the primary name the user specified.
-	# This name will be used for the internal or external linkage.
-	# In other words, if the user specifies "FoO|BaR", it will
-	# match any case combinations of 'foo' and 'bar', but if a global
-	# variable needs to be set, it will be $opt_FoO in the exact case
-	# as specified.
-	my $linko;
-
-	if ( ! defined $o ) {
-	    # empty -> '-' option
-	    $linko = $o = '';
-	    $opctl{''} = [$c];
-	    $bopctl{''} = [$c] if $bundling;
-	}
-	else {
-	    # Handle alias names
-	    my @o =  split (/\|/, $o);
-	    $linko = $o = $o[0];
-	    # Force an alias if the option name is not locase.
-	    $a = $o unless $o eq lc($o);
-	    $o = lc ($o)
-		if $ignorecase > 1
-		    || ($ignorecase
-			&& ($bundling ? length($o) > 1  : 1));
-
-	    foreach ( @o ) {
-		if ( $bundling && length($_) == 1 ) {
-		    $_ = lc ($_) if $ignorecase > 1;
-		    if ( $c eq '!' ) {
-			$opctl{"no$_"} = [$c];
-			# warn ("Ignoring '!' modifier for short option $_\n");
-			$opctl{$_} = $bopctl{$_} = [''];
-		    }
-		    else {
-			$opctl{$_} = $bopctl{$_} = [$c];
-		    }
-		}
-		else {
-		    $_ = lc ($_) if $ignorecase;
-		    if ( $c eq '!' ) {
-			$opctl{"no$_"} = [$c];
-			$opctl{$_} = ['']
-		    }
-		    else {
-			$opctl{$_} = [$c];
-		    }
-		}
-		if ( defined $a ) {
-		    # Note alias.
-		    $aliases{$_} = $a;
-		}
-		else {
-		    # Set primary name.
-		    $a = $_;
-		}
-	    }
 	}
 
 	# If no linkage is supplied in the @optionlist, copy it from
@@ -389,24 +354,22 @@ sub GetOptions {
 	if ( @optionlist > 0 && ref($optionlist[0]) ) {
 	    print STDERR ("=> link \"$linko\" to $optionlist[0]\n")
 		if $debug;
-	    if ( ref($optionlist[0]) =~ /^(SCALAR|CODE)$/ ) {
+	    if ( ref($optionlist[0]) eq "SCALAR" ) {
 		$linkage{$linko} = shift (@optionlist);
 	    }
-	    elsif ( ref($optionlist[0]) =~ /^(ARRAY)$/ ) {
+	    elsif ( ref($optionlist[0]) eq "CODE" ) {
 		$linkage{$linko} = shift (@optionlist);
-		$opctl{$o}[CTL_TYPE] .= '@'
-		  if $opctl{$o}[CTL_TYPE] ne '' and $opctl{$o}[CTL_TYPE] !~ /\@$/;
-		$bopctl{$o}[CTL_TYPE] .= '@'
-		  if $bundling and defined $bopctl{$o}[CTL_TYPE] and
-		    $bopctl{$o}[CTL_TYPE] ne '' and $bopctl{$o}[CTL_TYPE] !~ /\@$/;
 	    }
-	    elsif ( ref($optionlist[0]) =~ /^(HASH)$/ ) {
+	    elsif ( ref($optionlist[0]) eq "ARRAY" ) {
 		$linkage{$linko} = shift (@optionlist);
-		$opctl{$o}[CTL_TYPE] .= '%'
-		  if $opctl{$o}[CTL_TYPE] ne '' and $opctl{$o}[CTL_TYPE] !~ /\%$/;
-		$bopctl{$o}[CTL_TYPE] .= '%'
-		  if $bundling and defined $bopctl{$o}[CTL_TYPE] and
-		    $bopctl{$o}[CTL_TYPE] ne '' and $bopctl{$o}[CTL_TYPE] !~ /\%$/;
+		# $opctl{$o} and $bopctl{$o} point to the same array ref.
+		# So it is sufficient to change only one.
+		$opctl{$o}[CTL_DEST] = CTL_DEST_ARRAY;
+	    }
+	    elsif ( ref($optionlist[0]) eq "HASH" ) {
+		$linkage{$linko} = shift (@optionlist);
+		# See comment above.
+		$opctl{$o}[CTL_DEST] = CTL_DEST_HASH;
 	    }
 	    else {
 		$error .= "Invalid option linkage for \"$opt\"\n";
@@ -417,12 +380,12 @@ sub GetOptions {
 	    # Make sure a valid perl identifier results.
 	    my $ov = $linko;
 	    $ov =~ s/\W/_/g;
-	    if ( $c =~ /@/ ) {
+	    if ( $opctl{$o}[CTL_DEST] == CTL_DEST_ARRAY ) {
 		print STDERR ("=> link \"$linko\" to \@$pkg","::opt_$ov\n")
 		    if $debug;
 		eval ("\$linkage{\$linko} = \\\@".$pkg."::opt_$ov;");
 	    }
-	    elsif ( $c =~ /%/ ) {
+	    elsif ( $opctl{$o}[CTL_DEST] == CTL_DEST_HASH ) {
 		print STDERR ("=> link \"$linko\" to \%$pkg","::opt_$ov\n")
 		    if $debug;
 		eval ("\$linkage{\$linko} = \\\%".$pkg."::opt_$ov;");
@@ -447,12 +410,12 @@ sub GetOptions {
 	my ($arrow, $k, $v);
 	$arrow = "=> ";
 	while ( ($k,$v) = each(%opctl) ) {
-	    print STDERR ($arrow, "\$opctl{\"$k\"} = \"$v\"\n");
+	    print STDERR ($arrow, "\$opctl{\"$k\"} = ", OptCtl($v), "\n");
 	    $arrow = "   ";
 	}
 	$arrow = "=> ";
 	while ( ($k,$v) = each(%bopctl) ) {
-	    print STDERR ($arrow, "\$bopctl{\"$k\"} = \"$v\"\n");
+	    print STDERR ($arrow, "\$bopctl{\"$k\"} = ", OptCtl($v), "\n");
 	    $arrow = "   ";
 	}
     }
@@ -478,12 +441,11 @@ sub GetOptions {
 
 	my $tryopt = $opt;
 	my $found;		# success status
-	my $dsttype;		# destination type ('@' or '%')
-	my $incr;		# destination increment
 	my $key;		# key (if hash type)
 	my $arg;		# option argument
+	my $ctl;		# the opctl entry
 
-	($found, $opt, $arg, $dsttype, $incr, $key) =
+	($found, $opt, $ctl, $arg, $key) =
 	  FindOption ($genprefix, $argend, $opt,
 		      \%opctl, \%bopctl, \@opctl, \%aliases);
 
@@ -504,7 +466,7 @@ sub GetOptions {
 				  ref($linkage{$opt}), "\n") if $debug;
 
 		    if ( ref($linkage{$opt}) eq 'SCALAR' ) {
-			if ( $incr ) {
+			if ( $ctl->[CTL_TYPE] eq '+' ) {
 			    print STDERR ("=> \$\$L{$opt} += \"$arg\"\n")
 			      if $debug;
 			    if ( defined ${$linkage{$opt}} ) {
@@ -532,14 +494,14 @@ sub GetOptions {
 		    }
 		    elsif ( ref($linkage{$opt}) eq 'CODE' ) {
 			print STDERR ("=> &L{$opt}(\"$opt\"",
-				      $dsttype eq '%' ? ", \"$key\"" : "",
+				      $ctl->[CTL_DEST] == CTL_DEST_HASH ? ", \"$key\"" : "",
 				      ", \"$arg\")\n")
 			    if $debug;
 			local ($@);
 			eval {
 			    local $SIG{__DIE__}  = '__DEFAULT__';
 			    &{$linkage{$opt}}($opt,
-					      $dsttype eq '%' ? ($key) : (),
+					      $ctl->[CTL_DEST] == CTL_DEST_HASH ? ($key) : (),
 					      $arg);
 			};
 			print STDERR ("=> die($@)\n") if $debug && $@ ne '';
@@ -560,7 +522,7 @@ sub GetOptions {
 		    }
 		}
 		# No entry in linkage means entry in userlinkage.
-		elsif ( $dsttype eq '@' ) {
+		elsif ( $ctl->[CTL_DEST] == CTL_DEST_ARRAY ) {
 		    if ( defined $userlinkage->{$opt} ) {
 			print STDERR ("=> push(\@{\$L{$opt}}, \"$arg\")\n")
 			    if $debug;
@@ -572,7 +534,7 @@ sub GetOptions {
 			$userlinkage->{$opt} = [$arg];
 		    }
 		}
-		elsif ( $dsttype eq '%' ) {
+		elsif ( $ctl->[CTL_DEST] == CTL_DEST_HASH ) {
 		    if ( defined $userlinkage->{$opt} ) {
 			print STDERR ("=> \$L{$opt}->{$key} = \"$arg\"\n")
 			    if $debug;
@@ -585,7 +547,7 @@ sub GetOptions {
 		    }
 		}
 		else {
-		    if ( $incr ) {
+		    if ( $ctl->[CTL_TYPE] eq '+' ) {
 			print STDERR ("=> \$L{$opt} += \"$arg\"\n")
 			  if $debug;
 			if ( defined $userlinkage->{$opt} ) {
@@ -654,31 +616,110 @@ sub GetOptions {
     return ($error == 0);
 }
 
+sub OptCtl ($) {
+    # A readable representation of what's in an optbl.
+    my ($v) = @_;
+    "[".
+      "\"$v->[0]\",".
+	($v->[1] ? "O" : "M"). ",".
+	  (("\$","\@","\%","\&")[$v->[2] || 0]).
+	    "]";
+}
+
+sub ParseOptionSpec ($$$$) {
+    my ($opt, $opctl, $bopctl, $aliases) = @_;
+
+    # Match option spec. Allow '?' as an alias only.
+    if ( $opt !~ /^((\w+[-\w]*)(\|(\?|\w[-\w]*)?)*)?([!+]|[=:][ionfse][@%]?)?$/ ) {
+	return (undef, "Error in option spec: \"$opt\"\n");
+    }
+
+    my ($o, $c, $a, $linko) = ($1, $5);
+    $c = '' unless defined $c;
+
+    # $linko keeps track of the primary name the user specified.
+    # This name will be used for the internal or external linkage.
+    # In other words, if the user specifies "FoO|BaR", it will
+    # match any case combinations of 'foo' and 'bar', but if a global
+    # variable needs to be set, it will be $opt_FoO in the exact case
+    # as specified.
+
+    if ( ! defined $o ) {
+	# empty -> '-' option
+	$linko = $o = '';
+	$opctl->{''} = $bopctl->{''} = [$c,0,CTL_DEST_SCALAR];
+    }
+    else {
+	# Handle alias names
+	my @o =  split (/\|/, $o);
+	$linko = $o = $o[0];
+	# Force an alias if the option name is not locase.
+	$a = $o unless $o eq lc($o);
+	$o = lc ($o)
+	    if $ignorecase > 1
+		|| ($ignorecase
+		    && ($bundling ? length($o) > 1  : 1));
+
+	foreach ( @o ) {
+
+	    $_ = lc ($_)
+	      if $ignorecase > (($bundling && length($_) == 1) ? 1 : 0);
+
+	    if ( $c eq '' || $c eq '+' ) {
+		$opctl->{$_} = [$c,0,CTL_DEST_SCALAR];
+	    }
+	    elsif ( $c eq '!' ) {
+		$opctl->{$_} = ['',0,CTL_DEST_SCALAR];
+		$opctl->{"no$_"} = ['!',0,CTL_DEST_SCALAR];
+	    }
+	    else {
+		my ($mand, $type, $dest) = $c =~ /([=:])([ionfse])([@%])?/;
+		$type = 'i' if $type eq 'n';
+		$type = 'f' if $type eq 'e';
+		$dest ||= '$';
+		$dest = $dest eq '@' ? CTL_DEST_ARRAY
+		  : $dest eq '%' ? CTL_DEST_HASH : CTL_DEST_SCALAR;
+		$opctl->{$_} = [$type, $mand eq '=', $dest];
+	    }
+	    $bopctl->{$_} = $opctl->{$_} if $bundling && length($_) == 1;
+
+	    if ( defined $a ) {
+		# Note alias.
+		$aliases->{$_} = $a;
+	    }
+	    else {
+		# Set primary name.
+		$a = $_;
+	    }
+	}
+    }
+    ($o, $linko);
+}
+
 # Option lookup.
 sub FindOption ($$$$$$$) {
 
-    # returns (1, $opt, $arg, $dsttype, $incr, $key) if okay,
+    # returns (1, $opt, $ctl, $arg, $key) if okay,
+    # returns (1, undef) if option in error,
     # returns (0) otherwise.
 
     my ($prefix, $argend, $opt, $opctl, $bopctl, $names, $aliases) = @_;
-    my $key;			# hash key for a hash option
-    my $arg;
 
     print STDERR ("=> find \"$opt\", prefix=\"$prefix\"\n") if $debug;
 
-    return 0 unless $opt =~ /^$prefix(.*)$/s;
-    return 0 if $opt eq "-" && !defined $opctl->{""};
+    return (0) unless $opt =~ /^$prefix(.*)$/s;
+    return (0) if $opt eq "-" && !defined $opctl->{""};
 
     $opt = $+;
-    my ($starter) = $1;
+    my $starter = $1;
 
     print STDERR ("=> split \"$starter\"+\"$opt\"\n") if $debug;
 
-    my $optarg = undef;	# value supplied with --opt=value
-    my $rest = undef;	# remainder from unbundling
+    my $optarg;			# value supplied with --opt=value
+    my $rest;			# remainder from unbundling
 
     # If it is a long option, it may include the value.
-    # With getopt_compat, not if bundling.
+    # With getopt_compat, only if not bundling.
     if ( ($starter eq "--" 
           || ($getopt_compat && ($bundling == 0 || $bundling == 2)))
 	  && $opt =~ /^([^=]+)=(.*)$/s ) {
@@ -690,37 +731,37 @@ sub FindOption ($$$$$$$) {
 
     #### Look it up ###
 
-    my $tryopt = $opt;		# option to try
+    my $tryopt;			# option to try
     my $optbl = $opctl;		# table to look it up (long names)
-    my $type;
-    my $dsttype = '';
-    my $incr = 0;
 
     if ( $bundling && $starter eq '-' ) {
-	# Unbundle single letter option.
-	$rest = length ($tryopt) > 0 ? substr ($tryopt, 1) : "";
-	$tryopt = substr ($tryopt, 0, 1);
-	$tryopt = lc ($tryopt) if $ignorecase > 1;
-	print STDERR ("=> $starter$tryopt unbundled from ",
-		      "$starter$tryopt$rest\n") if $debug;
-	$rest = undef unless $rest ne '';
-	$optbl = $bopctl;	# look it up in the short names table
+
+	# To try overides, obey case ignore.
+	$tryopt = $ignorecase ? lc($opt) : $opt;
 
 	# If bundling == 2, long options can override bundles.
-	if ( $bundling == 2 and
-	     defined ($rest) and
-	     defined ($type = $opctl->{$tryopt.$rest}[CTL_TYPE]) ) {
-	    print STDERR ("=> $starter$tryopt rebundled to ",
+	if ( $bundling == 2 && defined ($opctl->{$tryopt}) ) {
+	    print STDERR ("=> $starter$tryopt overrides unbundling\n")
+	      if $debug;
+	}
+	else {
+	    $tryopt = $opt;
+	    # Unbundle single letter option.
+	    $rest = length ($tryopt) > 0 ? substr ($tryopt, 1) : "";
+	    $tryopt = substr ($tryopt, 0, 1);
+	    $tryopt = lc ($tryopt) if $ignorecase > 1;
+	    print STDERR ("=> $starter$tryopt unbundled from ",
 			  "$starter$tryopt$rest\n") if $debug;
-	    $tryopt .= $rest;
-	    undef $rest;
+	    $rest = undef unless $rest ne '';
+	    $optbl = $bopctl;	# look it up in the short names table
 	}
     }
 
     # Try auto-abbreviation.
     elsif ( $autoabbrev ) {
 	# Downcase if allowed.
-	$tryopt = $opt = lc ($opt) if $ignorecase;
+	$opt = lc ($opt) if $ignorecase;
+	$tryopt = $opt;
 	# Turn option name into pattern.
 	my $pat = quotemeta ($opt);
 	# Look up in option names.
@@ -742,8 +783,7 @@ sub FindOption ($$$$$$$) {
 		warn ("Option ", $opt, " is ambiguous (",
 		      join(", ", @hits), ")\n");
 		$error++;
-		undef $opt;
-		return (1, $opt,$arg,$dsttype,$incr,$key);
+		return (1, undef);
 	    }
 	    @hits = keys(%hit);
 	}
@@ -763,20 +803,24 @@ sub FindOption ($$$$$$$) {
     }
 
     # Check validity by fetching the info.
-    $type = $optbl->{$tryopt}[CTL_TYPE] unless defined $type;
-    unless  ( defined $type ) {
+    my $ctl = $optbl->{$tryopt};
+    unless  ( defined $ctl ) {
 	return (0) if $passthrough;
 	warn ("Unknown option: ", $opt, "\n");
 	$error++;
-	return (1, $opt,$arg,$dsttype,$incr,$key);
+	return (1, undef);
     }
     # Apparently valid.
     $opt = $tryopt;
-    print STDERR ("=> found \"$type\" for \"", $opt, "\"\n") if $debug;
+    print STDERR ("=> found ", OptCtl($ctl),
+		  " for \"", $opt, "\"\n") if $debug;
 
     #### Determine argument status ####
 
     # If it is an option w/o argument, we're almost finished with it.
+    my $type = $ctl->[CTL_TYPE];
+    my $arg;
+
     if ( $type eq '' || $type eq '!' || $type eq '+' ) {
 	if ( defined $optarg ) {
 	    return (0) if $passthrough;
@@ -786,26 +830,24 @@ sub FindOption ($$$$$$$) {
 	}
 	elsif ( $type eq '' || $type eq '+' ) {
 	    $arg = 1;		# supply explicit value
-	    $incr = $type eq '+';
 	}
 	else {
-	    substr ($opt, 0, 2) = ''; # strip NO prefix
+	    $opt =~ s/^no//i;	# strip NO prefix
 	    $arg = 0;		# supply explicit value
 	}
 	unshift (@ARGV, $starter.$rest) if defined $rest;
-	return (1, $opt,$arg,$dsttype,$incr,$key);
+	return (1, $opt, $ctl, $arg);
     }
 
     # Get mandatory status and type info.
-    my $mand;
-    ($mand, $type, $dsttype, $key) = $type =~ /^(.)(.)([@%]?)$/;
+    my $mand = $ctl->[CTL_MAND];
 
     # Check if there is an option argument available.
     if ( $gnu_compat ) {
-	return (1, $opt, $optarg, $dsttype, $incr, $key)
+	return (1, $opt, $ctl, $optarg)
 	  if defined $optarg;
-	return (1, $opt, $type eq "s" ? '' : 0, $dsttype, $incr, $key)
-	  if $mand eq ':';
+	return (1, $opt, $ctl, $type eq "s" ? '' : 0)
+	  unless $mand;
     }
 
     # Check if there is an option argument available.
@@ -813,13 +855,13 @@ sub FindOption ($$$$$$$) {
 	 ? ($optarg eq '')
 	 : !(defined $rest || @ARGV > 0) ) {
 	# Complain if this option needs an argument.
-	if ( $mand eq "=" ) {
+	if ( $mand ) {
 	    return (0) if $passthrough;
 	    warn ("Option ", $opt, " requires an argument\n");
 	    $error++;
-	    undef $opt;
+	    return (1, undef);
 	}
-	return (1, $opt, $type eq "s" ? '' : 0, $dsttype, $incr, $key);
+	return (1, $opt, $ctl, $type eq "s" ? '' : 0);
     }
 
     # Get (possibly optional) argument.
@@ -827,8 +869,8 @@ sub FindOption ($$$$$$$) {
 	    : (defined $optarg ? $optarg : shift (@ARGV)));
 
     # Get key if this is a "name=value" pair for a hash option.
-    $key = undef;
-    if ($dsttype eq '%' && defined $arg) {
+    my $key;
+    if ($ctl->[CTL_DEST] == CTL_DEST_HASH && defined $arg) {
 	($key, $arg) = ($arg =~ /^([^=]*)=(.*)$/s) ? ($1, $2) : ($arg, 1);
     }
 
@@ -836,12 +878,12 @@ sub FindOption ($$$$$$$) {
 
     if ( $type eq "s" ) {	# string
 	# A mandatory string takes anything.
-	return (1, $opt,$arg,$dsttype,$incr,$key) if $mand eq "=";
+	return (1, $opt, $ctl, $arg, $key) if $mand;
 
 	# An optional string takes almost anything.
-	return (1, $opt,$arg,$dsttype,$incr,$key)
+	return (1, $opt, $ctl, $arg, $key)
 	  if defined $optarg || defined $rest;
-	return (1, $opt,$arg,$dsttype,$incr,$key) if $arg eq "-"; # ??
+	return (1, $opt, $ctl, $arg, $key) if $arg eq "-"; # ??
 
 	# Check for option or option list terminator.
 	if ($arg eq $argend ||
@@ -870,7 +912,7 @@ sub FindOption ($$$$$$$) {
 	    $arg = ($type eq "o" && $arg =~ /^0/) ? oct($arg) : 0+$arg;
 	}
 	else {
-	    if ( defined $optarg || $mand eq "=" ) {
+	    if ( defined $optarg || $mand ) {
 		if ( $passthrough ) {
 		    unshift (@ARGV, defined $rest ? $starter.$rest : $arg)
 		      unless defined $optarg;
@@ -881,9 +923,9 @@ sub FindOption ($$$$$$$) {
 		      $type eq "o" ? "extended " : "",
 		      "number expected)\n");
 		$error++;
-		undef $opt;
 		# Push back.
 		unshift (@ARGV, $starter.$rest) if defined $rest;
+		return (1, undef);
 	    }
 	    else {
 		# Push back.
@@ -905,7 +947,7 @@ sub FindOption ($$$$$$$) {
 	    unshift (@ARGV, $starter.$rest) if defined $rest && $rest ne '';
 	}
 	elsif ( $arg !~ /^[-+]?[0-9.]+(\.[0-9]+)?([eE][-+]?[0-9]+)?$/ ) {
-	    if ( defined $optarg || $mand eq "=" ) {
+	    if ( defined $optarg || $mand ) {
 		if ( $passthrough ) {
 		    unshift (@ARGV, defined $rest ? $starter.$rest : $arg)
 		      unless defined $optarg;
@@ -914,9 +956,9 @@ sub FindOption ($$$$$$$) {
 		warn ("Value \"", $arg, "\" invalid for option ",
 		      $opt, " (real number expected)\n");
 		$error++;
-		undef $opt;
 		# Push back.
 		unshift (@ARGV, $starter.$rest) if defined $rest;
+		return (1, undef);
 	    }
 	    else {
 		# Push back.
@@ -929,7 +971,7 @@ sub FindOption ($$$$$$$) {
     else {
 	Croak ("GetOpt::Long internal error (Can't happen)\n");
     }
-    return (1, $opt, $arg, $dsttype, $incr, $key);
+    return (1, $opt, $ctl, $arg, $key);
 }
 
 # Getopt::Long Configuration.
