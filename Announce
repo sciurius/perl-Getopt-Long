@@ -7,16 +7,6 @@ GetOptions(). This function implements the POSIX standard for command
 line options, with GNU extensions, while still capable of handling
 the traditional one-letter options (including option bundling).
 
-The kit contains:
-
-  README         -- Introductionary text
-  INSTALL        -- Installation information
-  GetoptLong.pm  -- version 2.12 of Getopt::Long (subroutine GetOptions)
-  newgetopt.pl   -- version 1.17 of newgetopt.pl (subroutine NGetOpt)
-  Makefile.PL    -- Makefile for installation
-  skel.pl        -- Skeleton program to use Getopt::Long
-  skel2.pl       -- Skeleton program to use Getopt::Long with Pod::Usage
-
 The README document is attached to this message.
 
 The best way to download from CPAN is to use a Web browser and point
