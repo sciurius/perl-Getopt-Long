@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Aug 24 11:24:03 2001
-# Update Count    : 1
+# Last Modified On: Fri Aug 24 19:15:52 2001
+# Update Count    : 95
 # Status          : In progress
 
 ################ No args ################
@@ -38,20 +38,19 @@ A: -v1 -- foo
    $opt_v1 1
    @ARGV foo
 
-T:
 P: one \\$v1
+
+T:
 A: -one foo
    $v1 1
    @ARGV foo
 
 T:
-P: one \\$v1
 A: -one -- foo
    $v1 1
    @ARGV foo
 
 T: Basic case ignoring
-P: one \\$v1
 A: -oNe -- foo
    $v1 1
    @ARGV foo
@@ -67,8 +66,9 @@ A: -oNe -- foo
    $v1 1
    @ARGV foo
 
-T:
 P: one \\$v1 One \\$v2 oNe \\$v3
+
+T:
 #  Due to case ignoring, one becomes an alias for oNe...
 A: -oNe -one foo
    $v3 1
@@ -76,7 +76,6 @@ A: -oNe -one foo
 
 T:
 O: no_ignore_case
-P: one \\$v1 One \\$v2 oNe \\$v3
 A: -oNe -one foo
    $v1 1
    $v3 1
@@ -118,10 +117,14 @@ A: -one -notwo foo
    $v1 0
    @ARGV foo
 
+# Clear sticky opts.
+P:
+
 ################ String opt (mandatory) ################
 
-T: String opt (mandatory)
 P: v2=s
+
+T: String opt (mandatory)
 A: -v2 bar foo
    $opt_v2 bar
    @ARGV foo
@@ -165,6 +168,9 @@ A: -a1 -bar -a1 blech foo
    @opt_a1 -bar blech
    @ARGV foo
 
+# Clear sticky opts.
+P:
+
 ################ String opt (optional) ################
 
 P: v3:s v1
@@ -200,6 +206,9 @@ A: -a3 xx -a3 -v1 foo
    @opt_a3 xx ''
    $opt_v1 1
    @ARGV foo
+
+# Clear sticky opts.
+P:
 
 ################ Int opt (mandatory) ################
 
@@ -240,6 +249,9 @@ P: a1=i@
 A: -a1 -24 -a1 12 foo
    @opt_a1 -24 12
    @ARGV foo
+
+# Clear sticky opts.
+P:
 
 ################ Int opt (optional) ################
 
@@ -294,6 +306,9 @@ A: -a2 -24 -a2 -v1 foo
    @opt_a2 -24 0
    @ARGV foo
 
+# Clear sticky opts.
+P:
+
 ################ Ext Int opt (mandatory) ################
 
 P: v1=o
@@ -339,6 +354,9 @@ W: Value "0xefg" invalid for option v1 (extended number expected)
 T: Ext Int opt (mandatory)
 A: -v1 0b012 foo
 W: Value "0b012" invalid for option v1 (extended number expected)
+
+# Clear sticky opts.
+P:
 
 ################ Float opt (mandatory) ################
 
@@ -409,6 +427,9 @@ A: -a3 -.24 -a3 1.2 foo
    @opt_a3 -.24 1.2
    @ARGV foo
 
+# Clear sticky opts.
+P:
+
 ################ Float opt (optional) ################
 
 P: v1:f a1:f@ v2
@@ -466,6 +487,9 @@ A: -a1 -2.74 -a1 -v2 foo
    @opt_a1 -2.74 0
    @ARGV foo
 
+# Clear sticky opts.
+P:
+
 ################ Empty option ################
 
 P: v1:f a1:f@ v2
@@ -504,5 +528,337 @@ O: bundling
 A: - foo
    $opt_ 1
    @ARGV foo
+
+# Clear sticky opts.
+P:
+
+################ Other delimeters ################
+
+T: Other delimeters
+P: / seven=f \\$v1
+A: /seven -1.42 foo
+   $v1 == -1.42
+   @ARGV foo
+
+T: Other delimeters
+P: / seven:f \\@a1 v1
+A: /seven -1.42 /seven /v1 -- foo
+   $opt_v1 1
+   @a1 -1.42 0
+   @ARGV foo
+
+T: Other delimeters
+P: / seven:f \\@a1 v1
+A: /seven -2.74 /seven /v1 // foo
+W: Unknown option: /
+
+T: Other delimeters
+P: seven=f \\$v1
+A: --seven -1.42 foo
+   $v1 == -1.42
+   @ARGV foo
+
+T: Other delimeters
+P: seven:f \\@a1 v1
+A: --seven -1.42 +seven -v1 -- foo
+   $opt_v1 1
+   @a1 -1.42 0
+   @ARGV foo
+
+T: Other delimeters
+P: seven:f \\@a1 v1
+A: --seven -1.42 +seven -v1 ++ foo
+W: Unknown option: +
+
+################ Auto-abbrev ################
+
+P: six=f \\$v1 seven:f \\$v2 eight|opt8=s \\$v3 sixs=f \\@a1 sevens:f \\@a2
+
+T: Auto-abbrev
+A: -six -1.42 foo
+   $v1 == -1.42
+   @ARGV foo
+
+T: Auto-abbrev
+A: -e xxx foo
+   $v3 xxx
+   @ARGV foo
+
+T: Auto-abbrev
+A: -s -1.42 foo
+W: Option s is ambiguous (seven, sevens, six, sixs)
+W: Unknown option: 1.42
+
+# Clear sticky opts.
+P:
+
+################ Aliases ################
+
+P: v1|eight|opt8=s help|? \\$v1
+
+T: Aliases
+A: -v1 22 foo
+   $opt_v1 22
+   @ARGV foo
+
+T: Aliases
+A: -eight 22 foo
+   $opt_v1 22
+   @ARGV foo
+
+T: Aliases
+A: -opt8 22
+   $opt_v1 22
+
+T: Aliases/Autoabbrev
+A: -o 22 foo
+   $opt_v1 22
+   @ARGV foo
+
+T: Aliases/Autoabbrev
+A: -v 22
+   $opt_v1 22
+
+T: Aliases/Autoabbrev
+A: -e 22 foo
+   $opt_v1 22
+   @ARGV foo
+
+T: 2.12 Allow ? as an alias (not primary).
+A: -help foo
+   $v1 1
+   @ARGV foo
+
+T: 2.12 Allow ? as an alias (not primary).
+A: -? foo
+   $v1 1
+   @ARGV foo
+
+T: 2.12 Allow ? as an alias (not primary).
+P: help ? ?? ?|help
+A: foo
+E: Error in option spec: "?"
+E: Error in option spec: "??"
+E: Error in option spec: "?|help"
+
+# Clear sticky opts.
+P:
+
+################ Dashes in option name ################
+
+T: Dashes in option names
+P: a-b \\$v1
+A: -a-b foo
+   $v1 1
+   @ARGV foo
+
+T: Dashes in option names
+# Skip this with linkage, since the a-b -> opt_a_b translation doesn't
+# take place.
+P: a-b
+A: -a-b foo
+S: !linkage
+   $opt_a_b 1
+   @ARGV foo
+
+T: Dashes in option names
+# Thi sis the varaint for the linkage case.
+P: a-b
+A: -a-b foo
+S: linkage
+   $opt_a-b 1
+   @ARGV foo
+
+################ Arguments between options ################
+
+T: Arguments between options (permute)
+P: v1=f
+A: foo -v1 1.2 bar
+   $opt_v1 == 1.2
+   @ARGV foo bar
+
+################ POSIX compliancy ################
+
+T: POSIX compliancy
+P: v1:f v2
+A: -v1 1.2 foo
+   $opt_v1 == 1.2
+   @ARGV foo
+
+T: POSIX compliancy
+O: posix_default
+P: v1:f v2
+A: -v1 1.2 foo
+   $opt_v1 == 1.2
+   @ARGV foo
+
+T: POSIX compliancy
+P: v1:f v2
+A: --v1 1.2 foo
+   $opt_v1 == 1.2
+   @ARGV foo
+
+T: POSIX compliancy
+O: posix_default
+P: v1:f v2
+A: --v1 1.2 foo
+   $opt_v1 == 1.2
+   @ARGV foo
+
+T: POSIX compliancy
+P: v1:f v2
+A: +v1 1.2 foo
+   $opt_v1 == 1.2
+   @ARGV foo
+
+T: POSIX compliancy
+O: posix_default
+P: v1:f v2
+A: +v1 1.2 foo
+   @ARGV +v1 1.2 foo
+
+T: POSIX compliancy
+P: v1:f v2
+A: foo -v1 1.2
+   $opt_v1 == 1.2
+   @ARGV foo
+
+T: POSIX compliancy
+O: posix_default
+P: v1:f v2
+A: foo -v1 1.2
+   @ARGV foo -v1 1.2
+
+++
+
+################ Bundling ################
+
+O: bundling
+
+T: Short options should not be case sensitive
+P: a \\$v1 A \\$v2
+A: -a foo
+   $v1 1
+   @ARGV foo
+
+T: Short options should not be case sensitive
+P: a \\$v1 A \\$v2
+A: -A foo
+   $v2 1
+   @ARGV foo
+
+T: Short options should not be case sensitive
+P: a=n \\$v1 A=n \\$v2
+A: -a21A 12 foo
+   $v1 21
+   $v2 12
+   @ARGV foo
+
+T: Short options should not be case sensitive
+P: a=n \\$v1 A=n \\$v2
+A: -a21A12a33 foo
+   $v1 33
+   $v2 12
+   @ARGV foo
+
+T: Unbundle short and long
+P: a \\$v1 one \\$v2
+A: -a --one foo
+   $v1 1
+   $v2 1
+   @ARGV foo
+
+T: Unbundle short and long
+O+ bundling_override
+P: a \\$v1 one \\$v2
+A: -aone foo
+   $v1 1
+   $v2 1
+   @ARGV foo
+
+P: a! \\$v1 b=s \\$v2 c:s \\$v3
+
+T: Bundling
+A: -a -b -c foo
+   $v1 1
+   $v2 -c
+   @ARGV foo
+
+T: Bundling
+A: -a -b-c --noa foo
+   $v1 0
+   $v2 -c
+   @ARGV foo
+
+T: Bundling
+A: -a -b-c -noa foo
+W: Unknown option: noa
+
+T: Bundling
+A: -a -c-b foo
+   $v1 1
+   $v3 -b
+   @ARGV foo
+
+T: Bundling
+P: a f=i 
+A: -fa
+W: Value "a" invalid for option f (number expected)
+
+T: Bundling
+P: a f=i
+A: -fx
+W: Value "x" invalid for option f (number expected)
+W: Unknown option: x
+
+T: Bundling
+P: a \\$v1 f:i \\$v2
+A: -fa
+   $v1 1
+   $v2 0
+
+T: Bundling
+P: foo \\$v1 f=s \\$v2
+A: -fxx -foo foo
+   $v2 oo
+   @ARGV foo
+
+T: Bundling override
+O+ bundling_override
+P: foo \\$v1 f=s \\$v2
+A: -fxx -foo foo
+   $v1 1
+   $v2 xx
+   @ARGV foo
+
+T: Bundling
+P: a \\@a1 l=i \\$v1 w=i \\$v2 e=i \\$v3 f \\@a2
+A: -al24w80e3f foo
+   $v1 == 24
+   $v2 == 80
+   $v3 == 3
+   @a1 1
+   @a2 1
+   @ARGV foo
+
+T: Bundling
+P: a \\@a1 l=i \\$v1 w=f \\$v2 e=i \\$v3 f \\@a2
+A: -al24w80e3f foo
+   $v1 == 24
+   $v2 == 80000
+   @a1 1
+   @a2 1
+   @ARGV foo
+
+T: Bundling
+P: a=o \\$v1 b=o \\$v2 x=o \\$v3
+A: -a24b0b10x0x10 foo
+   $v1 == 24
+   $v2 == 0b10
+   $v3 == 0x10
+   @ARGV foo
+
+# Clear sticky config.
+O:
 
 --

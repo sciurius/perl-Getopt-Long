@@ -8,8 +8,8 @@ package MyTest;			# not main
 # Author          : Johan Vromans
 # Created On      : Mon Aug  6 11:53:07 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Aug 24 11:22:50 2001
-# Update Count    : 311
+# Last Modified On: Fri Aug 24 19:16:08 2001
+# Update Count    : 334
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -60,7 +60,7 @@ my $TMPDIR = $ENV{TMPDIR} || $ENV{TEMP} || '/usr/tmp';
 my ($v1, $v2, $v3, @a1, @a2, @a3, @argv, %h1, %h2, %h3);
 
 # Global variables.
-use vars ('$opt_v1', '$opt_v2', '$opt_v3', '$opt_',
+use vars ('$opt_v1', '$opt_v2', '$opt_v3', '$opt_', '$opt_a_b',
 	  '@opt_a1', '@opt_a2', '@opt_a3',
 	  '%opt_h1', '%opt_h2', '%opt_h3');
 
@@ -73,6 +73,7 @@ my %refmap = ( '$v1'	  => \$v1,
 	       '$opt_v2'  => \$opt_v2,
 	       '$opt_v3'  => \$opt_v3,
 	       '$opt_'    => \$opt_,
+	       '$opt_a_b' => \$opt_a_b,
 	       '@a1'	  => \@a1,
 	       '@a2'	  => \@a2,
 	       '@a3'	  => \@a3,
@@ -99,9 +100,14 @@ my $only;			# run only one test set
 my $only_style;			# in this style
 
 # Test call styles.
-use constant S_PLAIN	=> 0;
-use constant S_OO	=> 1;
-use constant S_LINKAGE	=> 2;
+use constant S_PLAIN	=> 1;
+use constant S_OO	=> 2;
+use constant S_LINKAGE	=> 4;
+
+my %styles = ( plain    => S_PLAIN,
+	       oo       => S_OO,
+	       linkage  => S_LINKAGE,
+	     );
 
 if ( @ARGV && $ARGV[-1] =~ /^(\d+)(@(\d+))?$/ ) {
     $only = $1;
@@ -113,21 +119,36 @@ if ( @ARGV && $ARGV[-1] =~ /^(\d+)(@(\d+))?$/ ) {
 my $t = {
 	 opts	 => [],
 	 argv	 => [],
-	 done	 => 1,		# bootstrap
+	 done	 => -1,		# bootstrap
 	};
 
+my @sticky_config = ();
+my @sticky_opts = ();
+my @sticky_argv = ();
+
 # The main program.
+my $skip = 0;
 while ( <> ) {
     chomp;
+    if ( /^\+\+$/ ) {
+	$skip = 0;
+	next;
+    }
+    next if $skip;
+
     next if /^\s*#/;
 
     # An empty line triggers the current test.
     unless ( /\S/ ) {
 	do_test() unless $t->{done};
+	$t->{done} = -1;
 	next;
     }
 
-    last if /^--$/;
+    if ( /^--$/ ) {
+	$skip++;
+	next;
+    }
 
     # Collect test information.
     gather();
@@ -175,7 +196,10 @@ sub gather {
 	$t->{errors}	= [];
 	$t->{vfy}	= {};
 	$t->{done}      = 0;
-	$t->{config}    = [];
+	$t->{argv}      = [ @sticky_argv ];
+	$t->{opts}      = [ @sticky_opts ];
+	$t->{config}    = [ @sticky_config ];
+	$t->{styles}    = [ undef, undef ];
 
 	if ( $only ) {
 	    if ( $only != $test ) {
@@ -191,34 +215,78 @@ sub gather {
     # O+ opt3 opt4 ...
     # Configuration options.
     elsif ( /^O(:|\+)(\s+(.*)|$)/i ) {
-	$t->{config} = [] if $1 eq ":";
-	return unless $2;
-	my @a = shellwords($3);
-	push (@{$t->{config}}, @a);
+	my @a = $2 ? shellwords($3) : ();
+	if ( $t->{done} < 0 ) {
+	    @sticky_config = () if $1 eq ":";
+	    push (@sticky_config, @a);
+	}
+	else {
+	    $t->{config} = [] if $1 eq ":";
+	    push (@{$t->{config}}, @a);
+	}
     }
 
     # A: arg1 arg2 ...
     # A+ arg3 arg4 ...
     # Call arguments (@ARGV).
     elsif ( /^A(:|\+)(\s+(.*)|$)/i ) {
-	$t->{argv} = [] if $1 eq ":";
-	return unless $2;
-	push (@{$t->{argv}}, shellwords($3));
+	my @a = $2 ? shellwords($3) : ();
+	if ( $t->{done} < 0 ) {
+	    @sticky_argv = () if $1 eq ":";
+	    push (@sticky_argv, @a);
+	}
+	else {
+	    $t->{argv} = [] if $1 eq ":";
+	    push (@{$t->{argv}}, @a);
+	}
     }
 
     # P: arg1 arg2 ...
     # P+ arg3 arg4 ...
     # Arguments to GetOptions().
     elsif ( /^P(:|\+)(\s+(.*)|$)/i ) {
-	$t->{opts} = [] if $1 eq ":";
-	return unless $2;
-	my @a = shellwords($3);
+	my @a = $2 ? shellwords($3) : ();
+	if ( $t->{done} < 0 ) {
+	    @sticky_opts = () if $1 eq ":";
+	}
+	else {
+	    $t->{opts} = [] if $1 eq ":";
+	}
 	foreach ( @a ) {
 	    if ( /^\\((\$v|\@a|\%h)[123])$/ && exists($refmap{$1}) ) {
 		$_ = $refmap{$1};
 	    }
 	}
-	push (@{$t->{opts}}, @a);
+	if ( $t->{done} < 0 ) {
+	    @sticky_opts = () if $1 eq ":";
+	    push (@sticky_opts, @a);
+	}
+	else {
+	    $t->{opts} = [] if $1 eq ":";
+	    push (@{$t->{opts}}, @a);
+	}
+    }
+
+    # S: style1 !style2 ...
+    # S+ style3 !style ...
+    # Style(s) to inc/exclude.
+    elsif ( /^S(:|\+)(\s+(.*)|$)/i ) {
+	$t->{styles} = [ undef, undef ] if $1 eq ":";
+	return unless $2;
+	my @a = shellwords(lc($3));
+	foreach my $style ( @a ) {
+	    my $excl = 0;
+	    if ( $style =~ /^!(.*)/ ) {
+		$excl = 1;
+		$style = $1;
+	    }
+	    if ( exists($styles{$style}) ) {
+		$t->{styles}->[$excl] |= $styles{$style};
+	    }
+	    else {
+		print STDERR (hdr(), "<$.> Unknown style: $style\n");
+	    }
+	}
     }
 
     # W: text
@@ -281,6 +349,14 @@ sub exec_plain {
     my ($call) = @_;
     $phase = ($call & S_LINKAGE) ? "link" : "plain";
     $phase .= "-oo" if $call & S_OO;
+
+    if ( defined(my $mask = $t->{styles}->[0]) ) {
+	return unless $call & $mask;
+    }
+    if ( defined(my $mask = $t->{styles}->[1]) ) {
+	return if $call & $mask;
+    }
+
     print STDERR (hdr()) if $only;
 
     $variants++;
@@ -334,7 +410,11 @@ sub exec_plain {
 
     while ( my ($var,$vfy) = each (%vfy) ) {
 
-	unless ( exists ($refmap{$var}) ) {
+	unless ( exists ($refmap{$var})
+	       || (($call & S_LINKAGE)
+		   && $var =~ /^[\$\@\%]opt_(.*)/
+		   && exists $linkage{$1})
+	       ) {
 	    print STDERR (hdr(), "Unhandled variable $var\n");
 	    next;
 	}
@@ -486,7 +566,7 @@ sub app_usage {
     my ($exit) = @_;
     app_ident();
     print STDERR <<EndOfUsage;
-Usage: $0 [options] [file ...] [test[@variant]]
+Usage: $0 [options] [file ...] [test[\@variant]]
     -help		this message
     -ident		show identification
     -verbose		verbose information
