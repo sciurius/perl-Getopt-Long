@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Mar 27 11:50:30 1998
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Nov  1 09:40:57 1999
-# Update Count    : 33
+# Last Modified On: Mon Nov 29 20:27:03 1999
+# Update Count    : 34
 # Status          : Released
 
 sub GetOptions {
@@ -558,7 +558,7 @@ sub FindOption ($$$$$$$) {
     # Get key if this is a "name=value" pair for a hash option.
     $key = undef;
     if ($dsttype eq '%' && defined $arg) {
-	($key, $arg) = ($arg =~ /^(.*)=(.*)$/s) ? ($1, $2) : ($arg, 1);
+	($key, $arg) = ($arg =~ /^([^=]*)=(.*)$/s) ? ($1, $2) : ($arg, 1);
     }
 
     #### Check if the argument is valid for this option ####
