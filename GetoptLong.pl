@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Mar 14 21:28:40 2000
-# Update Count    : 721
+# Last Modified On: Mon Jul 31 21:21:13 2000
+# Update Count    : 739
 # Status          : Released
 
 ################ Copyright ################
@@ -52,7 +52,7 @@ use vars qw($error $debug $major_version $minor_version);
 use vars qw($autoabbrev $getopt_compat $ignorecase $bundling $order
 	    $passthrough);
 # Official invisible variables.
-use vars qw($genprefix $caller);
+use vars qw($genprefix $caller $gnu_compat);
 
 # Public subroutines.
 sub Configure (@);
@@ -89,6 +89,27 @@ sub ConfigDefaults () {
     $error = 0;			# error tally
     $ignorecase = 1;		# ignore case when matching options
     $passthrough = 0;		# leave unrecognized options alone
+    $gnu_compat = 0;		# require --opt=val if value is optional
+}
+
+# Override import.
+sub import {
+    my $pkg = shift;		# package
+    my @syms = ();		# symbols to import
+    my @config = ();		# configuration
+    my $dest = \@syms;		# symbols first
+    for ( @_ ) {
+	if ( $_ eq ':config' ) {
+	    $dest = \@config;	# config next
+	    next;
+	}
+	push (@$dest, $_);	# push
+    }
+    # Hide one level and call super.
+    local $Exporter::ExportLevel = 1;
+    $pkg->SUPER::import(@syms);
+    # And configure.
+    Configure (@config) if @config;
 }
 
 ################ Initialization ################
@@ -99,6 +120,87 @@ sub ConfigDefaults () {
 ($major_version, $minor_version) = $VERSION =~ /^(\d+)\.(\d+)/;
 
 ConfigDefaults();
+
+################ OO Interface ################
+
+package Getopt::Long::Parser;
+
+# NOTE: The object oriented routines use $error for thread locking.
+my $_lock = sub {
+    lock ($Getopt::Long::error) if $] >= 5.005
+};
+
+# Store a copy of the default configuration. Since ConfigDefaults has
+# just been called, what we get from Configure is the default.
+my $default_config = do {
+    &$_lock;
+    Getopt::Long::Configure ()
+};
+
+sub new {
+    my $that = shift;
+    my $class = ref($that) || $that;
+    my %atts = @_;
+
+    # Register the callers package.
+    my $self = { caller => (caller)[0] };
+
+    bless ($self, $class);
+
+    # Process config attributes.
+    if ( defined $atts{config} ) {
+	&$_lock;
+	my $save = Getopt::Long::Configure ($default_config, @{$atts{config}});
+	$self->{settings} = Getopt::Long::Configure ($save);
+	delete ($atts{config});
+    }
+    # Else use default config.
+    else {
+	$self->{settings} = $default_config;
+    }
+
+    if ( %atts ) {		# Oops
+	Getopt::Long::Croak(__PACKAGE__.": unhandled attributes: ".
+			    join(" ", sort(keys(%atts))));
+    }
+
+    $self;
+}
+
+sub configure {
+    my ($self) = shift;
+
+    &$_lock;
+
+    # Restore settings, merge new settings in.
+    my $save = Getopt::Long::Configure ($self->{settings}, @_);
+
+    # Restore orig config and save the new config.
+    $self->{settings} = Configure ($save);
+}
+
+sub getoptions {
+    my ($self) = shift;
+
+    &$_lock;
+
+    # Restore config settings.
+    my $save = Getopt::Long::Configure ($self->{settings});
+
+    # Call main routine.
+    my $ret = 0;
+    $Getopt::Long::caller = $self->{caller};
+    eval { $ret = Getopt::Long::GetOptions (@_); };
+
+    # Restore saved settings.
+    Getopt::Long::Configure ($save);
+
+    # Handle errors and return value.
+    die ($@) if $@;
+    return $ret;
+}
+
+package Getopt::Long;
 
 ################ Package return ################
 
