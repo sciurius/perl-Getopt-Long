@@ -8,8 +8,8 @@ package MyTest;			# not main
 # Author          : Johan Vromans
 # Created On      : Mon Aug  6 11:53:07 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Jun 24 23:13:04 2003
-# Update Count    : 439
+# Last Modified On: Sun Sep 21 12:54:25 2003
+# Update Count    : 442
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -392,13 +392,17 @@ sub hdr {
 sub do_test {
     if ( $t->{version} ) {
 	my $v = $t->{version};
-	if ( ($v =~ /^<=\s*(.*)/) ? ($Getopt::Long::VERSION gt $1) :
-	     ($v =~ /^<\s*(.*)/)  ? ($Getopt::Long::VERSION ge $1) :
+	my $vv = $v;
+	if ( ($v =~ /^<=\s*(.*)/) ? ($Getopt::Long::VERSION gt ($vv = $1)) :
+	     ($v =~ /^<\s*(.*)/)  ? ($Getopt::Long::VERSION ge ($vv = $1)) :
 	                            ($Getopt::Long::VERSION lt $v) ) {
 	    $skipped += 4;
 	    # warn("skip: ", $t->{test}, " $Getopt::Long::VERSION $v\n");
 	    return;
 	}
+	# warn("accept: ", $t->{test}, " $Getopt::Long::VERSION $v\n");
+	# To obtain side effects...
+	Getopt::Long->VERSION($vv);
     }
     if ( $only ) {
 	unshift (@{$t->{config}}, "debug");
