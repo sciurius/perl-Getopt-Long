@@ -1,5 +1,5 @@
-Version 2.32 of module Getopt::Long has been released to CPAN. It will
-be standard part of Perl 5.8.
+Version 2.33 of module Getopt::Long has been released to CPAN. It will
+be standard part of Perl 5.8.1 and 5.9.
 
 Module Getopt::Long implements an extended getopt function called
 GetOptions(). This function implements the POSIX standard for command
