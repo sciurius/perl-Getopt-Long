@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Sep 20 18:14:20 2001
-# Update Count    : 149
+# Last Modified On: Thu Sep 20 18:32:03 2001
+# Update Count    : 158
 # Status          : In progress
 
 ################ No args ################
@@ -729,8 +729,6 @@ P: v1:f v2
 A: foo -v1 1.2
    @ARGV foo -v1 1.2
 
-++
-
 ################ Bundling ################
 
 O: bundling
@@ -1028,6 +1026,28 @@ P: v+ \\$v1
 A: -vvv foo
    $v1 3
    @ARGV foo
+
+################ Internal/External linkage ################
+
+T: Mixing linkage
+P: v1=i v2=s \\$v2 v3 a1=s \\@a1 a2=i@ a3 \\@a3
+A: -v1 1 -v2 aaa -v3 -a1 bbb -a1 bbb -a2 4 -a2 5 -a3 -a3 foo
+   $opt_v1 1
+   $v2 aaa
+   $opt_v3 1
+   @a1 bbb bbb
+   @opt_a2 4 5
+   @a3 1 1
+   @ARGV foo
+
+################ Some errors ################
+
+T: Some error situations
+P: v1 <> \\$v3 v2
+E: Option spec <> requires a reference to a subroutine
+E: /^Error in option spec: "SCALAR\(0x
+
+
 
 ################ Miscellaneous ################
 
