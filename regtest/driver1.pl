@@ -8,8 +8,8 @@ package MyTest;			# not main
 # Author          : Johan Vromans
 # Created On      : Mon Aug  6 11:53:07 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Sep 21 15:48:17 2001
-# Update Count    : 358
+# Last Modified On: Wed Sep 26 17:03:46 2001
+# Update Count    : 382
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -35,6 +35,7 @@ require "newgetopt.pl";
 
 # Command line options.
 my $verbose = 0;		# verbose processing
+my $fatal = 0;			# quit after first error
 
 # Development options (not shown with -help).
 my $debug = 0;			# debugging
@@ -53,6 +54,7 @@ $Data::Dumper::Indent = 1;
 use Text::ParseWords;
 
 my $retval = 0;
+my $skipped = 0;
 
 ################ The Process ################
 
@@ -130,6 +132,8 @@ my $t = {
 my @sticky_config  = ();
 my @sticky_opts	   = ();
 my @sticky_argv	   = ();
+my $sticky_version = "";
+my @sticky_styles  = (undef,undef);
 
 # The main program.
 my $skip = 0;
@@ -163,7 +167,12 @@ while ( <> ) {
 do_test() unless $t->{done};
 
 # Statistics.
-print STDERR ("Number of tests = $variants ($test sets).\n") if $verbose;
+if ( $verbose ) {
+    print STDERR ("Number of tests sets = $test, tests = ",
+		  4*$test, ", executed = $variants");
+    print STDERR (", skipped = $skipped") if $skipped;
+    print STDERR (".\n");
+}
 
 exit ($retval);
 
@@ -207,7 +216,8 @@ sub gather {
 	$t->{argv}      = [ @sticky_argv ];
 	$t->{opts}      = [ @sticky_opts ];
 	$t->{config}    = [ @sticky_config ];
-	$t->{styles}    = [ undef, undef ];
+	$t->{styles}    = [ @sticky_styles ];
+	$t->{version}   = $sticky_version;
 
 	if ( $only ) {
 	    if ( $only != $test ) {
@@ -277,7 +287,12 @@ sub gather {
     # S+ style3 !style ...
     # Style(s) to inc/exclude.
     elsif ( /^S(:|\+)(\s+(.*)|$)/i ) {
-	$t->{styles} = [ undef, undef ] if $1 eq ":";
+	if ( $t->{done} < 0 ) {
+	    @sticky_styles = (undef, undef) if $1 eq ":";
+	}
+	else {
+	    $t->{styles} = [ undef, undef ] if $1 eq ":";
+	}
 	return unless $2;
 	my @a = shellwords(lc($3));
 	foreach my $style ( @a ) {
@@ -287,12 +302,28 @@ sub gather {
 		$style = $1;
 	    }
 	    if ( exists($styles{$style}) ) {
-		$t->{styles}->[$excl] |= $styles{$style};
+		if ( $t->{done} < 0 ) {
+		    $sticky_styles[$excl] |= $styles{$style};
+		}
+		else {
+		    $t->{styles}->[$excl] |= $styles{$style};
+		}
 	    }
 	    else {
 		print STDERR (hdr(), "<$.> Unknown style: $style\n");
 		$retval = 1,
 	    }
+	}
+    }
+
+    # R: version
+    # Require a specific version
+    elsif ( /^R:(\s+(.*)|$)/i ) {
+	if ( $t->{done} < 0 ) {
+	    $sticky_version = $2 || "";
+	}
+	else {
+	    $t->{version} = $2 || "";
 	}
     }
 
@@ -338,16 +369,22 @@ sub hdr {
 
 # Run all variants of a test set.
 sub do_test {
+    if ( $t->{version} && $t->{version} gt $Getopt::Long::VERSION ) {
+	$skipped += 4;
+	return;
+    }
     if ( $only ) {
 	unshift (@{$t->{config}}, "debug");
     }
     if ( defined $only_style ) {
 	exec_plain ($only_style);
+	die("Quit\n") if $fatal && $retval;
     }
     else {
 	foreach my $i1 ( 0, S_OO ) {
 	    foreach my $i2 ( 0, S_LINKAGE ) {
 		exec_plain (S_PLAIN|$i1|$i2);
+		die("Quit\n") if $fatal && $retval;
 	    }
 	}
     }
@@ -361,10 +398,10 @@ sub exec_plain {
     $phase .= "-oo" if $call & S_OO;
 
     if ( defined(my $mask = $t->{styles}->[0]) ) {
-	return unless $call & $mask;
+	$skipped++, return unless $call & $mask;
     }
     if ( defined(my $mask = $t->{styles}->[1]) ) {
-	return if $call & $mask;
+	$skipped++, return if $call & $mask;
     }
 
     print STDERR (hdr()) if $only;
@@ -597,6 +634,7 @@ sub app_options {
 		     'ident'	=> \$ident,
 		     'verbose'	=> \$verbose,
 		     'trace'	=> \$trace,
+		     'fatal'	=> \$fatal,
 		     'help|?'	=> \$help,
 		     'debug'	=> \$debug,
 		    ) or $help )
