@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Feb 24 20:17:23 2004
-# Update Count    : 1441
+# Last Modified On: Mon Aug 16 20:08:06 2004
+# Update Count    : 1445
 # Status          : Released
 
 ################ Copyright ################
@@ -35,10 +35,10 @@ use 5.004;
 use strict;
 
 use vars qw($VERSION);
-$VERSION        =  2.3401;
+$VERSION        =  2.3402;
 # For testing versions only.
 use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.34_01";
+$VERSION_STRING = "2.34_02";
 
 use Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
@@ -63,7 +63,7 @@ use vars qw($error $debug $major_version $minor_version);
 use vars qw($autoabbrev $getopt_compat $ignorecase $bundling $order
 	    $passthrough);
 # Official invisible variables.
-use vars qw($genprefix $caller $gnu_compat $auto_help $auto_version);
+use vars qw($genprefix $caller $gnu_compat $auto_help $auto_version $longprefix);
 
 # Public subroutines.
 sub config(@);			# deprecated name
@@ -106,6 +106,7 @@ sub ConfigDefaults() {
     $ignorecase = 1;		# ignore case when matching options
     $passthrough = 0;		# leave unrecognized options alone
     $gnu_compat = 0;		# require --opt=val if value is optional
+    $longprefix = "(--)";       # what does a long prefix look like
 }
 
 # Override import.
@@ -280,7 +281,8 @@ sub GetOptions(@) {
 	   "ignorecase=$ignorecase,",
 	   "requested_version=$requested_version,",
 	   "passthrough=$passthrough,",
-	   "genprefix=\"$genprefix\".",
+	   "genprefix=\"$genprefix\",",
+	   "longprefix=\"$longprefix\".",
 	   "\n");
     }
 
@@ -858,7 +860,7 @@ sub FindOption ($$$$) {
 
     # If it is a long option, it may include the value.
     # With getopt_compat, only if not bundling.
-    if ( ($starter eq "--" 
+    if ( ($starter=~/^$longprefix$/
           || ($getopt_compat && ($bundling == 0 || $bundling == 2)))
 	  && $opt =~ /^([^=]+)=(.*)$/s ) {
 	$opt = $1;
@@ -1202,13 +1204,14 @@ sub Configure (@) {
     my $prevconfig =
       [ $error, $debug, $major_version, $minor_version,
 	$autoabbrev, $getopt_compat, $ignorecase, $bundling, $order,
-	$gnu_compat, $passthrough, $genprefix, $auto_version, $auto_help ];
+	$gnu_compat, $passthrough, $genprefix, $auto_version, $auto_help,
+	$longprefix ];
 
     if ( ref($options[0]) eq 'ARRAY' ) {
 	( $error, $debug, $major_version, $minor_version,
 	  $autoabbrev, $getopt_compat, $ignorecase, $bundling, $order,
-	  $gnu_compat, $passthrough, $genprefix, $auto_version, $auto_help ) =
-	    @{shift(@options)};
+	  $gnu_compat, $passthrough, $genprefix, $auto_version, $auto_help,
+	  $longprefix ) = @{shift(@options)};
     }
 
     my $opt;
@@ -1283,8 +1286,16 @@ sub Configure (@) {
 	    # Parenthesize if needed.
 	    $genprefix = "(" . $genprefix . ")"
 	      unless $genprefix =~ /^\(.*\)$/;
-	    eval { '' =~ /$genprefix/; };
+	    eval { '' =~ m"$genprefix"; };
 	    die("Getopt::Long: invalid pattern \"$genprefix\"") if $@;
+	}
+	elsif ( $try =~ /^long_prefix_pattern=(.+)$/ && $action ) {
+	    $longprefix = $1;
+	    # Parenthesize if needed.
+	    $longprefix = "(" . $longprefix . ")"
+	      unless $longprefix =~ /^\(.*\)$/;
+	    eval { '' =~ m"$longprefix"; };
+	    die("Getopt::Long: invalid long prefix pattern \"$longprefix\"") if $@;
 	}
 	elsif ( $try eq 'debug' ) {
 	    $debug = $action;
@@ -2236,8 +2247,21 @@ sufficient, see C<prefix_pattern>.
 =item prefix_pattern
 
 A Perl pattern that identifies the strings that introduce options.
-Default is C<(--|-|\+)> unless environment variable
-POSIXLY_CORRECT has been set, in which case it is C<(--|-)>.
+Default is C<--|-|\+> unless environment variable
+POSIXLY_CORRECT has been set, in which case it is C<--|->.
+
+=item long_prefix_pattern
+
+A Perl pattern that allows the disambiguation of long and short
+prefixes. Default is C<-->.
+
+Typically you only need to set this if you are using nonstandard
+prefixes and want some or all of them to have the same semantics as
+'--' does under normal circumstances.
+
+For example, setting prefix_pattern to C<--|-|\+|\/> and
+long_prefix_pattern to C<--|\/> would add Win32 style argument
+handling.
 
 =item debug (default: disabled)
 
