@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Mar 27 11:50:30 1998
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Jul  7 12:47:57 1999
-# Update Count    : 28
+# Last Modified On: Mon Nov  1 09:40:57 1999
+# Update Count    : 33
 # Status          : Released
 
 sub GetOptions {
@@ -583,12 +583,12 @@ sub FindOption ($$$$$$$) {
     }
 
     elsif ( $type eq "n" || $type eq "i" ) { # numeric/integer
-	if ( $bundling && defined $rest && $rest =~ /^(-?[0-9]+)(.*)$/s ) {
+	if ( $bundling && defined $rest && $rest =~ /^([-+]?[0-9]+)(.*)$/s ) {
 	    $arg = $1;
 	    $rest = $2;
 	    unshift (@ARGV, $starter.$rest) if defined $rest && $rest ne '';
 	}
-	elsif ( $arg !~ /^-?[0-9]+$/ ) {
+	elsif ( $arg !~ /^[-+]?[0-9]+$/ ) {
 	    if ( defined $optarg || $mand eq "=" ) {
 		if ( $passthrough ) {
 		    unshift (@ARGV, defined $rest ? $starter.$rest : $arg)
@@ -616,12 +616,12 @@ sub FindOption ($$$$$$$) {
 	# and at least one digit following the point and 'e'.
 	# [-]NN[.NN][eNN]
 	if ( $bundling && defined $rest &&
-	     $rest =~ /^(-?[0-9]+(\.[0-9]+)?([eE]-?[0-9]+)?)(.*)$/s ) {
+	     $rest =~ /^([-+]?[0-9]+(\.[0-9]+)?([eE][-+]?[0-9]+)?)(.*)$/s ) {
 	    $arg = $1;
 	    $rest = $+;
 	    unshift (@ARGV, $starter.$rest) if defined $rest && $rest ne '';
 	}
-	elsif ( $arg !~ /^-?[0-9.]+(\.[0-9]+)?([eE]-?[0-9]+)?$/ ) {
+	elsif ( $arg !~ /^[-+]?[0-9.]+(\.[0-9]+)?([eE][-+]?[0-9]+)?$/ ) {
 	    if ( defined $optarg || $mand eq "=" ) {
 		if ( $passthrough ) {
 		    unshift (@ARGV, defined $rest ? $starter.$rest : $arg)
