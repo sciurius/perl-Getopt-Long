@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : ***
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Jun 14 14:26:07 1998
-# Update Count    : 24
+# Last Modified On: Fri Feb 12 11:11:25 1999
+# Update Count    : 37
 # Status          : Internal use only.
 
 package foo;
@@ -1159,6 +1159,35 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT$ {test}d\n") unless @ARGV == 1 && $ARGV[0] eq 'foo';
 }
 { package newgetopt; $bundling = 0;}
+
+################ Miscellaneous ################
+
+#  From: "Epstein, Caleb" <cepstein@Montgomery.com>
+#  Subject: Strict warning from Getopt::Long under
+#  Date: Thu, 11 Feb 1999 08:37:00 -0500
+#
+#  I get warnings from perl with Getopt::Long and code like this:
+#
+#  		#!/usr/local/bin/perl -w
+#  		use strict;
+#  		use Getopt::Long;
+#  		my @ARY;
+#  		my $retval = GetOptions ("A|apple=s@" => \@ARY);
+#  		print join ("\n", @ARY), "\n";
+#
+#  The warning message is:
+#
+#  	Use of uninitialized value at
+#  /home/cepstein/lib/perl5/auto/Getopt/Long/GetOptions.al line 173.
+
+if ( ++$test == $single || $all ) {
+    # Option names that are not lowercase give warnings unless 
+    # ignorecase is switched off.
+    $newgetopt'debug = 1 if $test == $single;	#';
+    $newgetopt'ignorecase = 0;
+    my @ARY;
+    my $retval = NGetOpt ("A|apple=s@" => \@ARY);
+}
 
 ################ Finish ################
 
