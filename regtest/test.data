@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Dec 21 13:21:12 2001
-# Update Count    : 299
+# Last Modified On: Fri Dec 21 13:46:01 2001
+# Update Count    : 307
 # Status          : In progress
 
 ################ No args ################
@@ -124,6 +124,8 @@ A: -oNe
 
 P: one \\$v1 One \\$v2 oNe \\$v3
 
+R: <= 2.2603
+
 T: Due to case ignoring, one becomes an alias for oNe
 A: -oNe -one foo
    $v3 1
@@ -133,6 +135,14 @@ T: Due to case ignoring, one becomes an alias for One
 A: -One -one foo
    $v3 1
    @ARGV foo
+
+R: 2.2604
+
+T: Due to case ignoring, one becomes an alias for oNe
+E: Duplicate specification "One" for option "one"
+E: Duplicate specification "oNe" for option "one"
+
+R:
 
 T: Without case ignore
 O: no_ignore_case
@@ -1399,6 +1409,13 @@ E: Option spec <> requires a reference to a subroutine
 T: Some error situations
 P: v1 x@@! \\$v3 v2
 E: Error in option spec: "x@@!"
+
+T: Check dups
+P: foo|bar=s Bar Foo bar|foo=i
+E: Duplicate specification "Bar" for option "bar"
+E: Duplicate specification "Foo" for option "foo"
+E: Duplicate specification "bar|foo=i" for option "bar"
+E: Duplicate specification "bar|foo=i" for option "foo"
 
 R:
 
