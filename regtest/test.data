@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Jun 29 17:14:15 2002
-# Update Count    : 347
+# Last Modified On: Wed Dec 11 13:51:16 2002
+# Update Count    : 348
 # Status          : In progress
 
 ################ No args ################
@@ -1357,6 +1357,13 @@ O: pass_through
 P: v1=i v2=f
 A: -v2=blech -v1 6
    @ARGV -v2=blech
+   $opt_v1 == 6
+
+T: Pass-Through
+O: pass_through
+P: v1=i v2=f
+A: -v2=blech -v1 6 -- -v1 7
+   @ARGV -v2=blech -- -v1 7
    $opt_v1 == 6
 
 ################ Option character case ################
