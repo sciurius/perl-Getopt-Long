@@ -1,6 +1,6 @@
-Version 2.16 of module Getopt::Long is now available via CPAN. It
+Version 2.17 of module Getopt::Long is now available via CPAN. It
 should soon appear in directory authors/Johan_Vromans as file
-GetoptLong-2.16.tar.gz. It will be standard part of Perl 5.005 or later.
+GetoptLong-2.17.tar.gz. It will be standard part of Perl 5.005 or later.
 
 Module Getopt::Long implements an extended getopt function called
 GetOptions(). This function implements the POSIX standard for command
@@ -14,18 +14,24 @@ it to http://www.perl.com/CPAN/ (include the final slash!). It will
 automagically be redirected to a CPAN site in your neighborhood. 
 URL: http://www.perl.com/CPAN/authors/Johan_Vromans
 
-Changes in version 2.16
+Changes in version 2.17
 -----------------------
 
-* A couple of small additional fixes to the $` $& $' fixes.
+* Getopt::Long::config is renamed Getopt::Long::Configure. The old
+  name will remain supported without being documented.
 
-* The option prefix can be set using config("prefix=...") or, more
-  powerful, with config("prefix_pattern=..."); see the documentation
-  for details.
+* Getopt::Long now uses autoloading. This substantially reduces the
+  resources required to 'use Getopt::Long' (about 100 lines of over
+  1300 total).
 
-* More 'perl -w' warnings eliminated for obscure cases of bundling.
+* To install, it is now required to use the official procedure:
 
-Previous released version was 2.13.
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+Previous released version was 2.16.
 
 ---- README ----
 
