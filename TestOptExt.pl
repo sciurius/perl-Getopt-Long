@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : ***
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Jul  7 12:53:11 1999
-# Update Count    : 37
+# Last Modified On: Fri Mar 17 09:02:38 2000
+# Update Count    : 48
 # Status          : Internal use only
 
 package foo;
@@ -54,8 +54,8 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}g\n") unless defined $o_two;
     print STDOUT ("FT${test}h\n") unless $o_two == 2;
     print STDOUT ("FT${test}i\n") if defined $opt_three;
-    print STDOUT ("FT${test}j\n") if defined @opt_three;
-    print STDOUT ("FT${test}k\n") unless defined @o_three;
+    print STDOUT ("FT${test}j\n") if @opt_three;
+    print STDOUT ("FT${test}k\n") unless @o_three;
     print STDOUT ("FT${test}l\n") unless @o_three == 2;
     print STDOUT ("FT${test}m\n") unless $o_three[0] == 1 && $o_three[1] == 4;
     print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
@@ -83,8 +83,8 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}g\n") unless defined $o_two;
     print STDOUT ("FT${test}h\n") unless $o_two == 2;
     print STDOUT ("FT${test}i\n") if defined $opt_three;
-    print STDOUT ("FT${test}j\n") if defined @opt_three;
-    print STDOUT ("FT${test}k\n") unless defined @o_three;
+    print STDOUT ("FT${test}j\n") if @opt_three;
+    print STDOUT ("FT${test}k\n") unless @o_three;
     print STDOUT ("FT${test}l\n") unless @o_three == 2;
     print STDOUT ("FT${test}m\n") unless $o_three[0] == 1 && $o_three[1] == 4;
     my @k = keys(%linkage);
@@ -110,7 +110,7 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}a\n") if defined $opt_one;
     print STDOUT ("FT${test}b\n") if defined $opt_two;
     print STDOUT ("FT${test}c\n") if defined $opt_three;
-    print STDOUT ("FT${test}d\n") if defined @opt_three;
+    print STDOUT ("FT${test}d\n") if @opt_three;
     my @k = keys(%linkage);
     print STDOUT ("FT${test}e (@k)\n") unless @k == 2;
     print STDOUT ("FT${test}f\n") unless (exists $linkage{"one"});
@@ -149,7 +149,7 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}a\n") if defined $opt_one;
     print STDOUT ("FT${test}b\n") if defined $opt_two;
     print STDOUT ("FT${test}c\n") if defined $opt_three;
-    print STDOUT ("FT${test}d\n") if defined @opt_three;
+    print STDOUT ("FT${test}d\n") if @opt_three;
     my @k = keys(%$linkage);
     print STDOUT ("FT${test}e (@k)\n") unless @k == 2;
     print STDOUT ("FT${test}f\n") unless (exists $linkage->{"one"});
@@ -184,7 +184,7 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}a\n") if defined $opt_one;
     print STDOUT ("FT${test}b\n") if defined $opt_two;
     print STDOUT ("FT${test}c\n") if defined $opt_three;
-    print STDOUT ("FT${test}d\n") if defined @opt_three;
+    print STDOUT ("FT${test}d\n") if @opt_three;
     my @k = keys(%linkage);
     print STDOUT ("FT${test}e (@k)\n") unless @k == 2;
     print STDOUT ("FT${test}f\n") unless (exists $linkage{"one"});
@@ -293,6 +293,11 @@ sub cbx {
     $Getopt::Long::error++;
 }
 
+sub cby {
+    &cb;
+    die ("Option fail for \"$_[0]\"\n");
+}
+
 sub process {
     print STDOUT ("Process($_[0])\n") if $single;
     $xx{$_[0]} = -1;
@@ -315,7 +320,7 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}a\n") if defined $opt_one;
     print STDOUT ("FT${test}b\n") if defined $opt_two;
     print STDOUT ("FT${test}c\n") if defined $opt_three;
-    print STDOUT ("FT${test}d\n") if defined @opt_three;
+    print STDOUT ("FT${test}d\n") if @opt_three;
     my @k = keys(%linkage);
     print STDOUT ("FT${test}e (@k)\n") unless @k == 2;
     print STDOUT ("FT${test}f\n") unless (exists $linkage{"one"});
@@ -351,7 +356,7 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}a\n") if defined $opt_one;
     print STDOUT ("FT${test}b\n") if defined $opt_two;
     print STDOUT ("FT${test}c\n") if defined $opt_three;
-    print STDOUT ("FT${test}d\n") if defined @opt_three;
+    print STDOUT ("FT${test}d\n") if @opt_three;
     my @k = keys(%linkage);
     print STDOUT ("FT${test}e (@k)\n") unless @k == 2;
     print STDOUT ("FT${test}f\n") unless (exists $linkage{"one"});
@@ -389,7 +394,7 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}a\n") if defined $opt_one;
     print STDOUT ("FT${test}b\n") if defined $opt_two;
     print STDOUT ("FT${test}c\n") if defined $opt_three;
-    print STDOUT ("FT${test}d\n") if defined @opt_three;
+    print STDOUT ("FT${test}d\n") if @opt_three;
     my @k = keys(%linkage);
     print STDOUT ("FT${test}e (@k)\n") unless @k == 2;
     print STDOUT ("FT${test}f\n") unless (exists $linkage{"one"});
@@ -428,7 +433,7 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}a\n") if defined $opt_one;
     print STDOUT ("FT${test}b\n") if defined $opt_two;
     print STDOUT ("FT${test}c\n") if defined $opt_three;
-    print STDOUT ("FT${test}d\n") if defined @opt_three;
+    print STDOUT ("FT${test}d\n") if @opt_three;
     my @k = keys(%linkage);
     print STDOUT ("FT${test}e (@k)\n") unless @k == 2;
     print STDOUT ("FT${test}f\n") unless (exists $linkage{"one"});
@@ -469,7 +474,7 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}a\n") if defined $opt_one;
     print STDOUT ("FT${test}b\n") if defined $opt_two;
     print STDOUT ("FT${test}c\n") if defined $opt_three;
-    print STDOUT ("FT${test}d\n") if defined @opt_three;
+    print STDOUT ("FT${test}d\n") if @opt_three;
     my @k = keys(%linkage);
     print STDOUT ("FT${test}e (@k)\n") unless @k == 2;
     print STDOUT ("FT${test}f\n") unless (exists $linkage{"one"});
@@ -493,7 +498,7 @@ if ( ++$test == $single || $all ) {
 
 if ( ++$test == $single || $all ) {
 
-    my %linkage = ('one', \&cbx);
+    my %linkage = ('one', \&cby);
     my $o_one;
     my $o_two;
     my @o_three;
@@ -510,7 +515,7 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}a\n") if defined $opt_one;
     print STDOUT ("FT${test}b\n") if defined $opt_two;
     print STDOUT ("FT${test}c\n") if defined $opt_three;
-    print STDOUT ("FT${test}d\n") if defined @opt_three;
+    print STDOUT ("FT${test}d\n") if @opt_three;
     my @k = keys(%linkage);
     print STDOUT ("FT${test}e (@k)\n") unless @k == 2;
     print STDOUT ("FT${test}f\n") unless (exists $linkage{"one"});
@@ -622,7 +627,8 @@ if ( ++$test == $single || $all ) {
 
 ################ OO ################
 
-if ( 0 and ++$test == $single || $all ) {
+if ( ++$test == $single || $all ) {
+  if ( 0 ) {
 
     # If bundling, it is not allowed to split on aa=bb.
     # Also, prevent warnings for undefind $bopctl{$o}.
@@ -632,7 +638,7 @@ if ( 0 and ++$test == $single || $all ) {
     my $p = new Getopt::Long ("bundling");
     @ARGV = qw( -vwv=vw -wvv=vw -- foo );
     print STDOUT ("FT${test}a\n") 
-	unless $p->GetOptions ("v=s" => \@v, "vee=s" => \@v, "w=s" => \%w, "wee=s" => \%w);
+	unless $p->getoptions ("v=s" => \@v, "vee=s" => \@v, "w=s" => \%w, "wee=s" => \%w);
 
     print STDOUT ("FT${test}a\n") unless @v == 1;
     print STDOUT ("FT${test}b\n") unless $v[0] eq 'wv=vw';
@@ -640,6 +646,25 @@ if ( 0 and ++$test == $single || $all ) {
     print STDOUT ("FT${test}d\n") unless $w{vv} eq 'vw';
     print STDOUT ("FT${test}z\n") unless @ARGV == 1
 	&& "@ARGV" eq "foo";
+  }
+}
+
+################ Interrupting ################
+
+if ( ++$test == $single || $all ) {
+
+    # Use die(!FINISH) to interrupt the options handling.
+
+    my $a;
+    Getopt::Long::config("bundling");
+    @ARGV = qw( -amenu foo );
+    print STDOUT ("FT${test}a\n")
+	unless GetOptions ("a" => \$a, "m" => sub { die("!FINISH here") });
+    print STDOUT ("FT${test}b\n") unless defined $a;
+    print STDOUT ("FT${test}c\n") unless $a == 1;
+    print STDOUT ("FT${test}z\n") unless @ARGV == 2
+	&& "@ARGV" eq "-enu foo";
+    Getopt::Long::config("nobundling");
 }
 
 ################ Wrap Up ################
