@@ -231,10 +231,20 @@ defined.
 Options that start with "--" may have an argument appended, separated
 with an "=", e.g. "--foo=bar".
 
-=head2 Return value
+=head2 Return values and Errors
 
-A return status of 0 (false) indicates that the function detected
-one or more errors.
+Configuration errors and errors in the option definitions are
+signalled using C<die()> and will terminate the calling
+program unless the call to C<Getopt::Long::GetOptions()> was embedded
+in C<eval { ... }> or C<die()> was trapped using C<$SIG{__DIE__}>.
+
+A return value of 1 (true) indicates success.
+
+A return status of 0 (false) indicates that the function detected one
+or more errors during option parsing. These errors are signalled using
+C<warn()> and can be trapped with C<$SIG{__WARN__}>.
+
+Errors that can't happen are signalled using C<Carp::croak()>.
 
 =head1 COMPATIBILITY
 
@@ -415,10 +425,11 @@ would be equivalent to
 provided "vax", "v", "a" and "x" have been defined to be valid
 options. 
 
-Bundled options can also include a value in the bundle; this value has
-to be the last part of the bundle, e.g.
+Bundled options can also include a value in the bundle; for strings
+this value is the rest of the bundle, but integer and floating values
+may be combined in the bundle, e.g.
 
-    scale -h24 -w80
+    scale -h24w80
 
 is equivalent to
 
