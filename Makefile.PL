@@ -65,13 +65,16 @@ WriteMakefile(
 
 	( $] < 5.005 ) ? () : (
 	AUTHOR => 'Johan Vromans (jvromans@squirrel.nl)',
-        ABSTRACT => 'Extended getopt function for command line parsing',
+        ABSTRACT => 'Module to handle parsing command line options',
         ),
 
 	INSTALLDIRS => 'perl',
 	PM 	  => { "lib/newgetopt.pl"  => '$(INST_LIB)/newgetopt.pl',
-		       "lib/Getopt/Long.pm" => '$(INST_LIB)/Getopt/Long.pm'
+		       "lib/Getopt/Long.pm" => '$(INST_LIB)/Getopt/Long.pm',
+		       "perlcmdline.pod" => '$(INST_LIB)/pod/perlcmdline.pod',
 		     },
+	MAN1PODS  => { "perlcmdline.pod" => 'blib/man1/perlcmdline.1', },
+	MAN3PODS  => { "lib/Getopt/Long.pm" => 'blib/man3/Getopt::Long.3', },
 	dist      => { COMPRESS => 'gzip', SUFFIX => 'gz',
 		     },
  );
