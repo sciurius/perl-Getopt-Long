@@ -1,26 +1,14 @@
-# GetOpt::Long.pm -- POSIX compatible options parsing
+# GetOpt::Long.pm -- Universal options parsing
+
+package Getopt::Long;
 
 # RCS Status      : $Id$
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Feb 20 21:49:27 1997
-# Update Count    : 563
+# Last Modified On: Sun Mar  2 14:59:41 1997
+# Update Count    : 586
 # Status          : Released
-
-package Getopt::Long;
-require 5.000;
-require Exporter;
-
-@ISA = qw(Exporter);
-@EXPORT = qw(&GetOptions $REQUIRE_ORDER $PERMUTE $RETURN_IN_ORDER);
-@EXPORT_OK = qw(config);
-$VERSION = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
-use vars qw($autoabbrev $getopt_compat $ignorecase $bundling $order
-	    $passthrough $error $debug &config &config_defaults
-	    $REQUIRE_ORDER $PERMUTE $RETURN_IN_ORDER
-	    $VERSION $major_version $minor_version);
-use strict;
 
 =head1 NAME
 
@@ -512,8 +500,8 @@ cause options parsing to fail.
 
 =cut
 
-################ Introduction ################
-#
+################ Copyright ################
+
 # This program is Copyright 1990,1997 by Johan Vromans.
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -529,10 +517,30 @@ cause options parsing to fail.
 # the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, 
 # MA 02139, USA.
 
-################ Configuration Section ################
+################ Module Preamble ################
 
-# Values for $order. See GNU getopt.c for details.
-($REQUIRE_ORDER, $PERMUTE, $RETURN_IN_ORDER) = (0..2);
+use strict;
+
+BEGIN {
+    require 5.00327;
+    use Exporter ();
+    use vars   qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+    $VERSION   = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
+
+    @ISA       = qw(Exporter);
+    @EXPORT    = qw(&GetOptions $REQUIRE_ORDER $PERMUTE $RETURN_IN_ORDER);
+    %EXPORT_TAGS = ();
+    @EXPORT_OK = qw();
+}
+
+use vars @EXPORT, @EXPORT_OK;
+# User visible variables.
+use vars qw(&config $error $debug $major_version $minor_version);
+# Deprecated visible variables.
+use vars qw($autoabbrev $getopt_compat $ignorecase $bundling $order
+	    $passthrough);
+
+################ Local Variables ################
 
 my $gen_prefix;			# generic prefix (option starters)
 my $argend;			# option list terminator
@@ -548,11 +556,8 @@ my $array;			# current option is array typed
 my $hash;			# current option is hash typed
 my $key;			# hash key for a hash option
 				# than once in differing environments
-
-config_defaults ();
-($major_version, $minor_version) = $VERSION =~ /^(\d+)\.(\d+)/;
-
-use vars qw( @opctl );
+my $config_defaults;		# set config defaults
+my $find_option;		# helper routine
 
 ################ Subroutines ################
 
@@ -783,7 +788,7 @@ sub GetOptions {
 	my $tryopt = $opt;
 
 	# find_option operates on the GLOBAL $opt and $arg!
-	if ( &find_option ) {
+	if ( &$find_option () ) {
 	    
 	    # find_option undefines $opt in case of errors.
 	    next unless defined $opt;
@@ -887,7 +892,78 @@ sub GetOptions {
     return ($error == 0);
 }
 
-sub find_option {
+sub config (@) {
+    my (@options) = @_;
+    my $opt;
+    foreach $opt ( @options ) {
+	my $try = lc ($opt);
+	my $action = 1;
+	if ( $try =~ /^no_?/ ) {
+	    $action = 0;
+	    $try = $';
+	}
+	if ( $try eq 'default' or $try eq 'defaults' ) {
+	    &$config_defaults () if $action;
+	}
+	elsif ( $try eq 'auto_abbrev' or $try eq 'autoabbrev' ) {
+	    $autoabbrev = $action;
+	}
+	elsif ( $try eq 'getopt_compat' ) {
+	    $getopt_compat = $action;
+	}
+	elsif ( $try eq 'ignorecase' or $try eq 'ignore_case' ) {
+	    $ignorecase = $action;
+	}
+	elsif ( $try eq 'ignore_case_always' ) {
+	    $ignorecase = $action ? 2 : 0;
+	}
+	elsif ( $try eq 'bundling' ) {
+	    $bundling = $action;
+	}
+	elsif ( $try eq 'bundling_override' ) {
+	    $bundling = $action ? 2 : 0;
+	}
+	elsif ( $try eq 'require_order' ) {
+	    $order = $action ? $REQUIRE_ORDER : $PERMUTE;
+	}
+	elsif ( $try eq 'permute' ) {
+	    $order = $action ? $PERMUTE : $REQUIRE_ORDER;
+	}
+	elsif ( $try eq 'pass_through' or $try eq 'passthrough' ) {
+	    $passthrough = $action;
+	}
+	elsif ( $try eq 'debug' ) {
+	    $debug = $action;
+	}
+	else {
+	    $Carp::CarpLevel = 1;
+	    Carp::croak("Getopt::Long: unknown config parameter \"$opt\"")
+	}
+    }
+}
+
+# Modified from Exporter. This one handles 2.001 and 2.01 etc just like 2.1.
+sub require_version {
+    no strict;
+    my ($self, $wanted) = @_;
+    my $pkg = ref $self || $self;
+    my $version = $ {"${pkg}::VERSION"} || "(undef)";
+
+    $wanted .= '.0' unless $wanted =~ /\./;
+    $wanted = $1 * 1000 + $2 if $wanted =~ /^(\d+)\.(\d+)$/;
+    $version = $1 * 1000 + $2 if $version =~ /^(\d+)\.(\d+)$/;
+    if ( $version < $wanted ) {
+	$version =~ s/^(\d+)(\d\d\d)$/$1.'.'.(0+$2)/e;
+	$wanted =~ s/^(\d+)(\d\d\d)$/$1.'.'.(0+$2)/e;
+	$Carp::CarpLevel = 1;
+	Carp::croak("$pkg $wanted required--this is only version $version")
+    }
+    $version;
+}
+
+################ Private Subroutines ################
+
+$find_option = sub {
 
     return 0 unless $opt =~ /^$genprefix/;
 
@@ -1103,59 +1179,9 @@ sub find_option {
 	die ("GetOpt::Long internal error (Can't happen)\n");
     }
     return 1;
-}
+};
 
-sub config {
-    my (@options) = @_;
-    my $opt;
-    foreach $opt ( @options ) {
-	my $try = lc ($opt);
-	my $action = 1;
-	if ( $try =~ /^no_?/ ) {
-	    $action = 0;
-	    $try = $';
-	}
-	if ( $try eq 'default' or $try eq 'defaults' ) {
-	    config_defaults () if $action;
-	}
-	elsif ( $try eq 'auto_abbrev' or $try eq 'autoabbrev' ) {
-	    $autoabbrev = $action;
-	}
-	elsif ( $try eq 'getopt_compat' ) {
-	    $getopt_compat = $action;
-	}
-	elsif ( $try eq 'ignorecase' or $try eq 'ignore_case' ) {
-	    $ignorecase = $action;
-	}
-	elsif ( $try eq 'ignore_case_always' ) {
-	    $ignorecase = $action ? 2 : 0;
-	}
-	elsif ( $try eq 'bundling' ) {
-	    $bundling = $action;
-	}
-	elsif ( $try eq 'bundling_override' ) {
-	    $bundling = $action ? 2 : 0;
-	}
-	elsif ( $try eq 'require_order' ) {
-	    $order = $action ? $REQUIRE_ORDER : $PERMUTE;
-	}
-	elsif ( $try eq 'permute' ) {
-	    $order = $action ? $PERMUTE : $REQUIRE_ORDER;
-	}
-	elsif ( $try eq 'pass_through' or $try eq 'passthrough' ) {
-	    $passthrough = $action;
-	}
-	elsif ( $try eq 'debug' ) {
-	    $debug = $action;
-	}
-	else {
-	    $Carp::CarpLevel = 1;
-	    Carp::croak("Getopt::Long: unknown config parameter \"$opt\"")
-	}
-    }
-}
-
-sub config_defaults {
+$config_defaults = sub {
     # Handle POSIX compliancy.
     if ( defined $ENV{"POSIXLY_CORRECT"} ) {
 	$gen_prefix = "(--|-)";
@@ -1176,26 +1202,17 @@ sub config_defaults {
     $error = 0;			# error tally
     $ignorecase = 1;		# ignore case when matching options
     $passthrough = 0;		# leave unrecognized options alone
-}
+};
 
-# Modified from Exporter. This one handles 2.001 and 2.01 etc just like 2.1.
-sub require_version {
-    no strict;
-    my ($self, $wanted) = @_;
-    my $pkg = ref $self || $self;
-    my $version = $ {"${pkg}::VERSION"} || "(undef)";
+################ Initialization ################
 
-    $wanted .= '.0' unless $wanted =~ /\./;
-    $wanted = $1 * 1000 + $2 if $wanted =~ /^(\d+)\.(\d+)$/;
-    $version = $1 * 1000 + $2 if $version =~ /^(\d+)\.(\d+)$/;
-    if ( $version < $wanted ) {
-	$version =~ s/^(\d+)(\d\d\d)$/$1.'.'.(0+$2)/e;
-	$wanted =~ s/^(\d+)(\d\d\d)$/$1.'.'.(0+$2)/e;
-	$Carp::CarpLevel = 1;
-	Carp::croak("$pkg $wanted required--this is only version $version")
-    }
-    $version;
-}
+# Values for $order. See GNU getopt.c for details.
+($REQUIRE_ORDER, $PERMUTE, $RETURN_IN_ORDER) = (0..2);
+# Version major/minor numbers.
+($major_version, $minor_version) = $VERSION =~ /^(\d+)\.(\d+)/;
+
+# Set defaults.
+&$config_defaults ();
 
 ################ Package return ################
 
