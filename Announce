@@ -1,6 +1,6 @@
-Version 2.8 of module Getopt::Long is now available via CPAN. It
+Version 2.9 of module Getopt::Long is now available via CPAN. It
 should soon appear in directory authors/Johan_Vromans as file
-GetoptLong-2.8.tar.gz.
+GetoptLong-2.9.tar.gz. It will be standard part of Perl 5.004.
 
 Module Getopt::Long implements an extended getopt function called
 GetOptions(). This function implements the POSIX standard for command
@@ -10,7 +10,7 @@ the traditional one-letter options (including option bundling).
 The kit contains:
 
   README         -- Introductionary text
-  GetoptLong.pm  -- version 2.6 of Getopt::Long (subroutine GetOptions)
+  GetoptLong.pm  -- version 2.9 of Getopt::Long (subroutine GetOptions)
   newgetopt.pl   -- version 1.17 of newgetopt.pl (subroutine NGetOpt)
   Makefile.PL    -- Makefile for installation
   skel.pl        -- Skeleton program to use Getopt::Long
@@ -19,15 +19,15 @@ The kit contains:
 The README document is attached to this message.
 
 The best way to download from CPAN is to use a Web browser and point
-it to http://www.perl.com/CPAN. It will automagically be redirected to
-a CPAN site in your neighborhood.
-URL: http://www.perl.com/CPAN/authors/Johan_Vromans
+it to http://www.perl.com/CPAN/ (include the final slash!). It will
+automagically be redirected to a CPAN site in your neighborhood. URL:
+http://www.perl.com/CPAN/authors/Johan_Vromans
 
-Changes w.r.t version 2.6
--------------------------
+User visible changes w.r.t version 2.6
+--------------------------------------
 
 * A new way to configure Getopt::Long. Instead of setting module local
-  variables routine Getopt::Long::config can be called with the names
+  variables, routine Getopt::Long::config can be called with the names
   of options to be set or reset, e.g.
 
     Getopt::Long::config ("no_auto_abbrev", "ignore_case");
@@ -36,3 +36,4 @@ Changes w.r.t version 2.6
   it will continue to work for backwark compatibility.
 
 ---- README ----
+
