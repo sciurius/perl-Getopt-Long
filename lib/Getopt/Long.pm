@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Nov 12 13:38:14 2001
-# Update Count    : 981
+# Last Modified On: Thu Nov 15 18:13:36 2001
+# Update Count    : 987
 # Status          : Released
 
 ################ Copyright ################
@@ -35,10 +35,10 @@ use 5.004;
 use strict;
 
 use vars qw($VERSION);
-$VERSION        =  2.26_02;
+$VERSION        =  2.26_03;
 # For testing versions only.
 use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.26_02";
+$VERSION_STRING = "2.26_03";
 
 use Exporter;
 
@@ -723,11 +723,12 @@ sub FindOption ($$$$) {
 
     if ( $bundling && $starter eq '-' ) {
 
-	# To try overides, obey case ignore.
+	# To try overrides, obey case ignore.
 	$tryopt = $ignorecase ? lc($opt) : $opt;
 
 	# If bundling == 2, long options can override bundles.
-	if ( $bundling == 2 && defined ($opctl->{$tryopt}) ) {
+	if ( $bundling == 2 && length($tryopt) > 1
+	     && defined ($opctl->{$tryopt}) ) {
 	    print STDERR ("=> $starter$tryopt overrides unbundling\n")
 	      if $debug;
 	}
@@ -832,11 +833,9 @@ sub FindOption ($$$$) {
     my $mand = $ctl->[CTL_MAND];
 
     # Check if there is an option argument available.
-    if ( $gnu_compat ) {
-	return (1, $opt, $ctl, $optarg)
-	  if defined $optarg;
-	return (1, $opt, $ctl, $type eq "s" ? '' : 0)
-	  unless $mand;
+    if ( $gnu_compat && defined $optarg && $optarg eq "" ) {
+	return (1, $opt, $ctl, $type eq "s" ? "" : 0) unless $mand;
+	$optarg = 0 unless $type eq "s";
     }
 
     # Check if there is an option argument available.
