@@ -1,11 +1,13 @@
 #!./perl -w
 
-use Getopt::Long 2.17;
+use Getopt::Long qw(:config no_ignore_case);
+die("Getopt::Long version 2.23_03 required--this is only version ".
+    $Getopt::Long::VERSION)
+  unless $Getopt::Long::VERSION ge "2.24";
 
 print "1..9\n";
 
 @ARGV = qw(-Foo -baR --foo bar);
-Getopt::Long::Configure ("no_ignore_case");
 undef $opt_baR;
 undef $opt_bar;
 print "ok 1\n" if GetOptions ("foo", "Foo=s");
