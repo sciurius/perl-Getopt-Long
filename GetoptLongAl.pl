@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Mar 27 11:50:30 1998
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Mar 27 13:35:24 1998
-# Update Count    : 8
+# Last Modified On: Fri Mar 27 13:43:47 1998
+# Update Count    : 10
 # Status          : Released
 
 sub GetOptions {
@@ -21,13 +21,13 @@ sub GetOptions {
     my %linkage;		# linkage
     my $userlinkage;		# user supplied HASH
     my $opt;			# current option
-    my $genprefix = $genprefix;# so we can call the same module many times
+    my $genprefix = $genprefix;	# so we can call the same module many times
     my @opctl;			# the possible long option names
 
     $error = '';
 
     print STDERR ('GetOptions $Revision$ ',
-		  "[GetOpt::Long $Getopt::Long::VERSION/A] -- ",
+		  "[GetOpt::Long $Getopt::Long::VERSION] -- ",
 		  "called from package \"$pkg\".\n",
 		  "  (@ARGV)\n",
 		  "  autoabbrev=$autoabbrev".
@@ -245,19 +245,19 @@ sub GetOptions {
 	}
 
 	my $tryopt = $opt;
-	my $found;
-	my $array;
-	my $hash;
-	my $key;
-	my $arg;
+	my $found;		# success status
+	my $array;		# option is array type
+	my $hash;		# option is hash type
+	my $key;		# key (if hash type)
+	my $arg;		# option argument
 
-	($found,$opt,$arg,$array,$hash,$key) = 
+	($found, $opt, $arg, $array, $hash, $key) = 
 	  FindOption ($genprefix, $argend, $opt, 
 		      \%opctl, \%bopctl, \@opctl, \%aliases);
 
 	if ( $found ) {
 	    
-	    # find_option undefines $opt in case of errors.
+	    # FindOption undefines $opt in case of errors.
 	    next unless defined $opt;
 
 	    if ( defined $arg ) {
@@ -358,83 +358,6 @@ sub GetOptions {
 
     return ($error == 0);
 }
-
-# Getopt::Long Configuration.
-sub Configure (@) {
-    my (@options) = @_;
-    my $opt;
-    foreach $opt ( @options ) {
-	my $try = lc ($opt);
-	my $action = 1;
-	if ( $try =~ /^no_?(.*)$/s ) {
-	    $action = 0;
-	    $try = $+;
-	}
-	if ( $try eq 'default' or $try eq 'defaults' ) {
-	    ConfigDefaults () if $action;
-	}
-	elsif ( $try eq 'auto_abbrev' or $try eq 'autoabbrev' ) {
-	    $autoabbrev = $action;
-	}
-	elsif ( $try eq 'getopt_compat' ) {
-	    $getopt_compat = $action;
-	}
-	elsif ( $try eq 'ignorecase' or $try eq 'ignore_case' ) {
-	    $ignorecase = $action;
-	}
-	elsif ( $try eq 'ignore_case_always' ) {
-	    $ignorecase = $action ? 2 : 0;
-	}
-	elsif ( $try eq 'bundling' ) {
-	    $bundling = $action;
-	}
-	elsif ( $try eq 'bundling_override' ) {
-	    $bundling = $action ? 2 : 0;
-	}
-	elsif ( $try eq 'require_order' ) {
-	    $order = $action ? $REQUIRE_ORDER : $PERMUTE;
-	}
-	elsif ( $try eq 'permute' ) {
-	    $order = $action ? $PERMUTE : $REQUIRE_ORDER;
-	}
-	elsif ( $try eq 'pass_through' or $try eq 'passthrough' ) {
-	    $passthrough = $action;
-	}
-	elsif ( $try =~ /^prefix=(.+)$/ ) {
-	    $genprefix = $1;
-	    # Turn into regexp. Needs to be parenthesized!
-	    $genprefix = "(" . quotemeta($genprefix) . ")";
-	    eval { '' =~ /$genprefix/; };
-	    Croak ("Getopt::Long: invalid pattern \"$genprefix\"") if $@;
-	}
-	elsif ( $try =~ /^prefix_pattern=(.+)$/ ) {
-	    $genprefix = $1;
-	    # Parenthesize if needed.
-	    $genprefix = "(" . $genprefix . ")" 
-	      unless $genprefix =~ /^\(.*\)$/;
-	    eval { '' =~ /$genprefix/; };
-	    Croak ("Getopt::Long: invalid pattern \"$genprefix\"") if $@;
-	}
-	elsif ( $try eq 'debug' ) {
-	    $debug = $action;
-	}
-	else {
-	    Croak ("Getopt::Long: unknown config parameter \"$opt\"")
-	}
-    }
-}
-
-# Deprecated name.
-sub config (@) {
-    Configure (@_);
-}
-
-# To prevent Carp from being loaded unnecessarily.
-sub Croak (@) {
-    require 'Carp.pm';
-    $Carp::CarpLevel = 1;
-    Carp::croak(@_);
-};
 
 # Option lookup.
 sub FindOption ($$$$$$$) {
@@ -686,6 +609,83 @@ sub FindOption ($$$$$$$) {
     }
     return (1, $opt, $arg, $array, $hash, $key);
 }
+
+# Getopt::Long Configuration.
+sub Configure (@) {
+    my (@options) = @_;
+    my $opt;
+    foreach $opt ( @options ) {
+	my $try = lc ($opt);
+	my $action = 1;
+	if ( $try =~ /^no_?(.*)$/s ) {
+	    $action = 0;
+	    $try = $+;
+	}
+	if ( $try eq 'default' or $try eq 'defaults' ) {
+	    ConfigDefaults () if $action;
+	}
+	elsif ( $try eq 'auto_abbrev' or $try eq 'autoabbrev' ) {
+	    $autoabbrev = $action;
+	}
+	elsif ( $try eq 'getopt_compat' ) {
+	    $getopt_compat = $action;
+	}
+	elsif ( $try eq 'ignorecase' or $try eq 'ignore_case' ) {
+	    $ignorecase = $action;
+	}
+	elsif ( $try eq 'ignore_case_always' ) {
+	    $ignorecase = $action ? 2 : 0;
+	}
+	elsif ( $try eq 'bundling' ) {
+	    $bundling = $action;
+	}
+	elsif ( $try eq 'bundling_override' ) {
+	    $bundling = $action ? 2 : 0;
+	}
+	elsif ( $try eq 'require_order' ) {
+	    $order = $action ? $REQUIRE_ORDER : $PERMUTE;
+	}
+	elsif ( $try eq 'permute' ) {
+	    $order = $action ? $PERMUTE : $REQUIRE_ORDER;
+	}
+	elsif ( $try eq 'pass_through' or $try eq 'passthrough' ) {
+	    $passthrough = $action;
+	}
+	elsif ( $try =~ /^prefix=(.+)$/ ) {
+	    $genprefix = $1;
+	    # Turn into regexp. Needs to be parenthesized!
+	    $genprefix = "(" . quotemeta($genprefix) . ")";
+	    eval { '' =~ /$genprefix/; };
+	    Croak ("Getopt::Long: invalid pattern \"$genprefix\"") if $@;
+	}
+	elsif ( $try =~ /^prefix_pattern=(.+)$/ ) {
+	    $genprefix = $1;
+	    # Parenthesize if needed.
+	    $genprefix = "(" . $genprefix . ")" 
+	      unless $genprefix =~ /^\(.*\)$/;
+	    eval { '' =~ /$genprefix/; };
+	    Croak ("Getopt::Long: invalid pattern \"$genprefix\"") if $@;
+	}
+	elsif ( $try eq 'debug' ) {
+	    $debug = $action;
+	}
+	else {
+	    Croak ("Getopt::Long: unknown config parameter \"$opt\"")
+	}
+    }
+}
+
+# Deprecated name.
+sub config (@) {
+    Configure (@_);
+}
+
+# To prevent Carp from being loaded unnecessarily.
+sub Croak (@) {
+    require 'Carp.pm';
+    $Carp::CarpLevel = 1;
+    Carp::croak(@_);
+};
 
 ################ Documentation ################
 
