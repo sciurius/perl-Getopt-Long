@@ -1,3 +1,10 @@
+Changes in version 2.30
+-----------------------
+
+* Fix a problem where a 'die' from a 'warn' via a localized
+  $SIG{__WARN__} was not properly propagated from a callback.
+  Thanks to Diab Jerius <dj@head-cfa.harvard.edu>.
+
 Changes in version 2.29
 -----------------------
 
