@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : ***
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Nov 29 20:30:49 1999
-# Update Count    : 46
+# Last Modified On: Tue Mar 14 21:15:18 2000
+# Update Count    : 50
 # Status          : Internal use only.
 
 package foo;
@@ -145,6 +145,27 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}c = \"$opt_one\"\n") unless $opt_one == 0;
     print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
 }
+
+# Negation with aliases.
+if ( ++$test == $single || $all ) {
+    $opt_one = 2;
+    local (@stdopts) = ("one|two!");
+    &doit1 ("-one", "-noone", "foo");
+    print STDOUT ("FT${test}b\n") unless defined $opt_one;
+    print STDOUT ("FT${test}c = \"$opt_one\"\n") unless $opt_one == 0;
+    print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
+}
+
+# Must apply to all of them.
+if ( ++$test == $single || $all ) {
+    $opt_one = 2;
+    local (@stdopts) = ("one|two!");
+    &doit1 ("-one", "-notwo", "foo");
+    print STDOUT ("FT${test}b\n") unless defined $opt_one;
+    print STDOUT ("FT${test}c = \"$opt_one\"\n") unless $opt_one == 0;
+    print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
+}
+
 
 ################# String opt (mandatory) ################
 
