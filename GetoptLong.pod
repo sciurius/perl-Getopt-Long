@@ -747,9 +747,9 @@ Now the command line may look like:
 Note that to terminate options processing still requires a double dash
 C<-->.
 
-GetOptions() will not interpret a leading C<"<>"> as option starters
-if the next argument is a reference. To force C<"<"> and C<">"> as
-option starters, use C<"><">. Confusing? Well, B<using a starter
+GetOptions() will not interpret a leading C<< "<>" >> as option starters
+if the next argument is a reference. To force C<< "<" >> and C<< ">" >> as
+option starters, use C<< "><" >>. Confusing? Well, B<using a starter
 argument is strongly deprecated> anyway.
 
 =head2 Configuration variables
@@ -759,9 +759,28 @@ configuring. Although manipulating these variables still work, it
 is strongly encouraged to use the new C<config> routine. Besides, it
 is much easier.
 
+=head1 Trouble Shooting
+
+=head2 Warning: Ignoring '!' modifier for short option
+
+This warning is issued when the '!' modifier is applied to a short
+(one-character) option and bundling is in effect. E.g.,
+
+    Getopt::Long::Configure("bundling");
+    GetOptions("foo|f!" => \$foo);
+
+Note that older Getopt::Long versions did not issue a warning, because
+the '!' modifier was applied to the first name only. This bug was
+fixed in 2.22.
+
+Solution: separate the long and short names and apply the '!' to the
+long names only, e.g.,
+
+    GetOptions("foo!" => \$foo, "f" => \$foo);
+
 =head1 AUTHOR
 
-Johan Vromans E<lt>jvromans@squirrel.nlE<gt>
+Johan Vromans <jvromans@squirrel.nl>
 
 =head1 COPYRIGHT AND DISCLAIMER
 
