@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Sep 27 17:38:47 2001
-# Update Count    : 980
+# Last Modified On: Mon Nov 12 13:38:14 2001
+# Update Count    : 981
 # Status          : Released
 
 ################ Copyright ################
@@ -1193,7 +1193,7 @@ STDERR, and return a false result.
 Getopt::Long supports two useful variants of simple options:
 I<negatable> options and I<incremental> options.
 
-A negatable option is specified with a exclamation mark C<!> after the
+A negatable option is specified with an exclamation mark C<!> after the
 option name:
 
     my $verbose = '';	# option variable with default value (false)
