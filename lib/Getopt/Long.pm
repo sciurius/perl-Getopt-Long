@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Sep 26 18:20:59 2001
-# Update Count    : 919
+# Last Modified On: Wed Sep 26 21:06:09 2001
+# Update Count    : 963
 # Status          : Released
 
 ################ Copyright ################
@@ -324,7 +324,7 @@ sub GetOptions {
 	# Parse option spec.
 	my ($name, $orig) = ParseOptionSpec ($opt, \%opctl);
 	unless ( defined $name ) {
-	    # Failed. $orig contains the error message.
+	    # Failed. $orig contains the error message. Sorry for the abuse.
 	    $error .= $orig;
 	    next;
 	}
@@ -351,19 +351,16 @@ sub GetOptions {
 	if ( @optionlist > 0 && ref($optionlist[0]) ) {
 	    print STDERR ("=> link \"$orig\" to $optionlist[0]\n")
 		if $debug;
-	    if ( ref($optionlist[0]) eq "SCALAR" ) {
-		$linkage{$orig} = shift (@optionlist);
-	    }
-	    elsif ( ref($optionlist[0]) eq "CODE" ) {
-		$linkage{$orig} = shift (@optionlist);
-	    }
-	    elsif ( ref($optionlist[0]) eq "ARRAY" ) {
-		$linkage{$orig} = shift (@optionlist);
+	    my $rl = ref($linkage{$orig} = shift (@optionlist));
+
+	    if ( $rl eq "ARRAY" ) {
 		$opctl{$name}[CTL_DEST] = CTL_DEST_ARRAY;
 	    }
-	    elsif ( ref($optionlist[0]) eq "HASH" ) {
-		$linkage{$orig} = shift (@optionlist);
+	    elsif ( $rl eq "HASH" ) {
 		$opctl{$name}[CTL_DEST] = CTL_DEST_HASH;
+	    }
+	    elsif ( $rl eq "SCALAR" || $rl eq "CODE" ) {
+		# Ok.
 	    }
 	    else {
 		$error .= "Invalid option linkage for \"$opt\"\n";
@@ -401,7 +398,7 @@ sub GetOptions {
 	my ($arrow, $k, $v);
 	$arrow = "=> ";
 	while ( ($k,$v) = each(%opctl) ) {
-	    print STDERR ($arrow, "\$opctl{\"$k\"} = ", OptCtl($v), "\n");
+	    print STDERR ($arrow, "\$opctl{$k} = $v ", OptCtl($v), "\n");
 	    $arrow = "   ";
 	}
     }
@@ -604,11 +601,16 @@ sub GetOptions {
 # A readable representation of what's in an optbl.
 sub OptCtl ($) {
     my ($v) = @_;
+    my @v = map { defined($_) ? ($_) : ("<undef>") } @$v;
     "[".
-      "\"$v->[0]\",".
-	($v->[1] ? "O" : "M"). ",".
-	  (("\$","\@","\%","\&")[$v->[2] || 0]).
-	    "]";
+      join(",",
+	   "\"$v[CTL_TYPE]\"",
+	   $v[CTL_MAND] ? "O" : "M",
+	   ("\$","\@","\%","\&")[$v[CTL_DEST] || 0],
+	   $v[CTL_RANGE] || '',
+	   $v[CTL_REPEAT] || '',
+	   "\"$v[CTL_CNAME]\"",
+	  ). "]";
 }
 
 # Parse an option specification and fill the tables.
@@ -616,11 +618,25 @@ sub ParseOptionSpec ($$) {
     my ($opt, $opctl) = @_;
 
     # Match option spec. Allow '?' as an alias only.
-    if ( $opt !~ /^((\w+[-\w]*)(\|(\?|\w[-\w]*)?)*)?([!+]|[=:][ionfse][@%]?)?$/ ) {
+    if ( $opt !~ m;^
+		   (
+		     # Option name
+		     (?: \w+[-\w]* )
+		     # Alias names, or "?"
+		     (?: \| (?: \? | \w[-\w]* )? )*
+		   )?
+		   (
+		     # Either modifiers ...
+		     [!+]
+		     |
+		     # ... or a value/dest specification.
+		     [=:][ionfs][@%]?
+		   )?
+		   $;x ) {
 	return (undef, "Error in option spec: \"$opt\"\n");
     }
 
-    my ($name, $spec) = ($1, $5);
+    my ($name, $spec) = ($1, $2);
     $spec = '' unless defined $spec;
 
     # $orig keeps track of the primary name the user specified.
@@ -631,64 +647,63 @@ sub ParseOptionSpec ($$) {
     # as specified.
     my $orig;
 
-    if ( ! defined $name ) {
-	# empty -> '-' option
-	$orig = $name = '';
-	$opctl->{''} = [$spec,0,CTL_DEST_SCALAR];
+    my @names;
+    if ( defined $name ) {
+	@names =  split (/\|/, $name);
+	$orig = $name = $names[0];
     }
     else {
-	# Handle alias names
-	my @names =  split (/\|/, $name);
-	$orig = $name = $names[0];
+	@names = ('');
+	$name = $orig = '';
+    }
 
-	# Force an alias if the option name is not locase.
-	my $alias;
-	$alias = $name unless $name eq lc($name);
-	$name = lc ($name)
-	    if $ignorecase > 1
-		|| ($ignorecase
-		    && ($bundling ? length($name) > 1  : 1));
+    # Force an alias if the option name is not locase.
+    my $alias;
+    $alias = $name unless $name eq lc($name);
+    $name = lc ($name)
+	if $ignorecase > 1
+	    || ($ignorecase
+		&& ($bundling ? length($name) > 1  : 1));
 
-	# Construct the opctl entries.
-	my $entry;
-	my $xentry;
-	if ( $spec eq '' || $spec eq '+' ) {
-	    $entry = [$spec,0,CTL_DEST_SCALAR];
-	}
-	elsif ( $spec eq '!' ) {
-	    $entry = ['',0,CTL_DEST_SCALAR];
-	    $xentry = ['!',0,CTL_DEST_SCALAR];
+    # Construct the opctl entries.
+    my $entry;
+    if ( $spec eq '' || $spec eq '+' || $spec eq '!' ) {
+	$entry = [$spec,0,CTL_DEST_SCALAR,undef,undef,$orig];
+    }
+    else {
+	my ($mand, $type, $dest) = $spec =~ /([=:])([ionfs])([@%])?/;
+	$type = 'i' if $type eq 'n';
+	$dest ||= '$';
+	$dest = $dest eq '@' ? CTL_DEST_ARRAY
+	  : $dest eq '%' ? CTL_DEST_HASH : CTL_DEST_SCALAR;
+	$entry = [$type,$mand eq '=',$dest,undef,undef,$orig];
+    }
+
+    # Process all aliases.
+    foreach ( @names ) {
+
+	$_ = lc ($_)
+	  if $ignorecase > (($bundling && length($_) == 1) ? 1 : 0);
+
+	if ( defined $alias ) {
+	    # Note alias.
+	    $entry->[CTL_CNAME] = $alias;
 	}
 	else {
-	    my ($mand, $type, $dest) = $spec =~ /([=:])([ionfse])([@%])?/;
-	    $type = 'i' if $type eq 'n';
-	    $type = 'f' if $type eq 'e';
-	    $dest ||= '$';
-	    $dest = $dest eq '@' ? CTL_DEST_ARRAY
-	      : $dest eq '%' ? CTL_DEST_HASH : CTL_DEST_SCALAR;
-	    $entry = [$type, $mand eq '=', $dest];
+	    # Set primary name.
+	    $alias = $_;
 	}
 
-	# Process all aliases.
-	foreach ( @names ) {
-
-	    $_ = lc ($_)
-	      if $ignorecase > (($bundling && length($_) == 1) ? 1 : 0);
-
+	if ( $spec eq '!' ) {
+	    $opctl->{"no$_"} = $entry;
+	    $opctl->{$_} = [@$entry];
+	    $opctl->{$_}->[CTL_TYPE] = '';
+	}
+	else {
 	    $opctl->{$_} = $entry;
-	    $opctl->{"no$_"} = $xentry if $spec eq '!';
-
-	    if ( defined $alias ) {
-		# Note alias.
-		$entry->[CTL_CNAME] = $alias;
-		$xentry->[CTL_CNAME] = $alias;
-	    }
-	    else {
-		# Set primary name.
-		$alias = $_;
-	    }
 	}
     }
+
     ($name, $orig);
 }
 
