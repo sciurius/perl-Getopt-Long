@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Feb 20 11:59:45 2002
-# Update Count    : 1038
+# Last Modified On: Wed Feb 20 14:52:37 2002
+# Update Count    : 1044
 # Status          : Released
 
 ################ Copyright ################
@@ -35,10 +35,10 @@ use 5.004;
 use strict;
 
 use vars qw($VERSION);
-$VERSION        =  2.27;
+$VERSION        =  2.28;
 # For testing versions only.
 use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.27";
+$VERSION_STRING = "2.28";
 
 use Exporter;
 
@@ -712,7 +712,14 @@ sub ParseOptionSpec ($$) {
 	}
     }
 
-    return (undef, $dups) if $dups;
+    if ( $dups ) {
+	return (undef, $dups) if $^W;
+	require 'Carp.pm';
+	$Carp::CarpLevel = 2;
+	foreach ( split(/\n+/, $dups) ) {
+	    Carp::cluck($_);
+	}
+    }
     ($names[0], $orig);
 }
 
