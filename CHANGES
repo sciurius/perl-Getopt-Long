@@ -1,3 +1,8 @@
+Changes in version 2.22
+-----------------------
+
+* Fixes a bug in the combination of aliases and negation.
+
 Changes in version 2.21
 -----------------------
 
