@@ -1,21 +1,44 @@
 # $Id$
 
+use Config;
 use ExtUtils::MakeMaker 5.0;
 
-require "./GetoptLong.pm";
+require "./lib/Getopt/Long.pm";
+
+sub MY::postamble {
+    my $mandir = $Config{installman3dir};
+    my $obsolete = "$mandir/Getopt::GetoptLong.3";
+    if ( -e $obsolete ) {
+	print STDERR (<<EOD);
+
+I found a left-over manual page from a previous version of Getopt::Long.
+This manual page has a wrong name, and should be removed.
+I can add instructions to the Makefile to remove it when you
+install this version.
+EOD
+	my $ans = prompt ("Shall I add the remove instructions?");
+	if ( $ans =~ /^y/i ) {
+	    return <<EOD;
+install ::
+	\$(RM_F) "$obsolete"
+EOD
+	}
+    }
+    "";
+}
 
 WriteMakefile(
 	NAME      => "Getopt::Long",
 	VERSION   => $Getopt::Long::VERSION,
 
-	( $[ < 5.005 ) ? () : (
+	( $] < 5.005 ) ? () : (
 	AUTHOR => 'Johan Vromans (jvromans@squirrel.nl)',
         ABSTRACT => 'Extended getopt function for command line parsing',
         ),
 
 	INSTALLDIRS => 'perl',
-	PM 	  => { "newgetopt.pl"  => '$(INST_LIB)/newgetopt.pl',
-		       "GetoptLong.pm" => '$(INST_LIB)/Getopt/Long.pm'
+	PM 	  => { "lib/newgetopt.pl"  => '$(INST_LIB)/newgetopt.pl',
+		       "lib/Getopt/Long.pm" => '$(INST_LIB)/Getopt/Long.pm'
 		     },
 	dist      => { COMPRESS => 'gzip', SUFFIX => 'gz',
 		     },
