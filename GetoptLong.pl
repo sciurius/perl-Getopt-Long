@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Apr 16 16:27:33 1997
-# Update Count    : 597
+# Last Modified On: Wed Sep 17 12:20:10 1997
+# Update Count    : 608
 # Status          : Released
 
 =head1 NAME
@@ -56,8 +56,9 @@ value. With a command line of "--size 24" this will cause the variable
 $offset to get the value 24.
 
 Alternatively, the first argument to GetOptions may be a reference to
-a HASH describing the linkage for the options. The following call is
-equivalent to the example above:
+a HASH describing the linkage for the options, or an object whose
+class is based on a HASH. The following call is equivalent to the
+example above:
 
   %optctl = ("size" => \$offset);
   GetOptions(\%optctl, "size=i");
@@ -591,9 +592,13 @@ sub GetOptions {
 	if $debug;
 
     # Check for ref HASH as first argument. 
+    # First argument may be an object. It's OK to use this as long
+    # as it is really a hash underneath. 
     $userlinkage = undef;
-    if ( ref($optionlist[0]) && ref($optionlist[0]) eq 'HASH' ) {
+    if ( ref($optionlist[0]) and
+	 "$optionlist[0]" =~ /^(?:.*\=)?HASH\([^\(]*\)$/ ) {
 	$userlinkage = shift (@optionlist);
+	print STDERR ("=> user linkage: $userlinkage\n") if $debug;
     }
 
     # See if the first element of the optionlist contains option
@@ -1145,7 +1150,11 @@ $find_option = sub {
     elsif ( $type eq "n" || $type eq "i" ) { # numeric/integer
 	if ( $arg !~ /^-?[0-9]+$/ ) {
 	    if ( defined $optarg || $mand eq "=" ) {
-		return 0 if $passthrough;
+		if ( $passthrough ) {
+		    unshift (@ARGV, defined $rest ? $starter.$rest : $arg)
+		      unless defined $optarg;
+		    return 0;
+		}
 		print STDERR ("Value \"", $arg, "\" invalid for option ",
 			      $opt, " (number expected)\n");
 		$error++;
@@ -1165,7 +1174,11 @@ $find_option = sub {
     elsif ( $type eq "f" ) { # real number, int is also ok
 	if ( $arg !~ /^-?[0-9.]+([eE]-?[0-9]+)?$/ ) {
 	    if ( defined $optarg || $mand eq "=" ) {
-		return 0 if  $passthrough;
+		if ( $passthrough ) {
+		    unshift (@ARGV, defined $rest ? $starter.$rest : $arg)
+		      unless defined $optarg;
+		    return 0;
+		}
 		print STDERR ("Value \"", $arg, "\" invalid for option ",
 			      $opt, " (real number expected)\n");
 		$error++;
