@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Mar 27 11:50:30 1998
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Mar  4 16:33:02 2000
-# Update Count    : 49
+# Last Modified On: Tue Mar 14 21:09:46 2000
+# Update Count    : 50
 # Status          : Released
 
 sub GetOptions {
@@ -121,17 +121,21 @@ sub GetOptions {
 		    if ( $c eq '!' ) {
 			$opctl{"no$_"} = $c;
 			warn ("Ignoring '!' modifier for short option $_\n");
-			$c = '';
+			$opctl{$_} = $bopctl{$_} = '';
 		    }
-		    $opctl{$_} = $bopctl{$_} = $c;
+		    else {
+			$opctl{$_} = $bopctl{$_} = $c;
+		    }
 		}
 		else {
 		    $_ = lc ($_) if $ignorecase;
 		    if ( $c eq '!' ) {
 			$opctl{"no$_"} = $c;
-			$c = '';
+			$opctl{$_} = ''
 		    }
-		    $opctl{$_} = $c;
+		    else {
+			$opctl{$_} = $c;
+		    }
 		}
 		if ( defined $a ) {
 		    # Note alias.
