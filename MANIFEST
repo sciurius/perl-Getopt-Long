@@ -12,3 +12,4 @@ t/gol-linkage.t       Test user linkage
 t/gol-oo.t            Test OO interface
 examples/skel.pl      Skeleton program to use Getopt::Long
 examples/skel2.pl     Skeleton program to use Getopt::Long with Pod::Usage
+perl-Getopt-Long.spec RPM spec file for RedHat 7.x
