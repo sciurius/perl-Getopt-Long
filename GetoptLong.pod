@@ -5,7 +5,12 @@ Getopt::Long - Extended processing of command line options
 =head1 SYNOPSIS
 
   use Getopt::Long;
-  $result = GetOptions (...option-descriptions...);
+  my $data   = "file.dat";
+  my $length = 24;
+  my $verbose;
+  $result = GetOptions ("length=i" => \$length,    # numeric
+                        "file=s"   => \$data,      # string
+			"verbose"  => \$verbose);  # flag
 
 =head1 DESCRIPTION
 
@@ -336,6 +341,15 @@ argument to start with C<-> or C<-->.
 
 Integer. An optional leading plus or minus sign, followed by a
 sequence of digits.
+
+=item o
+
+Extended integer, Perl style. This can be either an optional leading
+plus or minus sign, followed by a sequence of digits, or an octal
+string (a zero, optionally followed by '0', '1', .. '7'), or a
+hexadecimal string (C<0x> followed by '0' .. '9', 'a' .. 'f', case
+insensitive), or a binary string (C<0b> followed by a series of '0'
+and '1').
 
 =item f
 
