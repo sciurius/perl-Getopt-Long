@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Sep 21 13:19:19 2003
-# Update Count    : 392
+# Last Modified On: Fri Feb  4 11:35:24 2005
+# Update Count    : 462
 # Status          : In progress
 
 ################ No args ################
@@ -940,6 +940,63 @@ P: seven:f \\@a1 v1
 A: --seven -1.42 +seven -v1 ++ foo
 W: Unknown option: +
 
+R: 2.3402
+
+# Add / to option prefixes
+O: bundling prefix_pattern=--|-|\\+|/
+
+T: Other delimeters
+P: seven=f \\$v1
+A: /seven=-1.42 foo
+W: Unknown option: s
+
+T: Other delimeters
+P: seven=f \\$v1
+A: /s 1.42 foo
+   $v1 1.42
+   @ARGV foo
+
+T: Other delimeters
+P: seven:f \\@a1 v1
+A: --seven=1.42 -- foo
+   @a1 1.42
+   @ARGV foo
+
+# Treat / as a long option prefix.
+O+ long_prefix_pattern=/
+
+T: Other delimeters
+P: seven:f \\@a1 v1
+A: /seven=1.42 -- foo
+   @a1 1.42
+   @ARGV foo
+
+T: Other delimeters
+P: seven:f \\@a1 v1
+A: /seven 1.42 -- foo
+   @a1 1.42
+   @ARGV foo
+
+# Since / means long option, -- does not.
+
+T: Other delimeters
+P: seven:f \\@a1 v1
+A: --seven=1.42 -- foo
+W: Unknown option: seven=1.42
+
+# Add -- to long options.
+
+O+ long_prefix_pattern=/|--
+
+T: Other delimeters
+P: seven:f \\@a1 v1
+A: --seven=1.42 -- foo
+   @a1 1.42
+   @ARGV foo
+
+R:
+O:
+
 ################ Auto-abbrev ################
 
 P: six=f \\$v1 seven:f \\$v2 eight|opt8=s \\$v3 sixs=f \\@a1 sevens:f \\@a2
@@ -1723,6 +1780,190 @@ A: -v foo
    $v1 1
    @ARGV foo
 
+################ Repeat args ################
+
+R: 2.3401
+
+T: Repeat args -- syntaxis
+P: foo=s{} \\@a1
+A:
+
+T: Repeat args -- syntaxis
+P: foo=s@{} \\@a1
+A:
+
+T: Repeat args -- syntaxis
+P: foo=s{1} \\@a1
+A:
+
+T: Repeat args -- syntaxis
+P: foo=s@{1} \\@a1
+A:
+
+T: Repeat args -- syntaxis
+P: foo:s{1} \\@a1
+A:
+
+T: Repeat args -- syntaxis
+P: foo:s@{1} \\@a1
+A:
+
+T: Repeat args -- syntaxis
+P: foo=s{,1} \\@a1
+A:
+
+T: Repeat args -- syntaxis
+P: foo:s{,1} \\@a1
+A:
+
+T: Repeat args -- syntaxis
+P: foo=s{,} \\@a1
+A:
+
+T: Repeat args -- syntaxis
+P: foo:s{,} \\@a1
+A:
+
+T: Repeat args -- syntaxis
+P: foo=s{0} \\@a1
+E: {0} is useless in option spec: "foo=s{0}"
+A:
+
+T: Repeat args -- syntaxis
+P: foo:s{0} \\@a1
+E: {0} is useless in option spec: "foo:s{0}"
+A:
+
+T: Repeat args -- syntaxis
+P: foo=s{,0} \\@a1
+E: Max must be greater than zero in option spec: "foo=s{,0}"
+A:
+
+T: Repeat args -- syntaxis
+P: foo:s{,0} \\@a1
+E: Max must be greater than zero in option spec: "foo:s{,0}"
+A:
+
+T: Repeat args -- syntaxis
+P: foo=s{2,1} \\@a1
+E: Max less than min in option spec: "foo=s{2,1}"
+A:
+
+T: Repeat args -- syntaxis
+P: foo:s{2,1} \\@a1
+E: Max less than min in option spec: "foo:s{2,1}"
+A:
+
+T: Repeat args
+P: foo=s{2,3} \\@a1
+A: --foo aa bb cc dd --foo pp qq -- rr
+   @ARGV dd rr
+   @a1 aa bb cc pp qq
+
+T: Repeat args
+P: foo=s{2,3} \\@a1 bar \\$v1
+A: --foo aa bb --bar dd --foo pp qq --bar rr
+   @ARGV dd rr
+   @a1 aa bb pp qq
+   $v1 1
+
+T: Repeat args
+P: foo=s{2,3} \\@a1 bar \\$v1
+A: --foo=aa bb --bar dd --foo pp qq --bar rr
+   @ARGV dd rr
+   @a1 aa bb pp qq
+   $v1 1
+
+T: Repeat args
+P: foo=s{2,3} \\@a1 bar+ \\$v1
+A: --foo --bar --bar --bar --bar
+   @a1 --bar --bar
+   $v1 2
+
+T: Repeat args (int)
+P: foo=i{2,3} \\@a1 bar+ \\$v1
+A: --foo 1 -2 3 aa bb
+   @a1 1 -2 3
+   @ARGV aa bb
+
+T: Repeat args (int)
+P: foo=i{2,3} \\@a1 bar+ \\$v1
+A: --foo 1 -2 aa bb
+   @a1 1 -2
+   @ARGV aa bb
+
+T: Repeat args (float)
+P: foo=f{2,3} \\@a1 bar+ \\$v1
+A: --foo 1.1 -2.2 .3 aa bb
+   @a1 1.1 -2.2 .3
+   @ARGV aa bb
+
+T: Repeat args (int)
+P: foo=i{2,3} \\@a1 bar+ \\$v1
+A: --foo 1 aa bb
+W: Value "aa" invalid for option foo
+
+T: Repeat args
+P: foo=s{2,3} \\@a1 bar+ \\$v1
+A: --foo aa bb
+   @a1 aa bb
+
+T: Repeat args
+P: foo=s{2,3} \\@a1 bar+ \\$v1
+A: --foo aa -- bb
+   @a1 aa -- bb
+
+T: Repeat args
+P: foo=s{2,3} \\@a1 bar+ \\$v1
+A: --foo aa
+W: Insufficient arguments for option foo
+
+T: Repeat args
+P: foo=s{2,4} \\%h1 bar+ \\$v1
+A: --foo xx=aa yy=bb zz=cc qqq
+   %h1 xx aa yy bb zz cc
+   @ARGV qqq
+
+# From: Ryan <uncle_george@hotmail.com>
+# Subject: new range feature. CTL_AMAX, argcnt checking against -1
+# 
+# I love the new range functionality.  I found a bug when using the
+# undefined max range like in the example.  I even found a fix. : )
+
+T: Repeat args
+P: foo=s{2,} \\@a1
+A: --foo one two three four five
+   @a1 one two three four five
+
+# Thanks, Ryan.
+
+T: Repeat args
+P: foo=s{,2} \\@a1
+A: --foo one two three four five
+   @a1 one two
+   @ARGV three four five
+
+T: Repeat args
+P: foo=s{,2} \\@a1
+A: --foo one two 
+   @a1 one two
+
+T: Repeat args
+P: foo=s{,2} \\@a1
+A: --foo one 
+   @a1 one 
+
+T: Repeat args
+P: foo:s{,2} \\@a1
+A: --foo 
+
+T: Repeat args
+P: foo=s{,2} \\@a1
+A: --foo 
+W: Option foo requires an argument
+
+R:
+
 ################ Miscellaneous ################
 
 #  From: "Epstein, Caleb" <cepstein@Montgomery.com>
@@ -1753,3 +1994,24 @@ O: ignore_case
 P: A|apple=s@ \\@a1
 A:
 
+# From: Haakon Riiser <haakon.riiser@fys.uio.no>
+# Subject: Getopt::Long error messages with :config bundling
+# Date: Tue, 24 Feb 2004 16:45:32 +0100
+# 
+# I'll get right to the point. :-)
+# 
+#   ----- begin test.pl -----
+#   use Getopt::Long qw(:config bundling);
+#   GetOptions("help");
+#   ----- end test.pl -----
+# 
+#   $ perl test.pl --invalid
+#   Unknown option: i
+# 
+# Is this error message intentional?
+
+T: Error messages with :config bundling
+O: bundling
+P: foo \\$v1
+A: --invalid
+W: Unknown option: invalid

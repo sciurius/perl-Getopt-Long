@@ -6,13 +6,13 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Aug 16 20:08:06 2004
-# Update Count    : 1445
+# Last Modified On: Fri Feb  4 11:49:16 2005
+# Update Count    : 1451
 # Status          : Released
 
 ################ Copyright ################
 
-# This program is Copyright 1990,2002 by Johan Vromans.
+# This program is Copyright 1990,2005 by Johan Vromans.
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the Perl Artistic License or the
 # GNU General Public License as published by the Free Software
@@ -35,10 +35,10 @@ use 5.004;
 use strict;
 
 use vars qw($VERSION);
-$VERSION        =  2.3402;
+$VERSION        =  2.3403;
 # For testing versions only.
 use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.34_02";
+$VERSION_STRING = "2.34_03";
 
 use Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
@@ -613,7 +613,7 @@ sub GetOptions(@) {
 		}
 
 		$argcnt++;
-		last if $argcnt >= $ctl->[CTL_AMAX];
+		last if $argcnt >= $ctl->[CTL_AMAX] && $ctl->[CTL_AMAX] != -1;
 		undef($arg);
 
 		# Need more args?
@@ -1713,7 +1713,8 @@ the above example:
     GetOptions ('length|height=f' => \$length);
 
 The first name is called the I<primary> name, the other names are
-called I<aliases>.
+called I<aliases>. When using a hash to store options, the key will
+always be the primary name.
 
 Multiple alternate names are possible.
 
@@ -2473,7 +2474,7 @@ Johan Vromans <jvromans@squirrel.nl>
 
 =head1 COPYRIGHT AND DISCLAIMER
 
-This program is Copyright 2003,1990 by Johan Vromans.
+This program is Copyright 1990,2005 by Johan Vromans.
 This program is free software; you can redistribute it and/or
 modify it under the terms of the Perl Artistic License or the
 GNU General Public License as published by the Free Software
