@@ -1,6 +1,13 @@
 #!/usr/local/bin/perl5 -s
 
-# Testbed for Getopt::Long.pm .
+# TestOptExt.pl -- Testbed for Getopt::Long.pm (extended features).
+# RCS Info        : $Id$
+# Author          : Johan Vromans
+# Created On      : ***
+# Last Modified By: Johan Vromans
+# Last Modified On: Wed Oct  1 13:30:10 1997
+# Update Count    : 2
+# Status          : Internal use only
 
 package foo;
 BEGIN { require "./GetoptLong.pm"; import Getopt::Long; }
