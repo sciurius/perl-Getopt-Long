@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : ***
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri May 12 11:23:07 2000
-# Update Count    : 54
+# Last Modified On: Thu May 25 19:22:17 2000
+# Update Count    : 56
 # Status          : Internal use only
 
 package foo;
@@ -624,6 +624,35 @@ if ( ++$test == $single || $all ) {
     Getopt::Long::config("default",
 			 $single ? "debug" : "nodebug");
 }
+
+################ Faking POSIXLY_CORRECT ################
+
+Getopt::Long::Configure ("posix_default");
+
+if ( ++$test == $single || $all ) {
+#    showtest();
+    my $o_seven;
+    my $o_foo;
+    @ARGV = qw(-seven 1.2 foo);
+    print STDOUT ("FT${test}a\n") 
+	unless GetOptions ("foo" => \$o_foo, "seven=f" => \$o_seven);
+    print STDOUT ("FT${test}b\n") unless defined $o_seven;
+    print STDOUT ("FT${test}c = \"$o_seven\"\n") if $o_seven != 1.2;
+    print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
+}
+
+if ( ++$test == $single || $all ) {
+#    showtest();
+    my $o_seven;
+    my $o_foo;
+    @ARGV = qw(foo -seven 1.2);
+    print STDOUT ("FT${test}a\n") 
+	unless GetOptions ("foo" => \$o_foo, "seven=f" => \$o_seven);
+    print STDOUT ("FT${test}b\n") if defined $o_seven;
+    print STDOUT ("FT${test}z\n") if @ARGV != 3 || $ARGV[0] ne "foo";
+}
+
+Getopt::Long::Configure ("default");
 
 ################ OO ################
 
