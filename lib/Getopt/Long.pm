@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Jan  3 21:27:38 2002
-# Update Count    : 1005
+# Last Modified On: Wed Feb 20 11:59:45 2002
+# Update Count    : 1038
 # Status          : Released
 
 ################ Copyright ################
@@ -35,10 +35,10 @@ use 5.004;
 use strict;
 
 use vars qw($VERSION);
-$VERSION        =  2.26_04;
+$VERSION        =  2.27;
 # For testing versions only.
 use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.26_04";
+$VERSION_STRING = "2.27";
 
 use Exporter;
 
@@ -218,28 +218,32 @@ sub getoptions {
 package Getopt::Long;
 
 # Indices in option control info.
-use constant CTL_TYPE   => 0;
+# Note that ParseOptions uses the fields directly. Search for 'hard-wired'.
+use constant CTL_TYPE    => 0;
 #use constant   CTL_TYPE_FLAG   => '';
 #use constant   CTL_TYPE_NEG    => '!';
 #use constant   CTL_TYPE_INCR   => '+';
 #use constant   CTL_TYPE_INT    => 'i';
+#use constant   CTL_TYPE_INTINC => 'I';
 #use constant   CTL_TYPE_XINT   => 'o';
 #use constant   CTL_TYPE_FLOAT  => 'f';
 #use constant   CTL_TYPE_STRING => 's';
 
-use constant CTL_MAND   => 1;
+use constant CTL_CNAME   => 1;
 
-use constant CTL_DEST   => 2;
+use constant CTL_MAND    => 2;
+
+use constant CTL_DEST    => 3;
  use constant   CTL_DEST_SCALAR => 0;
  use constant   CTL_DEST_ARRAY  => 1;
  use constant   CTL_DEST_HASH   => 2;
  use constant   CTL_DEST_CODE   => 3;
 
-use constant CTL_RANGE  => 3;
+use constant CTL_DEFAULT => 4;
 
-use constant CTL_REPEAT => 4;
-
-use constant CTL_CNAME  => 5;
+# FFU.
+#use constant CTL_RANGE   => ;
+#use constant CTL_REPEAT  => ;
 
 sub GetOptions {
 
@@ -605,11 +609,12 @@ sub OptCtl ($) {
     "[".
       join(",",
 	   "\"$v[CTL_TYPE]\"",
+	   "\"$v[CTL_CNAME]\"",
 	   $v[CTL_MAND] ? "O" : "M",
 	   ("\$","\@","\%","\&")[$v[CTL_DEST] || 0],
-	   $v[CTL_RANGE] || '',
-	   $v[CTL_REPEAT] || '',
-	   "\"$v[CTL_CNAME]\"",
+	   "\"$v[CTL_DEFAULT]\"",
+#	   $v[CTL_RANGE] || '',
+#	   $v[CTL_REPEAT] || '',
 	  ). "]";
 }
 
@@ -617,7 +622,7 @@ sub OptCtl ($) {
 sub ParseOptionSpec ($$) {
     my ($opt, $opctl) = @_;
 
-    # Match option spec. Allow '?' as an alias only.
+    # Match option spec.
     if ( $opt !~ m;^
 		   (
 		     # Option name
@@ -629,8 +634,11 @@ sub ParseOptionSpec ($$) {
 		     # Either modifiers ...
 		     [!+]
 		     |
-		     # ... or a value/dest specification.
-		     [=:][ionfs][@%]?
+		     # ... or a value/dest specification
+		     [=:] [ionfs] [@%]?
+		     |
+		     # ... or an optional-with-default spec
+		     : (?: -?\d+ | \+ ) [@%]?
 		   )?
 		   $;x ) {
 	return (undef, "Error in option spec: \"$opt\"\n");
@@ -660,7 +668,18 @@ sub ParseOptionSpec ($$) {
     # Construct the opctl entries.
     my $entry;
     if ( $spec eq '' || $spec eq '+' || $spec eq '!' ) {
-	$entry = [$spec,0,CTL_DEST_SCALAR,undef,undef,$orig];
+	# Fields are hard-wired here.
+	$entry = [$spec,$orig,0,CTL_DEST_SCALAR,undef];
+    }
+    elsif ( $spec =~ /:(-?\d+|\+)([@%])?/ ) {
+	my $def = $1;
+	my $dest = $2;
+	my $type = $def eq '+' ? 'I' : 'i';
+	$dest ||= '$';
+	$dest = $dest eq '@' ? CTL_DEST_ARRAY
+	  : $dest eq '%' ? CTL_DEST_HASH : CTL_DEST_SCALAR;
+	# Fields are hard-wired here.
+	$entry = [$type,$orig,0,$dest,$def eq '+' ? undef : $def];
     }
     else {
 	my ($mand, $type, $dest) = $spec =~ /([=:])([ionfs])([@%])?/;
@@ -668,11 +687,12 @@ sub ParseOptionSpec ($$) {
 	$dest ||= '$';
 	$dest = $dest eq '@' ? CTL_DEST_ARRAY
 	  : $dest eq '%' ? CTL_DEST_HASH : CTL_DEST_SCALAR;
-	$entry = [$type,$mand eq '=',$dest,undef,undef,$orig];
+	# Fields are hard-wired here.
+	$entry = [$type,$orig,$mand eq '=',$dest,undef];
     }
 
     # Process all names. First is canonical, the rest are aliases.
-    my $dups = "";
+    my $dups = '';
     foreach ( @names ) {
 
 	$_ = lc ($_)
@@ -708,7 +728,7 @@ sub FindOption ($$$$) {
     print STDERR ("=> find \"$opt\"\n") if $debug;
 
     return (0) unless $opt =~ /^$prefix(.*)$/s;
-    return (0) if $opt eq "-" && !defined $opctl->{""};
+    return (0) if $opt eq "-" && !defined $opctl->{''};
 
     $opt = $+;
     my $starter = $1;
@@ -747,7 +767,7 @@ sub FindOption ($$$$) {
 	else {
 	    $tryopt = $opt;
 	    # Unbundle single letter option.
-	    $rest = length ($tryopt) > 0 ? substr ($tryopt, 1) : "";
+	    $rest = length ($tryopt) > 0 ? substr ($tryopt, 1) : '';
 	    $tryopt = substr ($tryopt, 0, 1);
 	    $tryopt = lc ($tryopt) if $ignorecase > 1;
 	    print STDERR ("=> $starter$tryopt unbundled from ",
@@ -831,7 +851,8 @@ sub FindOption ($$$$) {
 	    undef $opt;
 	}
 	elsif ( $type eq '' || $type eq '+' ) {
-	    $arg = 1;		# supply explicit value
+	    # Supply explicit value.
+	    $arg = 1;
 	}
 	else {
 	    $opt =~ s/^no//i;	# strip NO prefix
@@ -845,9 +866,9 @@ sub FindOption ($$$$) {
     my $mand = $ctl->[CTL_MAND];
 
     # Check if there is an option argument available.
-    if ( $gnu_compat && defined $optarg && $optarg eq "" ) {
-	return (1, $opt, $ctl, $type eq "s" ? "" : 0) unless $mand;
-	$optarg = 0 unless $type eq "s";
+    if ( $gnu_compat && defined $optarg && $optarg eq '' ) {
+	return (1, $opt, $ctl, $type eq 's' ? '' : 0) unless $mand;
+	$optarg = 0 unless $type eq 's';
     }
 
     # Check if there is an option argument available.
@@ -861,7 +882,15 @@ sub FindOption ($$$$) {
 	    $error++;
 	    return (1, undef);
 	}
-	return (1, $opt, $ctl, $type eq "s" ? '' : 0);
+	if ( $type eq 'I' ) {
+	    # Fake incremental type.
+	    my @c = @$ctl;
+	    $c[CTL_TYPE] = '+';
+	    return (1, $opt, \@c, 1);
+	}
+	return (1, $opt, $ctl,
+		defined($ctl->[CTL_DEFAULT]) ? $ctl->[CTL_DEFAULT] :
+		$type eq 's' ? '' : 0);
     }
 
     # Get (possibly optional) argument.
@@ -876,7 +905,7 @@ sub FindOption ($$$$) {
 
     #### Check if the argument is valid for this option ####
 
-    if ( $type eq "s" ) {	# string
+    if ( $type eq 's' ) {	# string
 	# A mandatory string takes anything.
 	return (1, $opt, $ctl, $arg, $key) if $mand;
 
@@ -895,21 +924,22 @@ sub FindOption ($$$$) {
 	}
     }
 
-    elsif ( $type eq "i" # numeric/integer
-	    || $type eq "o" ) { # dec/oct/hex/bin value
+    elsif ( $type eq 'i'	# numeric/integer
+            || $type eq 'I'	# numeric/integer w/ incr default
+	    || $type eq 'o' ) { # dec/oct/hex/bin value
 
 	my $o_valid =
-	  $type eq "o" ? "[-+]?[1-9][0-9]*|0x[0-9a-f]+|0b[01]+|0[0-7]*"
+	  $type eq 'o' ? "[-+]?[1-9][0-9]*|0x[0-9a-f]+|0b[01]+|0[0-7]*"
 	    : "[-+]?[0-9]+";
 
 	if ( $bundling && defined $rest && $rest =~ /^($o_valid)(.*)$/si ) {
 	    $arg = $1;
 	    $rest = $2;
-	    $arg = ($type eq "o" && $arg =~ /^0/) ? oct($arg) : 0+$arg;
+	    $arg = ($type eq 'o' && $arg =~ /^0/) ? oct($arg) : 0+$arg;
 	    unshift (@ARGV, $starter.$rest) if defined $rest && $rest ne '';
 	}
 	elsif ( $arg =~ /^($o_valid)$/si ) {
-	    $arg = ($type eq "o" && $arg =~ /^0/) ? oct($arg) : 0+$arg;
+	    $arg = ($type eq 'o' && $arg =~ /^0/) ? oct($arg) : 0+$arg;
 	}
 	else {
 	    if ( defined $optarg || $mand ) {
@@ -920,7 +950,7 @@ sub FindOption ($$$$) {
 		}
 		warn ("Value \"", $arg, "\" invalid for option ",
 		      $opt, " (",
-		      $type eq "o" ? "extended " : "",
+		      $type eq 'o' ? "extended " : '',
 		      "number expected)\n");
 		$error++;
 		# Push back.
@@ -930,13 +960,19 @@ sub FindOption ($$$$) {
 	    else {
 		# Push back.
 		unshift (@ARGV, defined $rest ? $starter.$rest : $arg);
+		if ( $type eq 'I' ) {
+		    # Fake incremental type.
+		    my @c = @$ctl;
+		    $c[CTL_TYPE] = '+';
+		    return (1, $opt, \@c, 1);
+		}
 		# Supply default value.
-		$arg = 0;
+		$arg = defined($ctl->[CTL_DEFAULT]) ? $ctl->[CTL_DEFAULT] : 0;
 	    }
 	}
     }
 
-    elsif ( $type eq "f" ) { # real number, int is also ok
+    elsif ( $type eq 'f' ) { # real number, int is also ok
 	# We require at least one digit before a point or 'e',
 	# and at least one digit following the point and 'e'.
 	# [-]NN[.NN][eNN]
@@ -1457,6 +1493,15 @@ and the value zero to numeric options.
 
 Note that if a string argument starts with C<-> or C<-->, it will be
 considered an option on itself.
+
+=item : I<number> [ I<desttype> ]
+
+Like C<:i>, but if the value is omitted, the I<number> will be assigned.
+
+=item : + [ I<desttype> ]
+
+Like C<:i>, but if the value is omitted, the current value for the
+option will be incremented.
 
 =back
 
