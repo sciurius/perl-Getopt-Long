@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Mar 27 11:50:30 1998
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Jun 14 13:54:35 1998
-# Update Count    : 24
+# Last Modified On: Fri Feb 12 10:52:30 1999
+# Update Count    : 25
 # Status          : Released
 
 sub GetOptions {
@@ -439,6 +439,7 @@ sub FindOption ($$$$$$$) {
 
 	# If bundling == 2, long options can override bundles.
 	if ( $bundling == 2 and
+	     defined ($rest) and
 	     defined ($type = $opctl->{$tryopt.$rest}) ) {
 	    print STDERR ("=> $starter$tryopt rebundled to ",
 			  "$starter$tryopt$rest\n") if $debug;
