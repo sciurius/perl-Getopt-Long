@@ -1,6 +1,6 @@
 =head1 NAME
 
-GetOptions - extended processing of command line options
+Getopt::Long - Extended processing of command line options
 
 =head1 SYNOPSIS
 
