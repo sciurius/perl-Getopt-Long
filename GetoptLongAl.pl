@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Mar 27 11:50:30 1998
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Feb 12 10:52:30 1999
-# Update Count    : 25
+# Last Modified On: Wed Jul  7 12:47:57 1999
+# Update Count    : 28
 # Status          : Released
 
 sub GetOptions {
@@ -56,7 +56,11 @@ sub GetOptions {
 
     # See if the first element of the optionlist contains option
     # starter characters.
-    if ( $optionlist[0] =~ /^\W+$/ ) {
+    # Be careful not to interpret '<>' as option starters.
+    if ( $optionlist[0] =~ /^\W+$/
+	 && !($optionlist[0] eq '<>'
+	      && @optionlist > 0
+	      && ref($optionlist[1])) ) {
 	$genprefix = shift (@optionlist);
 	# Turn into regexp. Needs to be parenthesized!
 	$genprefix =~ s/(\W)/\\$1/g;
