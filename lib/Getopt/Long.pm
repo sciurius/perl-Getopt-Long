@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Dec  3 09:58:15 2001
-# Update Count    : 988
+# Last Modified On: Fri Dec 21 12:51:29 2001
+# Update Count    : 993
 # Status          : Released
 
 ################ Copyright ################
@@ -35,10 +35,10 @@ use 5.004;
 use strict;
 
 use vars qw($VERSION);
-$VERSION        =  2.26_03;
+$VERSION        =  2.26_04;
 # For testing versions only.
 use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.26_03";
+$VERSION_STRING = "2.26_04";
 
 use Exporter;
 
@@ -316,6 +316,9 @@ sub GetOptions {
 	    unless ( @optionlist > 0
 		    && ref($optionlist[0]) && ref($optionlist[0]) eq 'CODE' ) {
 		$error .= "Option spec <> requires a reference to a subroutine\n";
+		# Kill the linkage (to avoid another error).
+		shift (@optionlist)
+		  if @optionlist && ref($optionlist[0]);
 		next;
 	    }
 	    $linkage{'<>'} = shift (@optionlist);
@@ -327,6 +330,9 @@ sub GetOptions {
 	unless ( defined $name ) {
 	    # Failed. $orig contains the error message. Sorry for the abuse.
 	    $error .= $orig;
+	    # Kill the linkage (to avoid another error).
+	    shift (@optionlist)
+	      if @optionlist && ref($optionlist[0]);
 	    next;
 	}
 
@@ -1762,10 +1768,14 @@ first.
 
 =item bundling (default: disabled)
 
-Enabling this option will allow single-character options to be bundled.
-To distinguish bundles from long option names, long options I<must> be
-introduced with C<--> and single-character options (and bundles) with
-C<->.
+Enabling this option will allow single-character options to be
+bundled. To distinguish bundles from long option names, long options
+I<must> be introduced with C<--> and bundles with C<->.
+
+Note that, if you have options C<a>, C<l> and C<all>, and
+auto_abbrev enabled, C<-a> and C<--a> will both match the
+single-character option C<a>. C<-al> will be unbundled into C<-a>
+and C<-l>, while C<--al> will autocomplete to C<--all>.
 
 Note: disabling C<bundling> also disables C<bundling_override>.
 
