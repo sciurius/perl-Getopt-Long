@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : ***
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Mar 27 12:29:20 1998
-# Update Count    : 33
+# Last Modified On: Wed Jul  7 12:53:11 1999
+# Update Count    : 37
 # Status          : Internal use only
 
 package foo;
@@ -462,8 +462,8 @@ if ( ++$test == $single || $all ) {
     Getopt::Long::config ("require_order");
     print STDOUT ("FT${test}a\n") 
 	if GetOptions (\%linkage,
-		       "one",
 		       "<>", \&process,
+		       "one",
 		       "two=i", \&cb,
 		       "three=i@");
     print STDOUT ("FT${test}a\n") if defined $opt_one;
@@ -488,6 +488,47 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}y\n") if exists $xx{"foo"};
     print STDOUT ("FT${test}z\n") unless @ARGV == 5
 	&& "@ARGV" eq "bar -three 4 -- foo";
+    Getopt::Long::config ("permute");
+}
+
+if ( ++$test == $single || $all ) {
+
+    my %linkage = ('one', \&cbx);
+    my $o_one;
+    my $o_two;
+    my @o_three;
+    %xx = ();
+
+    @ARGV = qw( >one >two 2 <three 1 bar <three 4 -- foo );
+    Getopt::Long::config ("require_order");
+    print STDOUT ("FT${test}a\n")
+	if GetOptions (\%linkage,
+		       "<>", "<>", \&process,
+		       "one",
+		       "two=i", \&cb,
+		       "three=i@");
+    print STDOUT ("FT${test}a\n") if defined $opt_one;
+    print STDOUT ("FT${test}b\n") if defined $opt_two;
+    print STDOUT ("FT${test}c\n") if defined $opt_three;
+    print STDOUT ("FT${test}d\n") if defined @opt_three;
+    my @k = keys(%linkage);
+    print STDOUT ("FT${test}e (@k)\n") unless @k == 2;
+    print STDOUT ("FT${test}f\n") unless (exists $linkage{"one"});
+    print STDOUT ("FT${test}g\n") unless (defined $linkage{"one"});
+    print STDOUT ("FT${test}h\n") if (exists $linkage{"two"});
+    print STDOUT ("FT${test}i\n") if (defined $linkage{"two"});
+    print STDOUT ("FT${test}j\n") unless (exists $linkage{"three"});
+    print STDOUT ("FT${test}k\n") unless (defined $linkage{"three"});
+    print STDOUT ("FT${test}l\n") unless $xx{"one"} == 1;
+    print STDOUT ("FT${test}m\n") unless $xx{"two"} == 2;
+    print STDOUT ("FT${test}n\n") unless ref($linkage{"three"}) eq 'ARRAY';
+    my @a = @{$linkage{"three"}};
+    print STDOUT ("FT${test}o -- ",scalar(@a), "\n") unless scalar(@a) == 1;
+    print STDOUT ("FT${test}p\n") unless $a[0] == 1;
+    print STDOUT ("FT${test}x\n") if exists $xx{"bar"};
+    print STDOUT ("FT${test}y\n") if exists $xx{"foo"};
+    print STDOUT ("FT${test}z\n") unless @ARGV == 5
+	&& "@ARGV" eq "bar <three 4 -- foo";
     Getopt::Long::config ("permute");
 }
 
