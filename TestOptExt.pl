@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : ***
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Mar 17 09:02:38 2000
-# Update Count    : 48
+# Last Modified On: Fri May 12 11:23:07 2000
+# Update Count    : 54
 # Status          : Internal use only
 
 package foo;
@@ -628,7 +628,7 @@ if ( ++$test == $single || $all ) {
 ################ OO ################
 
 if ( ++$test == $single || $all ) {
-  if ( 0 ) {
+  if ( do "../src/oo-ext.pl" ) {
 
     # If bundling, it is not allowed to split on aa=bb.
     # Also, prevent warnings for undefind $bopctl{$o}.
@@ -646,6 +646,9 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}d\n") unless $w{vv} eq 'vw';
     print STDOUT ("FT${test}z\n") unless @ARGV == 1
 	&& "@ARGV" eq "foo";
+  }
+  else {
+      print STDOUT ("Skipping test $test\n");
   }
 }
 
