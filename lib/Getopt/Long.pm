@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Sep 26 16:54:53 2001
-# Update Count    : 886
+# Last Modified On: Wed Sep 26 17:18:40 2001
+# Update Count    : 892
 # Status          : Released
 
 ################ Copyright ################
@@ -69,7 +69,7 @@ sub GetOptions;
 sub ConfigDefaults ();
 sub ParseOptionSpec ($$$);
 sub OptCtl ($);
-sub FindOption ($$$$$$);
+sub FindOption ($$$$$);
 sub Croak (@);			# demand loading the real Croak
 
 ################ Local Variables ################
@@ -252,7 +252,6 @@ sub GetOptions {
     my $userlinkage;		# user supplied HASH
     my $opt;			# current option
     my $genprefix = $genprefix;	# so we can call the same module many times
-    my @opctl;			# the possible long option names
 
     $error = '';
 
@@ -396,9 +395,6 @@ sub GetOptions {
     die ($error) if $error;
     $error = 0;
 
-    # Sort the possible long option names.
-    @opctl = sort(keys (%opctl)) if $autoabbrev;
-
     # Show the options tables if debugging.
     if ( $debug ) {
 	my ($arrow, $k, $v);
@@ -436,7 +432,7 @@ sub GetOptions {
 
 	($found, $opt, $ctl, $arg, $key) =
 	  FindOption ($genprefix, $argend, $opt,
-		      \%opctl, \@opctl, \%aliases);
+		      \%opctl, \%aliases);
 
 	if ( $found ) {
 
@@ -686,13 +682,13 @@ sub ParseOptionSpec ($$$) {
 }
 
 # Option lookup.
-sub FindOption ($$$$$$) {
+sub FindOption ($$$$$) {
 
     # returns (1, $opt, $ctl, $arg, $key) if okay,
     # returns (1, undef) if option in error,
     # returns (0) otherwise.
 
-    my ($prefix, $argend, $opt, $opctl, $names, $aliases) = @_;
+    my ($prefix, $argend, $opt, $opctl, $aliases) = @_;
 
     print STDERR ("=> find \"$opt\", prefix=\"$prefix\"\n") if $debug;
 
@@ -746,15 +742,17 @@ sub FindOption ($$$$$$) {
 
     # Try auto-abbreviation.
     elsif ( $autoabbrev ) {
+	# Sort the possible long option names.
+	my @names = sort(keys (%$opctl));
 	# Downcase if allowed.
 	$opt = lc ($opt) if $ignorecase;
 	$tryopt = $opt;
 	# Turn option name into pattern.
 	my $pat = quotemeta ($opt);
 	# Look up in option names.
-	my @hits = grep (/^$pat/, @{$names});
+	my @hits = grep (/^$pat/, @names);
 	print STDERR ("=> ", scalar(@hits), " hits (@hits) with \"$pat\" ",
-		      "out of ", scalar(@{$names}), "\n") if $debug;
+		      "out of ", scalar(@names), "\n") if $debug;
 
 	# Check for ambiguous results.
 	unless ( (@hits <= 1) || (grep ($_ eq $opt, @hits) == 1) ) {
