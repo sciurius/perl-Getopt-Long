@@ -1,0 +1,25 @@
+Version 2.26_01 of module Getopt::Long has been released to CPAN.
+It is a prerelease of version 2.27.
+
+Module Getopt::Long implements an extended getopt function called
+GetOptions(). This function implements the POSIX standard for command
+line options, with GNU extensions, while still capable of handling
+the traditional one-letter options (including option bundling).
+It adds a lot of features like automatic abbreviation of option names,
+aliases and callback functions.
+
+The README document is attached to this message.
+
+To get it, use a Web browser and point it to the CPAN search engine:
+  http://search.cpan.org/search?mode=module&query=Getopt::Long
+  http://search.cpan.org/search?module=Getopt::Long
+
+Changes in this version
+-----------------------
+
+See file CHANGES
+
+Previous released version was 2.26.
+
+---- README ----
+
