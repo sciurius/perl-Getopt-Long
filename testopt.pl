@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : ***
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Dec 26 17:58:36 2000
-# Update Count    : 62
+# Last Modified On: Sat Aug  4 17:29:40 2001
+# Update Count    : 122
 # Status          : Internal use only.
 
 package foo;
@@ -35,6 +35,8 @@ select (STDOUT); $| = 1;
 	    "twos=s@", "threes:s@", 
 	    "four=i", "five:i",
 	    "fours=i@", "fives:i@",
+	    "fourx=o", "fivex:o",
+	    "fourxs=o@", "fivexs:o@",
 	    "six=f", "seven:f",
 	    "sixs=f@", "sevens:f@",
 	    "eight|opt8=s",
@@ -43,7 +45,7 @@ select (STDOUT); $| = 1;
 	    "v+");
 
 sub showtest {
-    print STDOUT ("# test $test\n") if $verbose;
+    print STDOUT ("#[$_[0]] test $test\n") if $verbose;
 }
 
 sub doit {
@@ -52,17 +54,32 @@ sub doit {
     $newgetopt'debug = 1 if $test == $single;	#';
     undef $result;
     eval {$result = &NGetOpt (@stdopts);};
-    unless ( defined $result ) {
-	print STDERR ($@);
-    }
+#    unless ( defined $result ) {
+#	print STDERR ($@);
+#    }
 }
 sub doit1 {
+    my $msg = '';
+    local $SIG{__WARN__} = sub { $msg .= "@_" };
+    local $SIG{__DIE__} = sub { $msg .= "FATAL: @_" };
     &doit;
     print STDOUT ("FT${test}a\n") unless $result;
+    if ( $msg ) {
+	chomp($msg);
+	print STDOUT ("FT${test}a '$msg'\n");
+    }
 }
 sub doit0 {
+    my $exp = shift;
+    my $msg = '';
+    local $SIG{__WARN__} = sub { $msg .= "@_" };
+    local $SIG{__DIE__} = sub { $msg .= "FATAL: @_" };
     &doit;
     print STDOUT ("FT${test}a\n") if $result;
+    unless ( $msg eq $exp ) {
+	chomp($msg);
+	print STDOUT ("FT${test}a '$msg'\n");
+    }
 }
 
 ################ Setup ################
@@ -72,20 +89,20 @@ $test = 0;
 ################ No args ################
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     &doit1 ();
 }
 
 ################ Non-opt args ################
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     &doit1 ("foo");
     print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     &doit1 ("--", "foo");
     print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
 }
@@ -93,7 +110,7 @@ if ( ++$test == $single || $all ) {
 ################ Simple args ################
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_one;
     &doit1 ("-one", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_one;
@@ -102,7 +119,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_one;
     &doit1 ("-one", "--", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_one;
@@ -111,7 +128,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_one;
     &doit1 ("-ONe", "--", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_one;
@@ -120,7 +137,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     { package newgetopt; $ignorecase = 0; }
     undef $opt_one;
     local (@stdopts) = ("one", "One", "ONe", "ONE");
@@ -134,16 +151,16 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_one;
-    print STDERR ("Expect: Option one does not take an argument\n");
-    &doit0 ("--one=", "foo");
+    &doit0 ("Option one does not take an argument\n",
+	    "--one=", "foo");
     print STDOUT ("FT${test}b = \"$opt_one\"\n") if defined $opt_one;
     print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_one;
     &doit1 ("-one", "-one", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_one;
@@ -152,7 +169,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     $opt_one = 2;
     &doit1 ("-one", "-noone", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_one;
@@ -162,7 +179,7 @@ if ( ++$test == $single || $all ) {
 
 # Negation with aliases.
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     $opt_one = 2;
     local (@stdopts) = ("one|two!");
     &doit1 ("-one", "-noone", "foo");
@@ -173,7 +190,7 @@ if ( ++$test == $single || $all ) {
 
 # Must apply to all of them.
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     $opt_one = 2;
     local (@stdopts) = ("one|two!");
     &doit1 ("-one", "-notwo", "foo");
@@ -186,7 +203,7 @@ if ( ++$test == $single || $all ) {
 ################# String opt (mandatory) ################
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_two;
     &doit1 ("-two", "bar", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_two;
@@ -195,7 +212,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_two;
     &doit1 ("-two", "-bar", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_two;
@@ -204,7 +221,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_two;
     &doit1 ("-two", "-bar", "-two", "blech", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_two;
@@ -213,7 +230,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_two;
     &doit1 ("--two=-bar", "--two=blech", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_two;
@@ -222,7 +239,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_two;
     &doit1 ("-two", "--");
     print STDOUT ("FT${test}b\n") unless defined $opt_two;
@@ -230,7 +247,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_two;
     &doit1 ("--two=--");
     print STDOUT ("FT${test}b\n") unless defined $opt_two;
@@ -238,23 +255,23 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_two;
-    print STDERR ("Expect: Option two requires an argument\n");
-    &doit0 ("-two");
+    &doit0 ("Option two requires an argument\n",
+	    "-two");
     print STDOUT ("FT${test}b = \"$opt_two\"\n") if defined $opt_two;
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_two;
-    print STDERR ("Expect: Option two requires an argument\n");
-    &doit0 ("--two=");
+    &doit0 ("Option two requires an argument\n",
+	    "--two=");
     print STDOUT ("FT${test}b = \"$opt_two\"\n") if defined $opt_two;
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef @opt_twos;
     &doit1 ("-twos", "-bar", "-twos", "blech", "foo");
     print STDOUT ("FT${test}b\n") unless defined @opt_twos;
@@ -266,7 +283,7 @@ if ( ++$test == $single || $all ) {
 ################ String opt (optional) ################
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_three;
     &doit1 ("-three", "bar", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_three;
@@ -275,7 +292,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_three;
     undef $opt_one;
     &doit1 ("-three", "-one", "foo");
@@ -287,7 +304,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_three;
     undef $opt_one;
     &doit1 ("-three", "blech", "-three", "-one", "foo");
@@ -299,7 +316,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_three;
     &doit1 ("-three", "--");
     print STDOUT ("FT${test}b\n") unless defined $opt_three;
@@ -307,7 +324,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_three;
     &doit1 ("-three");
     print STDOUT ("FT${test}b\n") unless defined $opt_three;
@@ -315,7 +332,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef @opt_threes;
     undef $opt_one;
     &doit1 ("-threes", "-one", "-threes", "blech", "foo");
@@ -330,7 +347,7 @@ if ( ++$test == $single || $all ) {
 ################ Int opt (mandatory) ################
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_four;
     &doit1 ("-four", "327", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_four;
@@ -339,7 +356,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_four;
     &doit1 ("-four", "327");
     print STDOUT ("FT${test}b\n") unless defined $opt_four;
@@ -348,7 +365,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_four;
     &doit1 ("-four", "-6", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_four;
@@ -357,44 +374,41 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_four;
-    print STDERR ("Expect: Value \"bar\" invalid for option four",
-		  " (number expected)\n");
-    &doit0 ("-four", "bar", "foo");
+    &doit0 ("Value \"bar\" invalid for option four (number expected)\n",
+	    "-four", "bar", "foo");
     print STDOUT ("FT${test}b = \"$opt_four\"\n") if defined $opt_four;
     print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_four;
-    print STDERR ("Expect: Value \"-bar\" invalid for option four",
-		  " (number expected)\n");
-    &doit0 ("-four", "-bar", "foo");
+    &doit0 ("Value \"-bar\" invalid for option four (number expected)\n",
+	    "-four", "-bar", "foo");
     print STDOUT ("FT${test}b = \"$opt_four\"\n") if defined $opt_four;
     print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_four;
-    print STDERR ("Expect: Value \"--\" invalid for option four",
-		  " (number expected)\n");
-    &doit0 ("-four", "--");
+    &doit0 ("Value \"--\" invalid for option four (number expected)\n",
+	    "-four", "--");
     print STDOUT ("FT${test}b = \"$opt_four\"\n") if defined $opt_four;
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_four;
-    print STDERR ("Expect: Option four requires an argument\n");
-    &doit0 ("-four");
+    &doit0 ("Option four requires an argument\n",
+	    "-four");
     print STDOUT ("FT${test}b = \"$opt_four\"\n") if defined $opt_four;
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef @opt_fours;
     &doit1 ("-fours", "-24", "-fours", "12", "foo");
     print STDOUT ("FT${test}b\n") unless defined @opt_fours;
@@ -406,14 +420,14 @@ if ( ++$test == $single || $all ) {
 ################ Int opt (optional) ################
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_five;
     &doit1 ("-five", "foo");
     print STDOUT ("FT${test}b = \"$opt_five\"\n") if $opt_five != 0;
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_five;
     &doit1 ("-five", "12", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_five;
@@ -422,7 +436,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_five;
     &doit1 ("-five", "12");
     print STDOUT ("FT${test}b\n") unless defined $opt_five;
@@ -431,7 +445,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_five;
     &doit1 ("-five", "-12", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_five;
@@ -440,7 +454,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_five;
     &doit1 ("-five", "+12", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_five;
@@ -449,7 +463,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_five;
     &doit1 ("-five", "-12");
     print STDOUT ("FT${test}b\n") unless defined $opt_five;
@@ -458,7 +472,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_five;
     undef $opt_one;
     &doit1 ("-five", "12", "-five", "-one", "foo");
@@ -470,7 +484,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_five;
     &doit1 ("-five", "--");
     print STDOUT ("FT${test}b\n") unless defined $opt_five;
@@ -478,7 +492,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_five;
     &doit1 ("-five");
     print STDOUT ("FT${test}b\n") unless defined $opt_five;
@@ -486,7 +500,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef @opt_fives;
     undef $opt_one;
     &doit1 ("-fives", "-24", "-fives", "-one", "foo");
@@ -498,10 +512,83 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
 }
 
-################ Int opt (mandatory) ################
+################ Ext Int opt (mandatory) ################
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
+    undef $opt_fourx;
+    &doit1 ("-fourx", "327", "foo");
+    print STDOUT ("FT${test}b\n") unless defined $opt_fourx;
+    print STDOUT ("FT${test}c = \"$opt_fourx\"\n") unless $opt_fourx == 327;
+    print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
+}
+
+if ( ++$test == $single || $all ) {
+    showtest(__LINE__);
+    undef $opt_fourx;
+    &doit1 ("-fourx", "0b00101001");
+    print STDOUT ("FT${test}b\n") unless defined $opt_fourx;
+    print STDOUT ("FT${test}c = \"$opt_fourx\"\n") unless $opt_fourx == 0b00101001;
+    print STDOUT ("FT${test}z\n") if @ARGV != 0;
+}
+
+if ( ++$test == $single || $all ) {
+    showtest(__LINE__);
+    undef $opt_fourx;
+    &doit1 ("-fourx", "0327", "foo");
+    print STDOUT ("FT${test}b\n") unless defined $opt_fourx;
+    print STDOUT ("FT${test}c = \"$opt_fourx\"\n") unless $opt_fourx == 0327;
+    print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
+}
+
+if ( ++$test == $single || $all ) {
+    showtest(__LINE__);
+    undef $opt_fourx;
+    &doit1 ("-fourx", "0x327");
+    print STDOUT ("FT${test}b\n") unless defined $opt_fourx;
+    print STDOUT ("FT${test}c = \"$opt_fourx\"\n") unless $opt_fourx == 0x327;
+    print STDOUT ("FT${test}z\n") if @ARGV != 0;
+}
+
+if ( ++$test == $single || $all ) {
+    showtest(__LINE__);
+    undef $opt_fourx;
+    &doit1 ("-fourx", "-6", "foo");
+    print STDOUT ("FT${test}b\n") unless defined $opt_fourx;
+    print STDOUT ("FT${test}c = \"$opt_fourx\"\n") unless $opt_fourx == -6;
+    print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
+}
+
+if ( ++$test == $single || $all ) {
+    showtest(__LINE__);
+    undef $opt_fourx;
+    &doit0 ("Value \"019\" invalid for option fourx (extended number expected)\n",
+	    "-fourx", "019", "foo");
+    print STDOUT ("FT${test}b = \"$opt_fourx\"\n") if defined $opt_fourx;
+    print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
+}
+
+if ( ++$test == $single || $all ) {
+    showtest(__LINE__);
+    undef $opt_fourx;
+    &doit0 ("Value \"0xefg\" invalid for option fourx (extended number expected)\n",
+	    "-fourx", "0xefg", "foo");
+    print STDOUT ("FT${test}b = \"$opt_fourx\"\n") if defined $opt_fourx;
+    print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
+}
+
+if ( ++$test == $single || $all ) {
+    showtest(__LINE__);
+    undef $opt_fourx;
+    &doit0 ("Value \"0b12\" invalid for option fourx (extended number expected)\n",
+	    "-fourx", "0b12");
+    print STDOUT ("FT${test}b = \"$opt_fourx\"\n") if defined $opt_fourx;
+}
+
+################ Float opt (mandatory) ################
+
+if ( ++$test == $single || $all ) {
+    showtest(__LINE__);
     undef $opt_six;
     &doit1 ("-six", "327", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_six;
@@ -510,7 +597,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_six;
     &doit1 ("-six", "3.27", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_six;
@@ -519,7 +606,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_six;
     &doit1 ("-six", "3.18e2");
     print STDOUT ("FT${test}b\n") unless defined $opt_six;
@@ -528,7 +615,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_six;
     &doit1 ("-six", "+3.18e2");
     print STDOUT ("FT${test}b\n") unless defined $opt_six;
@@ -537,7 +624,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_six;
     &doit1 ("-six", "3.18e+2");
     print STDOUT ("FT${test}b\n") unless defined $opt_six;
@@ -546,7 +633,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_six;
     &doit1 ("-six", "+3.18e+2");
     print STDOUT ("FT${test}b\n") unless defined $opt_six;
@@ -555,7 +642,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_six;
     &doit1 ("-six", "-6", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_six;
@@ -564,7 +651,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_six;
     &doit1 ("-six", "-6.4", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_six;
@@ -573,7 +660,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_six;
     &doit1 ("-six", "-6.4e-1");
     print STDOUT ("FT${test}b\n") unless defined $opt_six;
@@ -582,44 +669,41 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_six;
-    print STDERR ("Expect: Value \"bar\" invalid for option six",
-		  " (real number expected)\n");
-    &doit0 ("-six", "bar", "foo");
+    &doit0 ("Value \"bar\" invalid for option six (real number expected)\n",
+	    "-six", "bar", "foo");
     print STDOUT ("FT${test}b = \"$opt_six\"\n") if defined $opt_six;
     print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_six;
-    print STDERR ("Expect: Value \"-bar\" invalid for option six",
-		  " (real number expected)\n");
-    &doit0 ("-six", "-bar", "foo");
+    &doit0 ("Value \"-bar\" invalid for option six (real number expected)\n",
+	    "-six", "-bar", "foo");
     print STDOUT ("FT${test}b = \"$opt_six\"\n") if defined $opt_six;
     print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_six;
-    print STDERR ("Expect: Value \"--\" invalid for option six",
-		  " (real number expected)\n");
-    &doit0 ("-six", "--");
+    &doit0 ("Value \"--\" invalid for option six (real number expected)\n",
+	    "-six", "--");
     print STDOUT ("FT${test}b = \"$opt_six\"\n") if defined $opt_six;
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_six;
-    print STDERR ("Expect: Option six requires an argument\n");
-    &doit0 ("-six");
+    &doit0 ("Option six requires an argument\n",
+	    "-six");
     print STDOUT ("FT${test}b = \"$opt_six\"\n") if defined $opt_six;
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef @opt_sixs;
     &doit1 ("-sixs", "-.24", "-sixs", "1.2", "foo");
     print STDOUT ("FT${test}b\n") unless defined @opt_sixs;
@@ -628,17 +712,17 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
 }
 
-################ Int opt (optional) ################
+################ Float opt (optional) ################
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_seven;
     &doit1 ("-seven", "foo");
     print STDOUT ("FT${test}b = \"$opt_seven\"\n") if $opt_seven != 0;
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_seven;
     &doit1 ("-seven", "12", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_seven;
@@ -647,7 +731,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_seven;
     &doit1 ("-seven", "12");
     print STDOUT ("FT${test}b\n") unless defined $opt_seven;
@@ -656,7 +740,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_seven;
     &doit1 ("-seven", "1.2", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_seven;
@@ -665,7 +749,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_seven;
     &doit1 ("-seven", "-12", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_seven;
@@ -674,7 +758,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_seven;
     &doit1 ("-seven", "-1.42", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_seven;
@@ -683,7 +767,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_seven;
     &doit1 ("-seven", "-1.43");
     print STDOUT ("FT${test}b\n") unless defined $opt_seven;
@@ -692,7 +776,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_seven;
     undef $opt_one;
     &doit1 ("-seven", "1.3", "-seven", "-one", "foo");
@@ -704,7 +788,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_seven;
     &doit1 ("-seven", "--");
     print STDOUT ("FT${test}b\n") unless defined $opt_seven;
@@ -712,7 +796,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_seven;
     &doit1 ("-seven");
     print STDOUT ("FT${test}b\n") unless defined $opt_seven;
@@ -720,7 +804,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef @opt_sevens;
     undef $opt_one;
     &doit1 ("-sevens", "-2.74", "-sevens", "-one", "foo");
@@ -735,7 +819,7 @@ if ( ++$test == $single || $all ) {
 ################ Empty option ################
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_seven;
     undef $opt_;
     local (@stdopts) = ("", @stdopts);
@@ -748,7 +832,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef @opt_sevens;
     undef $opt_one;
     undef $opt_;
@@ -765,7 +849,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_;
     local (@stdopts) = ("", @stdopts);
     &doit1 ("-", "foo");
@@ -774,7 +858,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_;
     &doit1 ("-", "foo");
     print STDOUT ("FT${test}b\n") if defined $opt_;
@@ -782,7 +866,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     { package newgetopt; $bundling = 1; }
     undef $opt_;
     local (@stdopts) = ("", @stdopts);
@@ -793,7 +877,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     { package newgetopt; $bundling = 1; }
     undef $opt_;
     &doit1 ("-", "foo");
@@ -805,7 +889,7 @@ if ( ++$test == $single || $all ) {
 ################ Other delimeters ################
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_seven;
     local (@stdopts) = ("/", @stdopts);
     &doit1 ("/seven", "-1.42", "foo");
@@ -815,7 +899,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef @opt_sevens;
     undef $opt_one;
     local (@stdopts) = ("/", @stdopts);
@@ -829,15 +913,15 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     local (@stdopts) = ("/", @stdopts);
-    print STDERR ("Expect: Unknown option: /\n");
-    &doit0 ("/sevens", "-2.74", "/sevens", "/one", "//", "foo");
+    &doit0 ("Unknown option: /\n",
+	    "/sevens", "-2.74", "/sevens", "/one", "//", "foo");
     print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_seven;
     &doit1 ("--seven", "-1.42", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_seven;
@@ -846,7 +930,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef @opt_sevens;
     undef $opt_one;
     &doit1 ("--sevens", "-2.74", "+sevens", "-one", "--", "foo");
@@ -859,16 +943,16 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
-    print STDERR ("Expect: Unknown option: +\n");
-    &doit0 ("--sevens", "-2.74", "+sevens", "-one", "++", "foo");
+    showtest(__LINE__);
+    &doit0 ("Unknown option: +\n",
+	    "--sevens", "-2.74", "+sevens", "-one", "++", "foo");
     print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
 }
 
 ################ Auto-abbrev ################
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_six;
     undef $opt_seven;
     &doit1 ("-six", "-1.42", "foo");
@@ -878,7 +962,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_eight;
     &doit1 ("-e", "xxx", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_eight;
@@ -887,13 +971,12 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_six;
     undef $opt_seven;
-    print STDERR ("Expect: ",
-		  "Option s is ambiguous (seven, sevens, six, sixs)\n",
-		  "Expect: Unknown option: 1.42\n");
-    &doit0 ("-s", "-1.42", "foo");
+    &doit0 ("Option s is ambiguous (seven, sevens, six, sixs)\n".
+	    "Unknown option: 1.42\n",
+	    "-s", "-1.42", "foo");
     print STDOUT ("FT${test}b\n") if defined $opt_six;
     print STDOUT ("FT${test}c\n") if defined $opt_seven;
     print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
@@ -902,7 +985,7 @@ if ( ++$test == $single || $all ) {
 ################ Aliases ################
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_eight;
     undef $opt_opt8;
     &doit1 ("-opt8", "1", "foo");
@@ -913,7 +996,7 @@ if ( ++$test == $single || $all ) {
 
 # 2.12 Allow ? as an alias (not primary).
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     local (@stdopts) = ("help|?");
     undef $opt_help;
     &doit1 ("-help", "foo");
@@ -922,18 +1005,18 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     local (@stdopts) = ("help", "?", "??", "?|help");
     undef $opt_help;
-    print STDERR ("Expect: Error in option spec: \"?\"\n");
-    print STDERR ("Expect: Error in option spec: \"??\"\n");
-    print STDERR ("Expect: Error in option spec: \"?|help\"\n");
-    &doit0 ("-?", "foo");
+    &doit0 ("FATAL: Error in option spec: \"?\"\n".
+	    "Error in option spec: \"??\"\n".
+	    "Error in option spec: \"?|help\"\n",
+	    "-?", "foo");
     print STDOUT ("FT${test}b\n") if defined $opt_help;
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     local (@stdopts) = ("help|?");
     undef $opt_help;
     &doit1 ("-?", "foo");
@@ -944,7 +1027,7 @@ if ( ++$test == $single || $all ) {
 ################ Dashes in option name ################
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_opt_nine;
     &doit1 ("-opt-nine", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_opt_nine;
@@ -954,7 +1037,7 @@ if ( ++$test == $single || $all ) {
 ################ Arguments between options ################
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_six;
     &doit1 ("foo", "-six", "1.2", "bar");
     print STDOUT ("FT${test}b\n") unless defined $opt_six;
@@ -970,7 +1053,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_seven;
     &doit1 ("-seven", "1.2", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_seven;
@@ -979,7 +1062,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_seven;
     &doit1 ("foo", "-seven", "1.2");
     print STDOUT ("FT${test}b\n") if defined $opt_seven;
@@ -996,7 +1079,7 @@ if ( ++$test == $single || $all ) {
 { package newgetopt; $bundling = 1;}
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     # Short options should not be case sensitive.
     local (@stdopts) = ('a!','A=i','b=s','Foo');
     undef $opt_a;
@@ -1004,7 +1087,6 @@ if ( ++$test == $single || $all ) {
     undef $opt_b;
     undef $opt_Foo;
     undef $opt_foo;
-    print STDOUT ("Expect: Ignoring '!' modifier for short option a\n");
     &doit1 ("foo", "-abseven", "-A2", "--foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_a;
     print STDOUT ("FT${test}c = $opt_a\n") unless $opt_a == 1;
@@ -1018,7 +1100,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     # Short options should not be case sensitive.
     # Unless ignorecase > 1
     { package newgetopt; $ignorecase = 2; }
@@ -1041,11 +1123,10 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     local (@stdopts) = ('a!','b=s','c:s','d=s@','e:s@','f=i','g:i');
     $opt_a = 1;
     undef $opt_b;
-    print STDOUT ("Expect: Ignoring '!' modifier for short option a\n");
     &doit1 ("foo", "--noa", "-bseven");
     print STDOUT ("FT${test}b\n") unless defined $opt_a;
     print STDOUT ("FT${test}c = $opt_a\n") unless $opt_a == 0;
@@ -1055,7 +1136,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     local (@stdopts) = ('a','b=s','c:s','d=s@','e:s@','f=i','g:i');
     undef $opt_c;
     undef $opt_f;
@@ -1068,7 +1149,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     local (@stdopts) = ('a','b=s','c:s','d=s@','e:s@','f=i','g:i');
     undef $opt_c;
     &doit1 ("foo", "-c--seven");
@@ -1078,7 +1159,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     local (@stdopts) = ('a','b=s','c:s','d=s@','e:s@','f=i','g:i');
     undef $opt_a;
     undef $opt_g;
@@ -1091,12 +1172,12 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     local (@stdopts) = ('a','b=s','c:s','d=s@','e:s@','f=i','g:i');
     undef $opt_a;
     undef $opt_f;
-    print STDOUT ("Expect: Value \"a\" invalid for option f (number expected)\n");
-    &doit0 ("foo", "-fa");
+    &doit0 ("Value \"a\" invalid for option f (number expected)\n",
+	    "foo", "-fa");
     print STDOUT ("FT${test}b\n") if defined $opt_f;
     print STDOUT ("FT${test}c\n") unless defined $opt_a;
     print STDOUT ("FT${test}d = $opt_a\n") unless $opt_a == 1;
@@ -1104,19 +1185,20 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     local (@stdopts) = ('a','b=s','c:s','d=s@','e:s@','f=i','g:i');
     undef $opt_f;
     undef $opt_x;
-    print STDOUT ("Expect: Value \"x\" invalid for option f (number expected)\n");
-    &doit0 ("foo", "-fx");
+    &doit0 ("Value \"x\" invalid for option f (number expected)\n".
+	    "Unknown option: x\n",
+	    "foo", "-fx");
     print STDOUT ("FT${test}b\n") if defined $opt_f;
     print STDOUT ("FT${test}c\n") if defined $opt_x;
     print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     local (@stdopts) = ('foo','a','b=s','c:s','d=s@','e:s@','g:i','f:s');
     undef $opt_foo;
     &doit1 ("foo", "--foo", "--fo", "--f", "-ga");
@@ -1127,7 +1209,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     local (@stdopts) = ('a','A=i','c:s','d=s@','e:s@','g:i','f:s');
     undef $opt_a;
     undef $opt_A;
@@ -1140,7 +1222,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     local (@stdopts) = ('f=s', 'foo');
     undef $opt_f;
     undef $opt_foo;
@@ -1152,7 +1234,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     $newgetopt'bundling = 2;	#';
     local (@stdopts) = ('f=s', 'foo');
     undef $opt_f;
@@ -1166,7 +1248,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     local (@stdopts) = ('a', 'l=i', 'w=i', 'f', 'foo');
     undef $opt_a;
     undef $opt_l;
@@ -1181,7 +1263,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     local (@stdopts) = ('a', 'l=i', 'w=f', 'f', 'foo');
     undef $opt_a;
     undef $opt_l;
@@ -1195,21 +1277,74 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
 }
 
+if ( ++$test == $single || $all ) {
+    showtest(__LINE__);
+    local (@stdopts) = ('a=o', 'b=o', 'x=o');
+    undef $opt_a;
+    undef $opt_b;
+    undef $opt_x;
+    &doit1 ("-a24b0b10x0x10", "foo");
+    print STDOUT ("FT${test}b = $opt_a\n") unless $opt_a == 24;
+    print STDOUT ("FT${test}c = $opt_b\n") unless $opt_b == 0b10;
+    print STDOUT ("FT${test}d = $opt_x\n") unless $opt_x == 0x10;
+    print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
+}
+
 { package newgetopt; $bundling = 0;}
+
+################ Bundling + getopt_compat ################
+
+{ package newgetopt; $bundling = 0; $getopt_compat = 0; }
+
+if ( ++$test == $single || $all ) {
+    showtest(__LINE__);
+    &doit0 ("Unknown option: two=bar\n",
+	    "+two=bar");
+}
+
+{ package newgetopt; $bundling = 0; $getopt_compat = 1; }
+
+if ( ++$test == $single || $all ) {
+    showtest(__LINE__);
+    &doit1 ("+two=bar", "foo" );
+    print STDOUT ("FT${test}b\n") unless defined $opt_two;
+    print STDOUT ("FT${test}c = $opt_two\n") unless $opt_two eq "bar";
+    print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
+}
+
+{ package newgetopt; $bundling = 1; $getopt_compat = 1; }
+
+if ( ++$test == $single || $all ) {
+    showtest(__LINE__);
+    &doit0 ("Unknown option: two=bar\n",
+	    "+two=bar");
+}
+
+{ package newgetopt; $bundling = 2; $getopt_compat = 1; }
+
+if ( ++$test == $single || $all ) {
+    showtest(__LINE__);
+    &doit1 ("+two=bar", "foo" );
+    print STDOUT ("FT${test}b\n") unless defined $opt_two;
+    print STDOUT ("FT${test}c = $opt_two\n") unless $opt_two eq "bar";
+    print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
+}
+
+{ package newgetopt; $bundling = 0; $getopt_compat = 1; }
 
 ################ Pass-Through ################
 
 { package newgetopt; $passthrough = 1;}
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     &doit1 ("-xx", "x1=foo");
     print STDOUT ("FT$ {test}b\n") unless @ARGV == 2;
     print STDOUT ("FT$ {test}c\n") unless "@ARGV" eq "-xx x1=foo";
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     { package newgetopt; $order = $REQUIRE_ORDER; }
     &doit1 ("-xx", "x1=foo");
     print STDOUT ("FT$ {test}b\n") unless @ARGV == 2;
@@ -1218,7 +1353,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     &doit1 ("-four", "-blech", "-six=6.3");
     print STDOUT ("FT$ {test}b\n") unless @ARGV == 2;
     print STDOUT ("FT$ {test}c\n") unless "@ARGV" eq "-four -blech";
@@ -1227,7 +1362,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     &doit1 ("-six=blech", "-four", "6");
     print STDOUT ("FT$ {test}b\n") unless @ARGV == 1;
     print STDOUT ("FT$ {test}c\n") unless "@ARGV" eq "-six=blech";
@@ -1240,7 +1375,7 @@ if ( ++$test == $single || $all ) {
 ################ Option character case ################
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     local (@stdopts) = ("Help");
     undef $opt_Help;
     undef $opt_help;
@@ -1252,7 +1387,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     local (@stdopts) = ("Help", "HeLp");
     $newgetopt'ignorecase = 0;	#';
     undef $opt_Help;
@@ -1270,7 +1405,7 @@ if ( ++$test == $single || $all ) {
 # on during option processing.
 # >>> solved in 2.06
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     local (@stdopts) = ("Help");
     $newgetopt'autoabbrev = 0;	#';
     undef $opt_Help;
@@ -1286,7 +1421,7 @@ if ( ++$test == $single || $all ) {
 # Bug report from tmohr@schleim.qwe.de (Torsten Mohr).
 # It is incorrect use, but a bug nevertheless.
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     my @INCS;
     my %DEFS;
     local (@stdopts) = ("I=s@" => \@INCS, "D=s%" => \%DEFS);
@@ -1300,7 +1435,7 @@ if ( ++$test == $single || $all ) {
 ################ Hashes ################
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     # Basic string.
     undef %opt_hs;
     &doit1 ("-hs", "x1=foo");
@@ -1309,7 +1444,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     # Basic integer.
     undef %opt_hi;
     &doit1 ("-hi", "x1=12");
@@ -1318,7 +1453,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     # Multiple + default.
     undef %opt_hi;
     &doit1 ("-hi", "x1=12", "-hi", "x2");
@@ -1328,18 +1463,31 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT$ {test}e\n") unless $opt_hi{"x2"} eq "1";
 }
 
+# if ( ++$test == $single || $all ) {
+#     showtest(__LINE__);
+#     local (%opt_hi);
+# 
+#     # TODO : hi gets =s%, but D gets only =s.
+# 
+#     local (@stdopts) = ("hi|D=s", \%opt_hi);
+#     &doit1 ("-hi", "x1=12", "-D", "x2");
+#     print STDOUT ("FT$ {test}b\n") unless defined $opt_hi{"x1"};
+#     print STDOUT ("FT$ {test}c\n") unless $opt_hi{"x1"} eq "12";
+#     print STDOUT ("FT$ {test}d\n") unless defined $opt_hi{"x2"};
+#     print STDOUT ("FT$ {test}e\n") unless $opt_hi{"x2"} eq "1";
+# }
+
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     # Arg type check.
     undef %opt_hi;
-    print STDOUT ("Expect: Value \"abc\" invalid for option hi",
-		  " (number expected)\n");
-    &doit0 ("-hi", "x1=abc");
+    &doit0 ("Value \"abc\" invalid for option hi (number expected)\n",
+	    "-hi", "x1=abc");
     print STDOUT ("FT$ {test}b\n") if defined $opt_hi{"x1"};
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     # Empties.
     undef %opt_hs;
     &doit1 ("-hs", "x1=");
@@ -1348,7 +1496,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     # Greedyness
     undef %opt_hs;
     &doit1 ("-hs", "x1=x1=x1");
@@ -1357,19 +1505,18 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     # Empties.
     undef %opt_hi;
-    print STDOUT ("Expect: Value \"\" invalid for option hi",
-		  " (number expected)\n");
-    &doit0 ("-hi", "x2=");
+    &doit0 ("Value \"\" invalid for option hi (number expected)\n",
+	    "-hi", "x2=");
     print STDOUT ("FT$ {test}b\n") if defined $opt_hi{"x2"};
 }
 
 ################ Increments ################
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_v;
     &doit1 ("-v", "foo");
     print STDOUT ("FT$ {test}b\n") unless defined $opt_v;
@@ -1378,7 +1525,7 @@ if ( ++$test == $single || $all ) {
 }
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     $opt_v = 3;
     &doit1 ("-v", "-v", "-v", "foo", "-v");
     print STDOUT ("FT$ {test}b\n") unless defined $opt_v;
@@ -1388,7 +1535,7 @@ if ( ++$test == $single || $all ) {
 
 { package newgetopt; $bundling = 1;}
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     undef $opt_v;
     &doit1 ("-vvv", "foo");
     print STDOUT ("FT$ {test}b\n") unless defined $opt_v;
@@ -1418,7 +1565,7 @@ if ( ++$test == $single || $all ) {
 #  /home/cepstein/lib/perl5/auto/Getopt/Long/GetOptions.al line 173.
 
 if ( ++$test == $single || $all ) {
-    showtest();
+    showtest(__LINE__);
     # Option names that are not lowercase give warnings unless 
     # ignorecase is switched off.
     $newgetopt'debug = 1 if $test == $single;	#';
