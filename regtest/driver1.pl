@@ -8,8 +8,8 @@ package MyTest;			# not main
 # Author          : Johan Vromans
 # Created On      : Mon Aug  6 11:53:07 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Jun 20 13:00:03 2003
-# Update Count    : 415
+# Last Modified On: Tue Jun 24 23:13:04 2003
+# Update Count    : 439
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -106,6 +106,9 @@ my %refmap = ( '$v1'	  => \$v1,
 # Default verification set: all variables must be undef.
 my @def_vfy = ( map { $_, [] } sort keys %refmap );
 
+$refmap{'@$v1'}     = \$v1;
+$refmap{'%$v1'}     = \$v1;
+
 $refmap{'&ok'}	    = \&cb1;
 $refmap{'&warn'}    = \&cb2;
 $refmap{'&die'}	    = \&cb3;
@@ -190,7 +193,7 @@ exit ($retval);
 # Reset all variables to their default state.
 sub reset_vars {
     foreach ( keys %refmap ) {
-	if ( /^\$/ ) {
+	if ( /^\$/ || /^[@%]\$/ ) {
 	    undef ${$refmap{$_}};
 	}
 	elsif ( /^\@/ ) {
@@ -480,6 +483,9 @@ sub exec_plain {
     xp_check ("warning", \@warnings, $warnings);
 
     my %vfy = ( @def_vfy, %{$t->{vfy}});
+    delete $vfy{'$v1'} if defined $vfy{'@$v1'};
+    delete $vfy{'$v1'} if defined $vfy{'%$v1'};
+
     return unless $ret && %vfy;
 
     while ( my ($var,$vfy) = each (%vfy) ) {
@@ -522,20 +528,27 @@ sub exec_plain {
 	    }
 	}
 
-	# VFY array
-	elsif ( $var =~ /^\@/ ) {
-	    $ref = [] if ($call & S_LINKAGE) && !defined($ref);
-	    vfy_array($var, $ref, \@a);
+	# VFY array(ref)
+	elsif ( $var =~ /^\@(\$?)/ ) {
+	    if ( $call & S_LINKAGE ) {
+		$$ref = [] if $1 eq '$' && !defined($$ref);
+		$ref = [] if !defined($ref);
+	    }
+	    vfy_array($var, $1 eq '$' ? $$ref : $ref, \@a);
 	}
 
 	# VFY hash
-	elsif ( $var =~ /^\%/ ) {
+	elsif ( $var =~ /^\%(\$?)/ ) {
 	    next if @a == 0 && (!$ref || !%$ref);
-	    $ref = {} if ($call & S_LINKAGE) && !defined($ref);
+	    if ( $call & S_LINKAGE ) {
+		$$ref = {} if $1 eq '$' && !defined($$ref);
+		$ref = {} if !defined($ref);
+	    }
 	    # Verify as array. Sort on keys.
 	    my $a = [];
-	    foreach ( sort keys %$ref ) {
-		push(@$a, $_, $ref->{$_});
+	    my $r = $1 eq '$' ? $$ref : $ref;
+	    foreach ( sort keys %$r ) {
+		push(@$a, $_, $r->{$_});
 	    }
 	    vfy_array($var, $a, \@a);
 	}
