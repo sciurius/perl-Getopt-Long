@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Jan  6 17:12:27 2001
-# Update Count    : 748
+# Last Modified On: Sun Aug  5 18:27:36 2001
+# Update Count    : 749
 # Status          : Released
 
 ################ Copyright ################
@@ -36,7 +36,9 @@ use strict;
 
 use vars qw($VERSION $VERSION_STRING);
 $VERSION        =  2.22;
-$VERSION_STRING = "2.22";
+
+=for testing
+$VERSION_STRING = "2.25_13";
 
 use Exporter;
 use AutoLoader qw(AUTOLOAD);
