@@ -6,8 +6,8 @@ my $RCS_Id = '$Id$ ';
 # Author          : Johan Vromans
 # Created On      : Tue Sep 15 15:59:04 1992
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Jun 11 09:43:46 2003
-# Update Count    : 74
+# Last Modified On: Mon Jul 14 22:22:15 2003
+# Update Count    : 75
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -52,14 +52,14 @@ use Getopt::Long 2.33;		# will enable help/version
 
 sub app_options {
 
-    GetOptions(ident	=> \&app_ident,
-	       verbose	=> \$verbose,
+    GetOptions(ident	   => \&app_ident,
+	       'verbose|v' => \$verbose,
 	       # application specific options go here
 
 	       # development options
-	       test	=> \$test,
-	       trace	=> \$trace,
-	       debug	=> \$debug)
+	       test	   => \$test,
+	       trace	   => \$trace,
+	       debug	   => \$debug)
       or Getopt::Long::HelpMessage(2);
 }
 
