@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : ***
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Feb 12 11:11:25 1999
-# Update Count    : 37
+# Last Modified On: Fri Oct 22 16:13:47 1999
+# Update Count    : 44
 # Status          : Internal use only.
 
 package foo;
@@ -377,6 +377,14 @@ if ( ++$test == $single || $all ) {
 
 if ( ++$test == $single || $all ) {
     undef $opt_five;
+    &doit1 ("-five", "+12", "foo");
+    print STDOUT ("FT${test}b\n") unless defined $opt_five;
+    print STDOUT ("FT${test}c = \"$opt_five\"\n") unless $opt_five == +12;
+    print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
+}
+
+if ( ++$test == $single || $all ) {
+    undef $opt_five;
     &doit1 ("-five", "-12");
     print STDOUT ("FT${test}b\n") unless defined $opt_five;
     print STDOUT ("FT${test}c = \"$opt_five\"\n") unless $opt_five == -12;
@@ -440,9 +448,33 @@ if ( ++$test == $single || $all ) {
 
 if ( ++$test == $single || $all ) {
     undef $opt_six;
-    &doit1 ("-six", "3.18");
+    &doit1 ("-six", "3.18e2");
     print STDOUT ("FT${test}b\n") unless defined $opt_six;
-    print STDOUT ("FT${test}c = \"$opt_six\"\n") unless $opt_six == 3.18;
+    print STDOUT ("FT${test}c = \"$opt_six\"\n") unless $opt_six == 318;
+    print STDOUT ("FT${test}z\n") if @ARGV != 0;
+}
+
+if ( ++$test == $single || $all ) {
+    undef $opt_six;
+    &doit1 ("-six", "+3.18e2");
+    print STDOUT ("FT${test}b\n") unless defined $opt_six;
+    print STDOUT ("FT${test}c = \"$opt_six\"\n") unless $opt_six == 318;
+    print STDOUT ("FT${test}z\n") if @ARGV != 0;
+}
+
+if ( ++$test == $single || $all ) {
+    undef $opt_six;
+    &doit1 ("-six", "3.18e+2");
+    print STDOUT ("FT${test}b\n") unless defined $opt_six;
+    print STDOUT ("FT${test}c = \"$opt_six\"\n") unless $opt_six == 318;
+    print STDOUT ("FT${test}z\n") if @ARGV != 0;
+}
+
+if ( ++$test == $single || $all ) {
+    undef $opt_six;
+    &doit1 ("-six", "+3.18e+2");
+    print STDOUT ("FT${test}b\n") unless defined $opt_six;
+    print STDOUT ("FT${test}c = \"$opt_six\"\n") unless $opt_six == 318;
     print STDOUT ("FT${test}z\n") if @ARGV != 0;
 }
 
@@ -464,9 +496,9 @@ if ( ++$test == $single || $all ) {
 
 if ( ++$test == $single || $all ) {
     undef $opt_six;
-    &doit1 ("-six", "-6.4");
+    &doit1 ("-six", "-6.4e-1");
     print STDOUT ("FT${test}b\n") unless defined $opt_six;
-    print STDOUT ("FT${test}c = \"$opt_six\"\n") unless $opt_six == -6.4;
+    print STDOUT ("FT${test}c = \"$opt_six\"\n") unless $opt_six == -.64;
     print STDOUT ("FT${test}z\n") if @ARGV != 0;
 }
 
