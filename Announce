@@ -20,6 +20,18 @@ Changes in version 2.17
 * Getopt::Long::config is renamed Getopt::Long::Configure. The old
   name will remain supported without being documented.
 
+* Options can have the specifier '+' to denote that the option value
+  must be incremented each time the option occurs on the command line.
+  For example:
+
+     my $more = 2;
+     Getopt::Long::Configure("bundling");
+     GetOptions ("v+" => \$more);
+     print STDOUT ("more = $more\n");
+
+  will print "more = 3" when called with "-v", "more = 4" when called
+  with "-vv" (or "-v -v"), and so on.
+
 * Getopt::Long now uses autoloading. This substantially reduces the
   resources required to 'use Getopt::Long' (about 100 lines of over
   1300 total).

@@ -4,13 +4,14 @@
 # Author          : Johan Vromans
 # Created On      : ***
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Dec 25 16:18:28 1997
-# Update Count    : 19
+# Last Modified On: Sun Jun 14 14:26:07 1998
+# Update Count    : 24
 # Status          : Internal use only.
 
 package foo;
 
 unless ( defined &NGetOpt ) {
+    use blib;
     unshift (@INC, ".");
     require "newgetopt.pl";
 }
@@ -38,7 +39,8 @@ select (STDOUT); $| = 1;
 	    "sixs=f@", "sevens:f@",
 	    "eight|opt8=s",
 	    "hi=i%", "hs=s%",
-	    "opt-nine");
+	    "opt-nine",
+	    "v+");
 
 sub doit {
     @ARGV = @_;
@@ -1129,6 +1131,34 @@ if ( ++$test == $single || $all ) {
     &doit0 ("-hi", "x2=");
     print STDOUT ("FT$ {test}b\n") if defined $opt_hi{"x2"};
 }
+
+################ Increments ################
+
+if ( ++$test == $single || $all ) {
+    undef $opt_v;
+    &doit1 ("-v", "foo");
+    print STDOUT ("FT$ {test}b\n") unless defined $opt_v;
+    print STDOUT ("FT$ {test}c\n") unless $opt_v == 1;
+    print STDOUT ("FT$ {test}d\n") unless @ARGV == 1 && $ARGV[0] eq 'foo';
+}
+
+if ( ++$test == $single || $all ) {
+    $opt_v = 3;
+    &doit1 ("-v", "-v", "-v", "foo", "-v");
+    print STDOUT ("FT$ {test}b\n") unless defined $opt_v;
+    print STDOUT ("FT$ {test}c\n") unless $opt_v == 7;
+    print STDOUT ("FT$ {test}d\n") unless @ARGV == 1 && $ARGV[0] eq 'foo';
+}
+
+{ package newgetopt; $bundling = 1;}
+if ( ++$test == $single || $all ) {
+    undef $opt_v;
+    &doit1 ("-vvv", "foo");
+    print STDOUT ("FT$ {test}b\n") unless defined $opt_v;
+    print STDOUT ("FT$ {test}c\n") unless $opt_v == 3;
+    print STDOUT ("FT$ {test}d\n") unless @ARGV == 1 && $ARGV[0] eq 'foo';
+}
+{ package newgetopt; $bundling = 0;}
 
 ################ Finish ################
 

@@ -76,6 +76,15 @@ Option does not take an argument and may be negated, i.e. prefixed by
 (with value 0).
 The option variable will be set to 1, or 0 if negated.
 
+=item +
+
+Option does not take an argument and will be incremented by 1 every
+time it appears on the command line. E.g. "more+", when used with
+B<--more --more --more>, will set the option variable to 3 (provided
+it was 0 or undefined at first).
+
+The B<+> specifier is ignored if the option destination is not a SCALAR.
+
 =item =s
 
 Option takes a mandatory string argument.

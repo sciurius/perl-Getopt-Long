@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Mar 27 11:50:30 1998
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Jun  2 09:40:28 1998
-# Update Count    : 13
+# Last Modified On: Sun Jun 14 13:54:35 1998
+# Update Count    : 24
 # Status          : Released
 
 sub GetOptions {
@@ -89,7 +89,7 @@ sub GetOptions {
 	}
 
 	# Match option spec. Allow '?' as an alias.
-	if ( $opt !~ /^((\w+[-\w]*)(\|(\?|\w[-\w]*)?)*)?(!|[=:][infse][@%]?)?$/ ) {
+	if ( $opt !~ /^((\w+[-\w]*)(\|(\?|\w[-\w]*)?)*)?([!~+]|[=:][infse][@%]?)?$/ ) {
 	    $error .= "Error in option spec: \"$opt\"\n";
 	    next;
 	}
@@ -250,12 +250,12 @@ sub GetOptions {
 
 	my $tryopt = $opt;
 	my $found;		# success status
-	my $array;		# option is array type
-	my $hash;		# option is hash type
+	my $dsttype;		# destination type ('@' or '%')
+	my $incr;		# destination increment 
 	my $key;		# key (if hash type)
 	my $arg;		# option argument
 
-	($found, $opt, $arg, $array, $hash, $key) = 
+	($found, $opt, $arg, $dsttype, $incr, $key) = 
 	  FindOption ($genprefix, $argend, $opt, 
 		      \%opctl, \%bopctl, \@opctl, \%aliases);
 
@@ -272,8 +272,21 @@ sub GetOptions {
 				  ref($linkage{$opt}), "\n") if $debug;
 
 		    if ( ref($linkage{$opt}) eq 'SCALAR' ) {
-			print STDERR ("=> \$\$L{$opt} = \"$arg\"\n") if $debug;
-			${$linkage{$opt}} = $arg;
+			if ( $incr ) {
+			    print STDERR ("=> \$\$L{$opt} += \"$arg\"\n")
+			      if $debug;
+			    if ( defined ${$linkage{$opt}} ) {
+			        ${$linkage{$opt}} += $arg;
+			    }
+		            else {
+			        ${$linkage{$opt}} = $arg;
+			    }
+			}
+			else {
+			    print STDERR ("=> \$\$L{$opt} = \"$arg\"\n")
+			      if $debug;
+			    ${$linkage{$opt}} = $arg;
+		        }
 		    }
 		    elsif ( ref($linkage{$opt}) eq 'ARRAY' ) {
 			print STDERR ("=> push(\@{\$L{$opt}, \"$arg\")\n")
@@ -297,7 +310,7 @@ sub GetOptions {
 		    }
 		}
 		# No entry in linkage means entry in userlinkage.
-		elsif ( $array ) {
+		elsif ( $dsttype eq '@' ) {
 		    if ( defined $userlinkage->{$opt} ) {
 			print STDERR ("=> push(\@{\$L{$opt}}, \"$arg\")\n")
 			    if $debug;
@@ -309,7 +322,7 @@ sub GetOptions {
 			$userlinkage->{$opt} = [$arg];
 		    }
 		}
-		elsif ( $hash ) {
+		elsif ( $dsttype eq '%' ) {
 		    if ( defined $userlinkage->{$opt} ) {
 			print STDERR ("=> \$L{$opt}->{$key} = \"$arg\"\n")
 			    if $debug;
@@ -322,8 +335,20 @@ sub GetOptions {
 		    }
 		}
 		else {
-		    print STDERR ("=>\$L{$opt} = \"$arg\"\n") if $debug;
-		    $userlinkage->{$opt} = $arg;
+		    if ( $incr ) {
+			print STDERR ("=> \$L{$opt} += \"$arg\"\n")
+			  if $debug;
+			if ( defined $userlinkage->{$opt} ) {
+			    $userlinkage->{$opt} += $arg;
+			}
+			else {
+			    $userlinkage->{$opt} = $arg;
+			}
+		    }
+		    else {
+			print STDERR ("=>\$L{$opt} = \"$arg\"\n") if $debug;
+			$userlinkage->{$opt} = $arg;
+		    }
 		}
 	    }
 	}
@@ -366,12 +391,10 @@ sub GetOptions {
 # Option lookup.
 sub FindOption ($$$$$$$) {
 
-    # returns (1, $opt, $arg, $array, $hash, $key) if okay,
+    # returns (1, $opt, $arg, $dsttype, $incr, $key) if okay,
     # returns (0) otherwise.
 
     my ($prefix, $argend, $opt, $opctl, $bopctl, $names, $aliases) = @_;
-    my $array = 0;
-    my $hash = 0;
     my $key;			# hash key for a hash option
     my $arg;
 
@@ -401,6 +424,8 @@ sub FindOption ($$$$$$$) {
     my $tryopt = $opt;		# option to try
     my $optbl = $opctl;		# table to look it up (long names)
     my $type;
+    my $dsttype = '';
+    my $incr = 0;
 
     if ( $bundling && $starter eq '-' ) {
 	# Unbundle single letter option.
@@ -448,7 +473,7 @@ sub FindOption ($$$$$$$) {
 		      join(", ", @hits), ")\n");
 		$error++;
 		undef $opt;
-		return (1, $opt,$arg,$array,$hash,$key);
+		return (1, $opt,$arg,$dsttype,$incr,$key);
 	    }
 	    @hits = keys(%hit);
 	}
@@ -473,7 +498,7 @@ sub FindOption ($$$$$$$) {
 	return (0) if $passthrough;
 	warn ("Unknown option: ", $opt, "\n");
 	$error++;
-	return (1, $opt,$arg,$array,$hash,$key);
+	return (1, $opt,$arg,$dsttype,$incr,$key);
     }
     # Apparently valid.
     $opt = $tryopt;
@@ -482,27 +507,28 @@ sub FindOption ($$$$$$$) {
     #### Determine argument status ####
 
     # If it is an option w/o argument, we're almost finished with it.
-    if ( $type eq '' || $type eq '!' ) {
+    if ( $type eq '' || $type eq '!' || $type eq '+' ) {
 	if ( defined $optarg ) {
 	    return (0) if $passthrough;
 	    warn ("Option ", $opt, " does not take an argument\n");
 	    $error++;
 	    undef $opt;
 	}
-	elsif ( $type eq '' ) {
+	elsif ( $type eq '' || $type eq '+' ) {
 	    $arg = 1;		# supply explicit value
+	    $incr = $type eq '+';
 	}
 	else {
 	    substr ($opt, 0, 2) = ''; # strip NO prefix
 	    $arg = 0;		# supply explicit value
 	}
 	unshift (@ARGV, $starter.$rest) if defined $rest;
-	return (1, $opt,$arg,$array,$hash,$key);
+	return (1, $opt,$arg,$dsttype,$incr,$key);
     }
 
     # Get mandatory status and type info.
     my $mand;
-    ($mand, $type, $array, $hash,$key) = $type =~ /^(.)(.)(@?)(%?)$/;
+    ($mand, $type, $dsttype, $key) = $type =~ /^(.)(.)([@%]?)$/;
 
     # Check if there is an option argument available.
     if ( defined $optarg ? ($optarg eq '') 
@@ -517,7 +543,7 @@ sub FindOption ($$$$$$$) {
 	if ( $mand eq ":" ) {
 	    $arg = $type eq "s" ? '' : 0;
 	}
-	return (1, $opt,$arg,$array,$hash,$key);
+	return (1, $opt,$arg,$dsttype,$incr,$key);
     }
 
     # Get (possibly optional) argument.
@@ -526,7 +552,7 @@ sub FindOption ($$$$$$$) {
 
     # Get key if this is a "name=value" pair for a hash option.
     $key = undef;
-    if ($hash && defined $arg) {
+    if ($dsttype eq '%' && defined $arg) {
 	($key, $arg) = ($arg =~ /^(.*)=(.*)$/s) ? ($1, $2) : ($arg, 1);
     }
 
@@ -534,11 +560,12 @@ sub FindOption ($$$$$$$) {
 
     if ( $type eq "s" ) {	# string
 	# A mandatory string takes anything. 
-	return (1, $opt,$arg,$array,$hash,$key) if $mand eq "=";
+	return (1, $opt,$arg,$dsttype,$incr,$key) if $mand eq "=";
 
 	# An optional string takes almost anything. 
-	return (1, $opt,$arg,$array,$hash,$key) if defined $optarg || defined $rest;
-	return (1, $opt,$arg,$array,$hash,$key) if $arg eq "-"; # ??
+	return (1, $opt,$arg,$dsttype,$incr,$key) 
+	  if defined $optarg || defined $rest;
+	return (1, $opt,$arg,$dsttype,$incr,$key) if $arg eq "-"; # ??
 
 	# Check for option or option list terminator.
 	if ($arg eq $argend ||
@@ -614,7 +641,7 @@ sub FindOption ($$$$$$$) {
     else {
 	Croak ("GetOpt::Long internal error (Can't happen)\n");
     }
-    return (1, $opt, $arg, $array, $hash, $key);
+    return (1, $opt, $arg, $dsttype, $incr, $key);
 }
 
 # Getopt::Long Configuration.
