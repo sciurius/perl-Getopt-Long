@@ -5,12 +5,12 @@
 # Author          : Johan Vromans
 # Created On      : ***
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Mar 27 13:29:55 1998
-# Update Count    : 9
+# Last Modified On: Fri Feb 12 10:58:24 1999
+# Update Count    : 23
 # Status          : Internal use only
 
 package foo;
-use blib;
+#use blib;
 use Getopt::Long;
 
 $newgetopt::REQUIRE_ORDER = $Getopt::Long::REQUIRE_ORDER;
@@ -78,6 +78,7 @@ sub NGetOpt {
 
     my $ret;
     my %link;
+    $link{"v"} = $opt_v if defined $opt_v;
     $ret = GetOptions (\%link, @_);
     while ( ($k,$v) = each(%link) ) {
 	my $K;
