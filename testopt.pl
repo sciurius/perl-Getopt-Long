@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : ***
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Oct 22 16:13:47 1999
-# Update Count    : 44
+# Last Modified On: Mon Nov 29 20:30:49 1999
+# Update Count    : 46
 # Status          : Internal use only.
 
 package foo;
@@ -1153,6 +1153,14 @@ if ( ++$test == $single || $all ) {
     &doit1 ("-hs", "x1=");
     print STDOUT ("FT$ {test}b\n") unless defined $opt_hs{"x1"};
     print STDOUT ("FT$ {test}c\n") unless $opt_hs{"x1"} eq "";
+}
+
+if ( ++$test == $single || $all ) {
+    # Greedyness
+    undef %opt_hs;
+    &doit1 ("-hs", "x1=x1=x1");
+    print STDOUT ("FT$ {test}b\n") unless defined $opt_hs{"x1"};
+    print STDOUT ("FT$ {test}c ", $opt_hs{"x1"}, "\n") unless $opt_hs{"x1"} eq "x1=x1";
 }
 
 if ( ++$test == $single || $all ) {
