@@ -15,10 +15,9 @@ The easiest way to get it is by using the CPAN shell:
    perl -MCPAN -e 'install("Getopt::Long")'
 
 Alternatively, use a Web browser and point it to the CPAN search engine:
-  http://search.cpan.org/search?mode=module&query=Getopt::Long
   http://search.cpan.org/search?module=Getopt::Long
 
-Changes in version 2.26
+Changes in this version
 -----------------------
 
 === to be filled in; see CHANGES ===

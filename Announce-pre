@@ -10,12 +10,27 @@ aliases and callback functions.
 
 The README document is attached to this message.
 
-To get it, use a Web browser and point it to the CPAN search engine:
-  http://search.cpan.org/search?mode=module&query=Getopt::Long
+The easiest way to get it is by using the CPAN shell:
+
+  perl -MCPAN -e 'install("JV/Getopt-Long-2.26_01.tar.gz")'
+
+Alternatively, use a Web browser and point it to the CPAN search engine:
   http://search.cpan.org/search?module=Getopt::Long
 
 Changes in this version
 -----------------------
+
+* Fix several problems with internal and external use of 'die' and
+  signal handlers.
+
+* A callback routine that is associated with a hash-valued option will
+  now have both the hask key and the value passed. It used to get only
+  the value passed.
+
+* Eliminated the use of autoloading. Autoloading kept generating
+  problems during development, and when using perlcc.
+
+* Redesigned the regression tests.
 
 See file CHANGES
 
