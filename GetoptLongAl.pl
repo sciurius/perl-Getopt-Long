@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Mar 27 11:50:30 1998
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Dec 26 18:01:16 2000
-# Update Count    : 98
+# Last Modified On: Sat Feb 17 10:27:20 2001
+# Update Count    : 99
 # Status          : Released
 
 sub GetOptions {
@@ -49,7 +49,7 @@ sub GetOptions {
     # First argument may be an object. It's OK to use this as long
     # as it is really a hash underneath.
     $userlinkage = undef;
-    if ( ref($optionlist[0]) and
+    if ( @optionlist && ref($optionlist[0]) and
 	 "$optionlist[0]" =~ /^(?:.*\=)?HASH\([^\(]*\)$/ ) {
 	$userlinkage = shift (@optionlist);
 	print STDERR ("=> user linkage: $userlinkage\n") if $debug;
@@ -58,7 +58,7 @@ sub GetOptions {
     # See if the first element of the optionlist contains option
     # starter characters.
     # Be careful not to interpret '<>' as option starters.
-    if ( $optionlist[0] =~ /^\W+$/
+    if ( @optionlist && $optionlist[0] =~ /^\W+$/
 	 && !($optionlist[0] eq '<>'
 	      && @optionlist > 0
 	      && ref($optionlist[1])) ) {
@@ -71,7 +71,7 @@ sub GetOptions {
     # Verify correctness of optionlist.
     %opctl = ();
     %bopctl = ();
-    while ( @optionlist > 0 ) {
+    while ( @optionlist ) {
 	my $opt = shift (@optionlist);
 
 	# Strip leading prefix so people can specify "--foo=i" if they like.
