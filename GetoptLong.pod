@@ -284,11 +284,14 @@ CONFIGURATION OPTIONS), options that start with "+" or "-" may also
 include their arguments, e.g. "+foo=bar". This is for compatiblity
 with older implementations of the GNU "getopt" routine.
 
-If the first argument to GetOptions is a string consisting of only
-non-alphanumeric characters, it is taken to specify the option starter
-characters. Everything starting with one of these characters from the
-starter will be considered an option. B<Using a starter argument is
-strongly deprecated.>
+If the first argument to GetOptions (after the optional linkage
+specification) is a string consisting of only non-alphanumeric
+characters, it is taken to specify the option starter characters.
+Everything starting with one of these characters from the starter will
+be considered an option. GetOptions will not interpret a leading
+"<>" as option starters if the next argument is a reference. To
+force "<" and ">" as option starters, use "><". Confusing? Well,
+B<using a starter argument is strongly deprecated.>
 
 For convenience, option specifiers may have a leading B<-> or B<-->,
 so it is possible to write:
