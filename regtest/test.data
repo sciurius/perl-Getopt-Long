@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Sep 21 14:45:44 2001
-# Update Count    : 183
+# Last Modified On: Fri Sep 21 14:56:49 2001
+# Update Count    : 190
 # Status          : In progress
 
 ################ No args ################
@@ -1055,6 +1055,12 @@ A: -xx foo
    $v1 1
    @ARGV foo
 
+T: Callbacks
+P: xx=s \\&ok
+A: -xx bar foo
+   $v1 bar
+   @ARGV foo
+
 T: Callbacks (non-option)
 P: <> \\&ok
 A: xx foo
@@ -1077,6 +1083,17 @@ P: xx \\&finish yy \\&finish
 A: -xx -yy foo 
    $v1 1
    @ARGV -yy foo
+
+T: Callbacks (using !FINISH)
+P: xx \\&ok <> \\&finish
+A: -xx yy foo 
+   $v1 x
+   @ARGV foo
+
+T: Callbacks (using !FINISH)
+P: xx=s \\&ok <> \\&finish
+A: -xx yy foo 
+   $v1 x
 
 T: Callbacks (using !FINISH, Merijn Brand special)
 O: bundling
