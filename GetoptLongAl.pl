@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Mar 27 11:50:30 1998
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Mar 27 13:43:47 1998
-# Update Count    : 10
+# Last Modified On: Tue Jun  2 09:40:28 1998
+# Update Count    : 13
 # Status          : Released
 
 sub GetOptions {
@@ -26,18 +26,22 @@ sub GetOptions {
 
     $error = '';
 
-    print STDERR ('GetOptions $Revision$ ',
-		  "[GetOpt::Long $Getopt::Long::VERSION] -- ",
-		  "called from package \"$pkg\".\n",
-		  "  (@ARGV)\n",
-		  "  autoabbrev=$autoabbrev".
-		  ",bundling=$bundling",
-		  ",getopt_compat=$getopt_compat",
-		  ",order=$order",
-		  ",\n  ignorecase=$ignorecase",
-		  ",passthrough=$passthrough",
-		  ",genprefix=\"$genprefix\"",
-		  ".\n")
+    print STDERR ("GetOpt::Long $Getopt::Long::VERSION ",
+		  "called from package \"$pkg\".",
+		  "\n  ",
+		  'GetOptionsAl $Revision$ ',
+		  "\n  ",
+		  "ARGV: (@ARGV)",
+		  "\n  ",
+		  "autoabbrev=$autoabbrev,".
+		  "bundling=$bundling,",
+		  "getopt_compat=$getopt_compat,",
+		  "order=$order,",
+		  "\n  ",
+		  "ignorecase=$ignorecase,",
+		  "passthrough=$passthrough,",
+		  "genprefix=\"$genprefix\".",
+		  "\n")
 	if $debug;
 
     # Check for ref HASH as first argument. 
@@ -361,6 +365,9 @@ sub GetOptions {
 
 # Option lookup.
 sub FindOption ($$$$$$$) {
+
+    # returns (1, $opt, $arg, $array, $hash, $key) if okay,
+    # returns (0) otherwise.
 
     my ($prefix, $argend, $opt, $opctl, $bopctl, $names, $aliases) = @_;
     my $array = 0;
