@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Feb  2 21:24:32 1996
-# Update Count    : 347
+# Last Modified On: Wed Feb 28 18:25:32 1996
+# Update Count    : 353
 # Status          : Released
 
 package Getopt::Long;
@@ -14,7 +14,7 @@ require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(&GetOptions $REQUIRE_ORDER $PERMUTE $RETURN_IN_ORDER);
-$VERSION = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
+$VERSION = 2.2;
 use strict;
 
 =head1 NAME
@@ -456,10 +456,9 @@ else {
 $Getopt::Long::debug = 0;		# for debugging
 $Getopt::Long::error = 0;		# error tally
 $Getopt::Long::ignorecase = 1;		# ignore case when matching options
-($Getopt::Long::version,
- $Getopt::Long::major_version, 
- $Getopt::Long::minor_version) = '$Revision$ ' =~ /: ((\d+)\.(\d+))/;
-$Getopt::Long::version .= '*' if length('$Locker$ ') > 12;
+$Getopt::Long::version = $Getopt::Long::VERSION;
+($Getopt::Long::major_version, 
+ $Getopt::Long::minor_version) = $Getopt::Long::version =~ /^(\d+)\.(\d+)/;
 
 ################ Subroutines ################
 
@@ -479,8 +478,8 @@ sub GetOptions {
 				# than once in differing environments
     $Getopt::Long::error = 0;
 
-    print STDERR ("GetOptions $Getopt::Long::version",
-		  " [GetOpt::Long $Getopt::Long::VERSION] -- ",
+    print STDERR ('GetOptions $Revision$ ',
+		  "[GetOpt::Long $Getopt::Long::VERSION] -- ",
 		  "called from package \"$pkg\".\n",
 		  "  autoabbrev=$Getopt::Long::autoabbrev".
 		  ",getopt_compat=$Getopt::Long::getopt_compat",
@@ -599,7 +598,7 @@ sub GetOptions {
 	    # Make sure a valid perl identifier results.
 	    my $ov = $o;
 	    $ov =~ s/\W/_/g;
-	    if ( $c =~ /@/ ) {
+	    if ( defined $c && $c =~ /@/ ) {
 		print STDERR ("=> link \"$o\" to \@$pkg","::opt_$ov\n")
 		    if $debug;
 		eval ("\$linkage{\$o} = \\\@".$pkg."::opt_$ov;");
