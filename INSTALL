@@ -17,12 +17,12 @@ documentation. Note that "make install" will usually require super
 user privilege unless your Perl is installed in a location you have
 write access to.
 
-The kit contains an "examples" directory with two program skeleton
-files that can be used to start writing application programs: skel.pl
-and skel2.pl. The first skeleton uses Getopt::Long in a standard way.
-The second skeleton combines Getopt::Long with the Pod::Usage module
-that extracts help texts from the embedded documentation. The
-Pod::Usage module is part of standard Perl as of Perl version 5.6.
-For other versions of Perl, it can be fetched from CPAN. Use
+The kit contains an "examples" directory with a program skeleton file
+that can be used to start writing application programs: skel.pl. It
+uses Getopt::Long in a standard way, automatically providing version
+and help information. For the latter, it uses the Pod::Usage module to
+extracts help texts from the embedded documentation. The Pod::Usage
+module is part of standard Perl as of Perl version 5.6. For older
+versions of Perl, it can be fetched from CPAN. Use
 http://search.cpan.org/search?dist=Pod-Parser.
 
