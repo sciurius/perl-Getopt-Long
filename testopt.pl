@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : ***
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri May 12 10:24:19 2000
-# Update Count    : 59
+# Last Modified On: Tue Dec 26 17:58:36 2000
+# Update Count    : 62
 # Status          : Internal use only.
 
 package foo;
@@ -762,6 +762,44 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}f\n") unless defined $opt_;
     print STDOUT ("FT${test}g = \"$opt_\"\n") unless $opt_ == 1;
     print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
+}
+
+if ( ++$test == $single || $all ) {
+    showtest();
+    undef $opt_;
+    local (@stdopts) = ("", @stdopts);
+    &doit1 ("-", "foo");
+    print STDOUT ("FT${test}b\n") unless defined $opt_;
+    print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
+}
+
+if ( ++$test == $single || $all ) {
+    showtest();
+    undef $opt_;
+    &doit1 ("-", "foo");
+    print STDOUT ("FT${test}b\n") if defined $opt_;
+    print STDOUT ("FT${test}z\n") if @ARGV != 2 || "@ARGV" ne "- foo";
+}
+
+if ( ++$test == $single || $all ) {
+    showtest();
+    { package newgetopt; $bundling = 1; }
+    undef $opt_;
+    local (@stdopts) = ("", @stdopts);
+    &doit1 ("-", "foo");
+    print STDOUT ("FT${test}b\n") unless defined $opt_;
+    print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
+    { package newgetopt; $bundling = 0; }
+}
+
+if ( ++$test == $single || $all ) {
+    showtest();
+    { package newgetopt; $bundling = 1; }
+    undef $opt_;
+    &doit1 ("-", "foo");
+    print STDOUT ("FT${test}b\n") if defined $opt_;
+    print STDOUT ("FT${test}z\n") if @ARGV != 2 || "@ARGV" ne "- foo";
+    { package newgetopt; $bundling = 0; }
 }
 
 ################ Other delimeters ################
