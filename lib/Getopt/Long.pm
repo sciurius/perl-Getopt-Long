@@ -1,4 +1,4 @@
-# GetOpt::Long.pm -- Universal options parsing
+# Getopt::Long.pm -- Universal options parsing
 
 package Getopt::Long;
 
@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Jun 20 07:48:05 2002
-# Update Count    : 1083
+# Last Modified On: Sat Jun 29 16:30:49 2002
+# Update Count    : 1084
 # Status          : Released
 
 ################ Copyright ################
@@ -248,7 +248,7 @@ sub GetOptions {
 
     $error = '';
 
-    print STDERR ("GetOpt::Long $Getopt::Long::VERSION (",
+    print STDERR ("Getopt::Long $Getopt::Long::VERSION (",
 		  '$Revision$', ") ",
 		  "called from package \"$pkg\".",
 		  "\n  ",
@@ -1004,7 +1004,7 @@ sub FindOption ($$$$) {
 	}
     }
     else {
-	die("GetOpt::Long internal error (Can't happen)\n");
+	die("Getopt::Long internal error (Can't happen)\n");
     }
     return (1, $opt, $ctl, $arg, $key);
 }
@@ -1538,7 +1538,7 @@ messages. For example:
 
     =head1 NAME
 
-    sample - Using GetOpt::Long and Pod::Usage
+    sample - Using Getopt::Long and Pod::Usage
 
     =head1 SYNOPSIS
 
