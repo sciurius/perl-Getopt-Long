@@ -1,0 +1,138 @@
+Changes in version 2.17
+-----------------------
+
+* Getopt::Long::config is renamed Getopt::Long::Configure. The old
+  name will remain supported without being documented.
+
+* Options can have the specifier '+' to denote that the option value
+  must be incremented each time the option occurs on the command line.
+  For example:
+
+     my $more = 2;
+     Getopt::Long::Configure("bundling");
+     GetOptions ("v+" => \$more);
+     print STDOUT ("more = $more\n");
+
+  will print "more = 3" when called with "-v", "more = 4" when called
+  with "-vv" (or "-v -v"), and so on.
+
+* Getopt::Long now uses autoloading. This substantially reduces the
+  resources required to 'use Getopt::Long' (about 100 lines of over
+  1300 total).
+
+* It is now documented that global option variables like $opt_foo
+  need to be declared using 'use vars ...' when running under 'use
+  strict'. 
+
+* To install, it is now required to use the official procedure:
+
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+Changes in version 2.16
+-----------------------
+
+* A couple of small additional fixes to the $` $& $' fixes.
+
+* The option prefix can be set using config("prefix=...") or, more
+  powerful, with config("prefix_pattern=..."); see the documentation
+  for details.
+
+* More 'perl -w' warnings eliminated for obscure cases of bundling.
+
+This version is identical to 2.15, which was not released.
+
+There's no version 2.14.
+
+Changes in version 2.13
+-----------------------
+
+* All regexps are changed to avoid the use of $`, $& and $'. Using one
+  of these causes all pattern matches in the program to be much slower
+  than necessary.
+
+* Configuration errors are signalled using die() and will cause the
+  program to be terminated (unless eval{...} or $SIG{__DIE__} is
+  used).
+
+* Option parsing errors are now signalled with calls to warn().
+
+* In option bundles, numeric values may be embedded in the bundle
+  (e.g. -al24w80).
+
+* More 'perl -w' warnings eliminated for obscure cases of bundling.
+
+* Removed non-standard version number matching. Version 1.121 is now
+  more than 1.12 but less than 1.13. 
+
+Changes in version 2.12
+-----------------------
+
+* A single question mark is allowed as an alias to an option, e.g. 
+
+    GetOptions ("help|?", ...)
+
+Changes in version 2.11
+-----------------------
+
+* User linkage may be an object, provided the object is really a hash.
+
+  For example:
+
+    {	package Foo;
+	sub new () { return bless {}; }
+    }
+
+    my $linkage = Foo->new();
+
+    GetOptions ($linkage, ... );
+
+* Some bug fixes in handling obscure cases of pass-through.
+
+Changes in version 2.9
+----------------------
+
+* A new way to configure Getopt::Long. Instead of setting module local
+  variables, routine Getopt::Long::config can be called with the names
+  of options to be set or reset, e.g.
+
+    Getopt::Long::config ("no_auto_abbrev", "ignore_case");
+
+  Configuring by using the module local variables is deprecated, but
+  it will continue to work for backwark compatibility.
+
+Changes in version 2.6
+----------------------
+
+* Handle ignorecase even if autoabbrev is off. 
+
+* POD corrections.
+
+Changes in version 2.4
+----------------------
+
+* Pass-through of unrecognized options. Makes it easy to write wrapper
+  programs that process some of the command line options but pass the
+  others to another program.
+
+* Options can be of type HASH, now you can say
+
+    --define foo=bar
+
+  and have $opt_define{"foo"} set to "bar".
+
+* An enhanced skeleton program, skel2.pl, that combines the power of
+  Getopt::Long with Pod::Usage. 
+  Module Pod::Usage can be obtained from CPAN,
+  http://www.perl.com/CPAN/authors/Brad_Appleton. 
+
+Possible incompatibility in version 2.4
+---------------------------------------
+
+Previous versions of Getopt::Long always downcased the option variable
+names when ignorecase was in effect. This bug has been corrected. As a
+consequence, &GetOptions ("Foo") will now set variable $opt_Foo
+instead of $opt_foo.
+
