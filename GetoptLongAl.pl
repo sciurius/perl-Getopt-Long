@@ -1,11 +1,15 @@
 ################ AutoLoading subroutines ################
 
+package Getopt::Long;
+
+use strict;
+
 # RCS Status      : $Id$
 # Author          : Johan Vromans
 # Created On      : Fri Mar 27 11:50:30 1998
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Feb 17 10:29:12 2001
-# Update Count    : 100
+# Last Modified On: Sat Aug  4 10:02:57 2001
+# Update Count    : 104
 # Status          : Released
 
 sub GetOptions {
@@ -462,8 +466,10 @@ sub FindOption ($$$$$$$) {
     my $rest = undef;	# remainder from unbundling
 
     # If it is a long option, it may include the value.
-    if (($starter eq "--" || ($getopt_compat && !$bundling))
-	&& $opt =~ /^([^=]+)=(.*)$/s ) {
+    # With getopt_compat, not if bundling.
+    if ( ($starter eq "--" 
+          || ($getopt_compat && ($bundling == 0 || $bundling == 2)))
+	  && $opt =~ /^([^=]+)=(.*)$/s ) {
 	$opt = $1;
 	$optarg = $2;
 	print STDERR ("=> option \"", $opt,
