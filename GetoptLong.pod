@@ -389,7 +389,7 @@ POSIXLY_CORRECT has been set, in which case B<getopt_compat> is reset.
 Whether non-options are allowed to be mixed with
 options.
 Default is set unless environment variable
-POSIXLY_CORRECT has been set, in which case b<require_order> is reset.
+POSIXLY_CORRECT has been set, in which case B<require_order> is reset.
 
 See also B<permute>, which is the opposite of B<require_order>.
 
