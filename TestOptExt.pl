@@ -10,12 +10,12 @@ $debug = defined $main::debug;
 $verbose = defined $main::verbose;
 $numbered = defined $main::numbered;
 
-$Getopt::Long::debug = $debug;
+Getopt::Long::config ("debug") if $debug;
 $single = 0;
 $single = shift (@main::ARGV) if @main::ARGV == 1;
 $all = $single == 0;
 if ( $single ) {
-    $Getopt::Long::debug = 1;
+    Getopt::Long::config ("debug");
     open (STDERR, ">&STDOUT");
 }
 select (STDERR); $| = 1;
@@ -119,6 +119,45 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
 }
 
+################ Using user linkage with an Object ################
+
+if ( ++$test == $single || $all ) {
+
+    {	package Foo;
+	sub new () { return bless {}; }
+    }
+
+    my $linkage = Foo->new();
+    my $o_one;
+    my $o_two;
+    my @o_three;
+
+    @ARGV = qw( -one -three 1 -three 4 foo );
+    print STDOUT ("FT${test}a\n") 
+	unless GetOptions ($linkage,
+			   "one",
+			   "two=i",
+			   "three=i@");
+    print STDOUT ("FT${test}a\n") if defined $opt_one;
+    print STDOUT ("FT${test}b\n") if defined $opt_two;
+    print STDOUT ("FT${test}c\n") if defined $opt_three;
+    print STDOUT ("FT${test}d\n") if defined @opt_three;
+    my @k = keys(%$linkage);
+    print STDOUT ("FT${test}e (@k)\n") unless @k == 2;
+    print STDOUT ("FT${test}f\n") unless (exists $linkage->{"one"});
+    print STDOUT ("FT${test}g\n") unless (defined $linkage->{"one"});
+    print STDOUT ("FT${test}h\n") if (exists $linkage->{"two"});
+    print STDOUT ("FT${test}i\n") if (defined $linkage->{"two"});
+    print STDOUT ("FT${test}j\n") unless (exists $linkage->{"three"});
+    print STDOUT ("FT${test}k\n") unless (defined $linkage->{"three"});
+    print STDOUT ("FT${test}m\n") unless $linkage->{"one"} == 1;
+    print STDOUT ("FT${test}n\n") unless ref($linkage->{"three"}) eq 'ARRAY';
+    my @a = @{$linkage->{"three"}};
+    print STDOUT ("FT${test}o -- ",scalar(@a), "\n") unless scalar(@a) == 2;
+    print STDOUT ("FT${test}p\n") unless $a[0] == 1 && $a[1] == 4;
+    print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
+}
+
 ################ Mixing internal and user linkage ################
 
 if ( ++$test == $single || $all ) {
@@ -157,36 +196,36 @@ if ( ++$test == $single || $all ) {
 
 ################ Some error situations ################
 
-if ( ++$test == $single || $all ) {
+# if ( ++$test == $single || $all ) {
+# 
+#     my %linkage = ();
+# 
+#     print STDERR ("Expect: Invalid option linkage for \"two=i\"\n",
+# 		  "Expect: Error in option spec: \"HASH(0x...)\"\n");
+# 
+# 
+#     @ARGV = qw( -one -two 2 -three 1 -three 4 foo );
+#     print STDOUT ("FT${test}a\n") 
+# 	if GetOptions ("one",
+# 		       "two=i", \%linkage,
+# 		       "three=i@");
+# }
 
-    my %linkage = ();
-
-    print STDERR ("Expect: Invalid option linkage for \"two=i\"\n",
-		  "Expect: Error in option spec: \"HASH(0x...)\"\n");
-
-
-    @ARGV = qw( -one -two 2 -three 1 -three 4 foo );
-    print STDOUT ("FT${test}a\n") 
-	if GetOptions ("one",
-		       "two=i", \%linkage,
-		       "three=i@");
-}
-
-if ( ++$test == $single || $all ) {
-
-    my %linkage = ();
-
-    print STDERR ("Expect: Invalid option linkage for \"two=i\"\n",
-		  "Expect: Error in option spec: \"HASH(0x...)\"\n");
-
-
-    @ARGV = qw( -one -two 2 -three 1 -three 4 foo );
-    print STDOUT ("FT${test}a\n") 
-	if GetOptions (\%linkage,
-		       "one",
-		       "two=i", \%linkage,
-		       "three=i@");
-}
+# if ( ++$test == $single || $all ) {
+# 
+#     my %linkage = ();
+# 
+#     print STDERR ("Expect: Invalid option linkage for \"two=i\"\n",
+# 		  "Expect: Error in option spec: \"HASH(0x...)\"\n");
+# 
+# 
+#     @ARGV = qw( -one -two 2 -three 1 -three 4 foo );
+#     print STDOUT ("FT${test}a\n") 
+# 	if GetOptions (\%linkage,
+# 		       "one",
+# 		       "two=i", \%linkage,
+# 		       "three=i@");
+# }
 
 if ( ++$test == $single || $all ) {
 
@@ -361,7 +400,7 @@ if ( ++$test == $single || $all ) {
     %xx = ();
 
     @ARGV = qw( -one -two 2 -three 1 bar -three 4 -- foo );
-    $Getopt::Long::order = $REQUIRE_ORDER;
+    Getopt::Long::config ("require_order");
     print STDOUT ("FT${test}a\n") 
 	unless GetOptions (\%linkage,
 			   "one",
@@ -390,7 +429,7 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}y\n") if exists $xx{"foo"};
     print STDOUT ("FT${test}z\n") unless @ARGV == 5
 	&& "@ARGV" eq "bar -three 4 -- foo";
-    $Getopt::Long::order = $PERMUTE;
+    Getopt::Long::config ("permute");
 }
 
 if ( ++$test == $single || $all ) {
@@ -402,7 +441,7 @@ if ( ++$test == $single || $all ) {
     %xx = ();
 
     @ARGV = qw( -one -two 2 -three 1 bar -three 4 -- foo );
-    $Getopt::Long::order = $REQUIRE_ORDER;
+    Getopt::Long::config ("require_order");
     print STDOUT ("FT${test}a\n") 
 	if GetOptions (\%linkage,
 		       "one",
@@ -431,7 +470,38 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}y\n") if exists $xx{"foo"};
     print STDOUT ("FT${test}z\n") unless @ARGV == 5
 	&& "@ARGV" eq "bar -three 4 -- foo";
-    $Getopt::Long::order = $PERMUTE;
+    Getopt::Long::config ("permute");
+}
+
+################ Hashes ################
+
+if ( ++$test == $single || $all ) {
+
+    my %hi = ();
+
+    @ARGV = qw( -hi one=2 -- foo );
+    print STDOUT ("FT${test}a\n") 
+	unless GetOptions ("hi=i", \%hi);
+
+    print STDOUT ("FT${test}a\n") unless defined $hi{"one"};
+    print STDOUT ("FT${test}b\n") unless $hi{"one"} == 2;
+    print STDOUT ("FT${test}z\n") unless @ARGV == 1
+	&& "@ARGV" eq "foo";
+}
+
+################ Multiple Options ################
+
+if ( ++$test == $single || $all ) {
+
+    my @v = ();
+
+    @ARGV = qw( -v -verbose -- foo );
+    print STDOUT ("FT${test}a\n") 
+	unless GetOptions ("verbose|v" => \@v);
+
+    print STDOUT ("FT${test}a\n") unless @v == 2;
+    print STDOUT ("FT${test}z\n") unless @ARGV == 1
+	&& "@ARGV" eq "foo";
 }
 
 ################ Wrap Up ################
