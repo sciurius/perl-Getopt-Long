@@ -8,8 +8,8 @@ package MyTest;			# not main
 # Author          : Johan Vromans
 # Created On      : Mon Aug  6 11:53:07 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Sep 27 17:53:42 2001
-# Update Count    : 395
+# Last Modified On: Fri Dec 21 13:16:06 2001
+# Update Count    : 404
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -336,7 +336,7 @@ sub gather {
 
     # R: version
     # Require a specific version
-    elsif ( /^R:(\s+(.*)|$)/i ) {
+    elsif ( /^R:(\s+((<=?)?\s*\d\.\d\d(\d\d)?)|$)/i ) {
 	if ( $t->{done} < 0 ) {
 	    $sticky_version = $2 || "";
 	}
@@ -387,9 +387,15 @@ sub hdr {
 
 # Run all variants of a test set.
 sub do_test {
-    if ( $t->{version} && $t->{version} gt $Getopt::Long::VERSION ) {
-	$skipped += 4;
-	return;
+    if ( $t->{version} ) {
+	my $v = $t->{version};
+	if ( ($v =~ /^<=\s*(.*)/) ? ($Getopt::Long::VERSION gt $1) :
+	     ($v =~ /^<\s*(.*)/)  ? ($Getopt::Long::VERSION ge $1) :
+	                            ($Getopt::Long::VERSION lt $v) ) {
+	    $skipped += 4;
+	    # warn("skip: ", $t->{test}, " $Getopt::Long::VERSION $v\n");
+	    return;
+	}
     }
     if ( $only ) {
 	unshift (@{$t->{config}}, "debug");
