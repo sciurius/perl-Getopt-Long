@@ -8,8 +8,8 @@ package MyTest;			# not main
 # Author          : Johan Vromans
 # Created On      : Mon Aug  6 11:53:07 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Aug 24 19:16:08 2001
-# Update Count    : 334
+# Last Modified On: Thu Sep 20 17:58:45 2001
+# Update Count    : 337
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -455,8 +455,9 @@ sub exec_plain {
 	# VFY hash
 	elsif ( $var =~ /^\%/ ) {
 	    next if @a == 0 && (!$ref || !%$ref);
-	    $ref = {} if ($call & S_LINKAGE) && !defined($ref);
-	    print STDERR (hdr(), "VFY hash: unhandled\n");
+	    $ref = [] if ($call & S_LINKAGE) && !defined($ref);
+	    # Verify as array.
+	    vfy_array($var, [%$ref], \@a);
 	}
 
 	else {
