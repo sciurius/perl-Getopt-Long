@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Mar 27 11:50:30 1998
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Mar 14 21:09:46 2000
-# Update Count    : 50
+# Last Modified On: Fri Mar 17 09:00:09 2000
+# Update Count    : 55
 # Status          : Released
 
 sub GetOptions {
@@ -315,8 +315,10 @@ sub GetOptions {
 			    &{$linkage{$opt}}($opt, $arg);
 			};
 			print STDERR ("=> die($@)\n") if $debug && $@ ne '';
-			if ( $@ =~ /^FINISH\b/ ) {
-			    $goon = 0;
+			if ( $@ =~ /^!/ ) {
+			    if ( $@ =~ /^!FINISH\b/ ) {
+				$goon = 0;
+			    }
 			}
 			elsif ( $@ ne '' ) {
 			    warn ($@);
@@ -383,8 +385,10 @@ sub GetOptions {
 		    &$cb ($tryopt);
 		};
 		print STDERR ("=> die($@)\n") if $debug && $@ ne '';
-		if ( $@ =~ /^FINISH\b/ ) {
-		    $goon = 0;
+		if ( $@ =~ /^!/ ) {
+		    if ( $@ =~ /^!FINISH\b/ ) {
+			$goon = 0;
+		    }
 		}
 		elsif ( $@ ne '' ) {
 		    warn ($@);
