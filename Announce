@@ -1,6 +1,6 @@
 Version 2.21 of module Getopt::Long is now available via CPAN. It
 should soon appear in directory authors/Johan_Vromans as file
-Getopt-Long-2.21.tar.gz. It will be standard part of Perl 5.6.
+Getopt-Long-2.21a.tar.gz. It will be standard part of Perl 5.6.
 
 Module Getopt::Long implements an extended getopt function called
 GetOptions(). This function implements the POSIX standard for command
@@ -23,6 +23,10 @@ Changes in version 2.21
 
 * User defined subroutines can preliminary terminate options
   processing by calling die("FINISH");
+
+* Correct erroneous install of Getopt::Long manpage.
+  Previous versions seem to install Getopt::GetoptLong instead of
+  Getopt::Long.
 
 Previous released version was 2.20.
 

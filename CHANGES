@@ -8,6 +8,10 @@ Changes in version 2.21
 * User defined subroutines can preliminary terminate options
   processing by calling die("FINISH");
 
+* Correct erroneous install of Getopt::Long manpage.
+  Previous versions seem to install Getopt::GetoptLong instead of
+  Getopt::Long.
+
 Changes in version 2.20
 -----------------------
 
