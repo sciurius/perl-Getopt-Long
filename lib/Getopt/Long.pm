@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon May 19 17:43:33 2003
-# Update Count    : 1330
+# Last Modified On: Fri Jun 20 13:14:42 2003
+# Update Count    : 1334
 # Status          : Released
 
 ################ Copyright ################
@@ -35,10 +35,10 @@ use 5.004;
 use strict;
 
 use vars qw($VERSION);
-$VERSION        =  2.33;
+$VERSION        =  2.3301;
 # For testing versions only.
-#use vars qw($VERSION_STRING);
-#$VERSION_STRING = "2.32_06";
+use vars qw($VERSION_STRING);
+$VERSION_STRING = "2.33_01";
 
 use Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
@@ -857,6 +857,8 @@ sub FindOption ($$$$) {
     my $ctl = $opctl->{$tryopt};
     unless  ( defined $ctl ) {
 	return (0) if $passthrough;
+	# Pretend one char when bundling.
+	$opt = substr($opt,0,1) if $bundling == 1;
 	warn ("Unknown option: ", $opt, "\n");
 	$error++;
 	return (1, undef);
