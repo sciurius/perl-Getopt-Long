@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Apr  4 18:23:36 2003
-# Update Count    : 349
+# Last Modified On: Fri May  9 13:28:19 2003
+# Update Count    : 370
 # Status          : In progress
 
 ################ No args ################
@@ -1274,11 +1274,25 @@ P: a=f \\%h1
 A: -a4=2e1
    %h1 4 2e1
 
+R: <= 2.3201
+
 T: Bundling with hashes
 P: a=i \\%h1 b=f \\%h2
 A: -aa=2bb=1e1a3
    %h1 3 1 a 2
    %h2 b 1e1
+
+R: 2.3202
+
+T: Bundling with hashes
+P: a=i \\%h1 b=f \\%h2
+A: -aa=2bb=1e1a3
+W: Option a, key "3", requires a value
+W: Unknown option: 3
+   %h1 3 1 a 2
+   %h2 b 1e1
+
+R:
 
 T: Bundling with hashes and a default
 P: a:7 \\%h1 b=f \\%h2
@@ -1430,11 +1444,28 @@ A: -hi x1=12 bar
    %h1 x1 12
    @ARGV bar
 
+R: <= 2.3201
+
 T: Hashes
 P: hi=i \\%h1
 A: -hi x1=12 -hi x2 bar
    %h1 x1 12 x2 1
    @ARGV bar
+
+R: 2.3202
+
+T: Hashes
+P: hi=i \\%h1
+A: -hi x1=12 -hi x2 bar
+W: Option hi, key "x2", requires a value
+
+T: Hashes
+P: hi:i \\%h1
+A: -hi x1=12 -hi x2 bar
+   %h1 x1 12 x2 1
+   @ARGV bar
+
+R:
 
 T: Hashes
 P: hi=i \\%h1
@@ -1447,11 +1478,28 @@ A: -hs x1= bar
    %h1 x1 ""
    @ARGV bar
 
+R: <= 2.3201
+
 T: Hashes
 P: hs=s \\%h1
 A: -hs x1 bar
    %h1 x1 1
    @ARGV bar
+
+R: 2.3202
+
+T: Hashes
+P: hs=s \\%h1
+A: -hs x1 bar
+W: Option hs, key "x1", requires a value
+
+T: Hashes
+P: hs:s \\%h1
+A: -hs x1 bar
+   %h1 x1 ""
+   @ARGV bar
+
+R:
 
 T: Hashes
 P: hs=s \\%h1
