@@ -1,11 +1,13 @@
-#!/usr/local/bin/perl -w
+#!/usr/bin/perl -w
 my $RCS_Id = '$Id$ ';
+
+# Skeleton for Getopt::Long.
 
 # Author          : Johan Vromans
 # Created On      : Tue Sep 15 15:59:04 1992
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat May 29 16:14:17 1999
-# Update Count    : 35
+# Last Modified On: Fri Oct 22 15:29:52 1999
+# Update Count    : 42
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -27,23 +29,24 @@ $my_version .= '*' if length('$Locker$ ') > 12;
 ################ Command line parameters ################
 
 use Getopt::Long 2.13;
-sub app_options();
 
+# Command line options.
 my $verbose = 0;		# verbose processing
 
 # Development options (not shown with -help).
 my $debug = 0;			# debugging
 my $trace = 0;			# trace (show process)
-my $test = 0;			# test (no actual processing)
+my $test = 0;			# test mode.
 
+# Process command line options.
 app_options();
 
-# Options post-processing.
+# Post-processing.
 $trace |= ($debug || $test);
 
 ################ Presets ################
 
-my $TMPDIR = $ENV{TMPDIR} || '/usr/tmp';
+my $TMPDIR = $ENV{TMPDIR} || $ENV{TEMP} || '/usr/tmp';
 
 ################ The Process ################
 
@@ -51,10 +54,7 @@ exit 0;
 
 ################ Subroutines ################
 
-sub app_ident;
-sub app_usage($);
-
-sub app_options() {
+sub app_options {
     my $help = 0;		# handled locally
     my $ident = 0;		# handled locally
 
@@ -72,21 +72,21 @@ sub app_options() {
     {
 	app_usage(2);
     }
-    app_ident if $ident;
+    app_ident() if $ident;
 }
 
 sub app_ident {
     print STDERR ("This is $my_package [$my_name $my_version]\n");
 }
 
-sub app_usage($) {
+sub app_usage {
     my ($exit) = @_;
-    app_ident;
+    app_ident();
     print STDERR <<EndOfUsage;
 Usage: $0 [options] [file ...]
     -help		this message
     -ident		show identification
     -verbose		verbose information
 EndOfUsage
-    exit $exit if $exit != 0;
+    exit $exit if defined $exit && $exit != 0;
 }

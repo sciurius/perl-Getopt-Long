@@ -1,11 +1,13 @@
-#!/usr/local/bin/perl -w
+#!/usr/bin/perl -w
 my $RCS_Id = '$Id$ ';
+
+# Skeleton for Getopt::Long with Pod::Parser.
 
 # Author          : Johan Vromans
 # Created On      : Sun Sep 15 18:39:01 1996
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Mar 27 12:33:58 1998
-# Update Count    : 15
+# Last Modified On: Fri Oct 22 15:29:44 1999
+# Update Count    : 18
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -27,23 +29,24 @@ $my_version .= '*' if length('$Locker$ ') > 12;
 ################ Command line parameters ################
 
 use Getopt::Long 2.13;
-sub app_options();
 
+# Command line options.
 my $verbose = 0;		# verbose processing
 
 # Development options (not shown with -help).
 my $debug = 0;			# debugging
 my $trace = 0;			# trace (show process)
-my $test = 0;			# test (no actual processing)
+my $test = 0;			# test mode.
 
+# Process command line options.
 app_options();
 
-# Options post-processing.
+# Post-processing.
 $trace |= ($debug || $test);
 
 ################ Presets ################
 
-my $TMPDIR = $ENV{'TMPDIR'} || '/usr/tmp';
+my $TMPDIR = $ENV{TMPDIR} || $ENV{TEMP} || '/usr/tmp';
 
 ################ The Process ################
 
@@ -51,7 +54,7 @@ exit 0;
 
 ################ Subroutines ################
 
-sub app_options() {
+sub app_options {
     my $help = 0;		# handled locally
     my $ident = 0;		# handled locally
     my $man = 0;		# handled locally
