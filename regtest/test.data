@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Aug 24 19:15:52 2001
-# Update Count    : 95
+# Last Modified On: Thu Sep 20 18:14:20 2001
+# Update Count    : 149
 # Status          : In progress
 
 ################ No args ################
@@ -861,4 +861,201 @@ A: -a24b0b10x0x10 foo
 # Clear sticky config.
 O:
 
---
+################ Bundling + getopt_compat ################
+
+T: No bundling + no getopt_compat
+O: no_bundling no_getopt_compat
+P: v1=s
+A: +v1=bar
+W: Unknown option: v1=bar
+
+T: Bundling + no getopt_compat
+O: no_bundling getopt_compat
+P: v1=s
+A: +v1=bar foo
+   $opt_v1 bar
+   @ARGV foo
+
+T: Bundling + getopt_compat
+O: bundling getopt_compat
+P: v1=s
+A: +v1=bar foo
+W: Unknown option: v1=bar
+
+T: Bundling override + getopt_compat
+O: bundling_override getopt_compat
+P: v1=s
+A: +v1=bar foo
+   $opt_v1 bar
+   @ARGV foo
+
+################ Pass-Through ################
+
+T: Pass-Through
+O: pass_through
+P: x1
+A: -xx x1=foo
+   @ARGV -xx x1=foo
+
+T: Pass-Through
+O: pass_through require_order
+P: x1
+A: -xx x1=foo
+   @ARGV -xx x1=foo
+
+T: Pass-Through
+O: pass_through
+P: v1=i v2=f
+A: -v1 blech -v2=6.3
+   @ARGV -v1 blech
+   $opt_v2 == 6.3
+
+T: Pass-Through
+O: pass_through
+P: v1=i v2=f
+A: -v2=blech -v1 6
+   @ARGV -v2=blech
+   $opt_v1 == 6
+
+################ Option character case ################
+
+T: Option character case
+P: Help \\$v1
+A: -HeLp foo
+   $v1 1
+   @ARGV foo
+
+T: Option character case
+O: no_ignore_case
+P: Help \\$v1 HeLp \\$v2
+A: -HeLp foo
+   $v2 1
+   @ARGV foo
+
+# Bug report by Brian Wilson <bcwilson@VNET.IBM.COM>, Jan 1997:
+# The other bug is that ignorecase is only evaluated with autoabbrev
+# on during option processing.
+# >>> solved in 2.06
+T: Option character case
+O: no_auto_abbrev
+P: Help \\$v1
+A: -HeLp foo
+   $v1 1
+   @ARGV foo
+
+# Bug report from tmohr@schleim.qwe.de (Torsten Mohr).
+# It is incorrect use, but a bug nevertheless.
+# This generates warnings. It shouldn't.
+T: Option character case
+P: I=s@ \\@a1 D=s% \\%h1
+A: -I foo -d aa=bb bar
+   @a1 foo
+   %h1 aa bb
+   @ARGV bar
+
+################ Hashes ################
+
+T: Hashes
+P: hs=s \\%h1
+A: -hs x1=foo bar
+   %h1 x1 foo
+   @ARGV bar
+
+T: Hashes
+P: hi=i \\%h1
+A: -hi x1=12 bar
+   %h1 x1 12
+   @ARGV bar
+
+T: Hashes
+P: hi=i \\%h1
+A: -hi x1=12 -hi x2 bar
+   %h1 x1 12 x2 1
+   @ARGV bar
+
+T: Hashes
+P: hi=i \\%h1
+A: -hi x1=aa bar
+W: Value "aa" invalid for option hi (number expected)
+
+T: Hashes
+P: hs=s \\%h1
+A: -hs x1= bar
+   %h1 x1 ""
+   @ARGV bar
+
+T: Hashes
+P: hs=s \\%h1
+A: -hs x1 bar
+   %h1 x1 1
+   @ARGV bar
+
+T: Hashes
+P: hs=s \\%h1
+A: -hs x1=x1=x1 bar
+   %h1 x1 x1=x1
+   @ARGV bar
+
+T: Hashes
+P: hi=i \\%h1
+A: -hi x1= bar
+W: Value "" invalid for option hi (number expected)
+
+################ Increments ################
+
+T: Increments
+P: v1+
+A: -v1 foo
+   $opt_v1 1
+   @ARGV foo
+
+T: Increments
+P: v1+
+A: -v1 -v1 -v1 foo -v1
+   $opt_v1 4
+   @ARGV foo
+
+T: Increments
+O: require_order
+P: v1+
+A: -v1 -v1 -v1 foo -v1
+   $opt_v1 3
+   @ARGV foo -v1
+
+T: Increments
+O: bundling
+P: v+ \\$v1
+A: -vvv foo
+   $v1 3
+   @ARGV foo
+
+################ Miscellaneous ################
+
+#  From: "Epstein, Caleb" <cepstein@Montgomery.com>
+#  Subject: Strict warning from Getopt::Long under
+#  Date: Thu, 11 Feb 1999 08:37:00 -0500
+#
+#  I get warnings from perl with Getopt::Long and code like this:
+#
+#  		#!/usr/local/bin/perl -w
+#  		use strict;
+#  		use Getopt::Long;
+#  		my @ARY;
+#  		my $retval = GetOptions ("A|apple=s@" => \@ARY);
+#  		print join ("\n", @ARY), "\n";
+#
+#  The warning message is:
+#
+#  	Use of uninitialized value at
+#  /home/cepstein/lib/perl5/auto/Getopt/Long/GetOptions.al line 173.
+
+T: Option names that are not lowercase give warnings unless ignorecase is switched off
+O: no_ignore_case
+P: A|apple=s@ \\@a1
+A:
+
+T: Option names that are not lowercase give warnings unless ignorecase is switched off
+O: ignore_case
+P: A|apple=s@ \\@a1
+A:
+
