@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Sep 26 18:15:27 2001
-# Update Count    : 916
+# Last Modified On: Wed Sep 26 18:20:59 2001
+# Update Count    : 919
 # Status          : Released
 
 ################ Copyright ################
@@ -322,10 +322,10 @@ sub GetOptions {
 	}
 
 	# Parse option spec.
-	my ($o, $linko, $c) = ParseOptionSpec ($opt, \%opctl);
-	unless ( defined $o ) {
-	    # Failed. $linko contains the error message.
-	    $error .= $linko;
+	my ($name, $orig) = ParseOptionSpec ($opt, \%opctl);
+	unless ( defined $name ) {
+	    # Failed. $orig contains the error message.
+	    $error .= $orig;
 	    next;
 	}
 
@@ -333,12 +333,12 @@ sub GetOptions {
 	# the userlinkage if available.
 	if ( defined $userlinkage ) {
 	    unless ( @optionlist > 0 && ref($optionlist[0]) ) {
-		if ( exists $userlinkage->{$linko} &&
-		     ref($userlinkage->{$linko}) ) {
-		    print STDERR ("=> found userlinkage for \"$linko\": ",
-				  "$userlinkage->{$linko}\n")
+		if ( exists $userlinkage->{$orig} &&
+		     ref($userlinkage->{$orig}) ) {
+		    print STDERR ("=> found userlinkage for \"$orig\": ",
+				  "$userlinkage->{$orig}\n")
 			if $debug;
-		    unshift (@optionlist, $userlinkage->{$linko});
+		    unshift (@optionlist, $userlinkage->{$orig});
 		}
 		else {
 		    # Do nothing. Being undefined will be handled later.
@@ -349,21 +349,21 @@ sub GetOptions {
 
 	# Copy the linkage. If omitted, link to global variable.
 	if ( @optionlist > 0 && ref($optionlist[0]) ) {
-	    print STDERR ("=> link \"$linko\" to $optionlist[0]\n")
+	    print STDERR ("=> link \"$orig\" to $optionlist[0]\n")
 		if $debug;
 	    if ( ref($optionlist[0]) eq "SCALAR" ) {
-		$linkage{$linko} = shift (@optionlist);
+		$linkage{$orig} = shift (@optionlist);
 	    }
 	    elsif ( ref($optionlist[0]) eq "CODE" ) {
-		$linkage{$linko} = shift (@optionlist);
+		$linkage{$orig} = shift (@optionlist);
 	    }
 	    elsif ( ref($optionlist[0]) eq "ARRAY" ) {
-		$linkage{$linko} = shift (@optionlist);
-		$opctl{$o}[CTL_DEST] = CTL_DEST_ARRAY;
+		$linkage{$orig} = shift (@optionlist);
+		$opctl{$name}[CTL_DEST] = CTL_DEST_ARRAY;
 	    }
 	    elsif ( ref($optionlist[0]) eq "HASH" ) {
-		$linkage{$linko} = shift (@optionlist);
-		$opctl{$o}[CTL_DEST] = CTL_DEST_HASH;
+		$linkage{$orig} = shift (@optionlist);
+		$opctl{$name}[CTL_DEST] = CTL_DEST_HASH;
 	    }
 	    else {
 		$error .= "Invalid option linkage for \"$opt\"\n";
@@ -372,22 +372,22 @@ sub GetOptions {
 	else {
 	    # Link to global $opt_XXX variable.
 	    # Make sure a valid perl identifier results.
-	    my $ov = $linko;
+	    my $ov = $orig;
 	    $ov =~ s/\W/_/g;
-	    if ( $opctl{$o}[CTL_DEST] == CTL_DEST_ARRAY ) {
-		print STDERR ("=> link \"$linko\" to \@$pkg","::opt_$ov\n")
+	    if ( $opctl{$name}[CTL_DEST] == CTL_DEST_ARRAY ) {
+		print STDERR ("=> link \"$orig\" to \@$pkg","::opt_$ov\n")
 		    if $debug;
-		eval ("\$linkage{\$linko} = \\\@".$pkg."::opt_$ov;");
+		eval ("\$linkage{\$orig} = \\\@".$pkg."::opt_$ov;");
 	    }
-	    elsif ( $opctl{$o}[CTL_DEST] == CTL_DEST_HASH ) {
-		print STDERR ("=> link \"$linko\" to \%$pkg","::opt_$ov\n")
+	    elsif ( $opctl{$name}[CTL_DEST] == CTL_DEST_HASH ) {
+		print STDERR ("=> link \"$orig\" to \%$pkg","::opt_$ov\n")
 		    if $debug;
-		eval ("\$linkage{\$linko} = \\\%".$pkg."::opt_$ov;");
+		eval ("\$linkage{\$orig} = \\\%".$pkg."::opt_$ov;");
 	    }
 	    else {
-		print STDERR ("=> link \"$linko\" to \$$pkg","::opt_$ov\n")
+		print STDERR ("=> link \"$orig\" to \$$pkg","::opt_$ov\n")
 		    if $debug;
-		eval ("\$linkage{\$linko} = \\\$".$pkg."::opt_$ov;");
+		eval ("\$linkage{\$orig} = \\\$".$pkg."::opt_$ov;");
 	    }
 	}
     }
