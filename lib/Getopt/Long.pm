@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Nov 15 18:13:36 2001
-# Update Count    : 987
+# Last Modified On: Mon Dec  3 09:58:15 2001
+# Update Count    : 988
 # Status          : Released
 
 ################ Copyright ################
@@ -1781,8 +1781,9 @@ especially when mixing long options and bundles. Caveat emptor.
 
 =item ignore_case  (default: enabled)
 
-If enabled, case is ignored when matching long option names. Single
-character options will be treated case-sensitive.
+If enabled, case is ignored when matching long option names. If,
+however, bundling is enabled as well, single character options will be
+treated case-sensitive.
 
 Note: disabling C<ignore_case> also disables C<ignore_case_always>.
 
