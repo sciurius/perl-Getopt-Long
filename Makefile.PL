@@ -4,6 +4,7 @@ use Config;
 use ExtUtils::MakeMaker 5.0;
 
 require "./lib/Getopt/Long.pm";
+my $version = $Getopt::Long::VERSION_STRING || $Getopt::Long::VERSION;
 
 sub MY::postamble {
     my $mandir = $Config{installman3dir};
@@ -27,10 +28,10 @@ EOD
     "";
 }
 
-if ( $Getopt::Long::VERSION_STRING =~ /_/ ) {
+if ( $version =~ /_/ ) {
     print STDERR <<EOD;
 
-WARNING: This is Getopt::Long version $Getopt::Long::VERSION_STRING.
+WARNING: This is Getopt::Long version $version.
 The underscore in the version number indicates that this is
 an intermediate, preview or beta release.
 Please keep checking CPAN for the official release.
@@ -40,7 +41,7 @@ EOD
 
 WriteMakefile(
 	NAME      => "Getopt::Long",
-	VERSION   => $Getopt::Long::VERSION_STRING,
+	VERSION   => $version,
 
 	( $] < 5.005 ) ? () : (
 	AUTHOR => 'Johan Vromans (jvromans@squirrel.nl)',
