@@ -4,8 +4,8 @@ my $RCS_Id = '$Id$ ';
 # Author          : Johan Vromans
 # Created On      : Tue Sep 15 15:59:04 1992
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Oct  1 13:37:23 1997
-# Update Count    : 30
+# Last Modified On: Thu Dec 25 16:22:23 1997
+# Update Count    : 31
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -26,7 +26,7 @@ $my_version .= '*' if length('$Locker$ ') > 12;
 
 ################ Command line parameters ################
 
-use Getopt::Long 2.12;
+use Getopt::Long 2.13;
 my $verbose = 0;
 my ($debug, $trace, $test) = (0, 0, 0);
 app_options();
