@@ -6,13 +6,13 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Dec 21 13:49:22 2001
-# Update Count    : 1001
+# Last Modified On: Thu Jan  3 21:27:38 2002
+# Update Count    : 1005
 # Status          : Released
 
 ################ Copyright ################
 
-# This program is Copyright 1990,2001 by Johan Vromans.
+# This program is Copyright 1990,2002 by Johan Vromans.
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the Perl Artistic License or the
 # GNU General Public License as published by the Free Software
@@ -1779,9 +1779,17 @@ bundled. To distinguish bundles from long option names, long options
 I<must> be introduced with C<--> and bundles with C<->.
 
 Note that, if you have options C<a>, C<l> and C<all>, and
-auto_abbrev enabled, C<-a> and C<--a> will both match the
-single-character option C<a>. C<-al> will be unbundled into C<-a>
-and C<-l>, while C<--al> will autocomplete to C<--all>.
+auto_abbrev enabled, possible arguments and option settings are:
+
+    using argument               sets option(s)
+    ------------------------------------------
+    -a, --a                      a
+    -l, --l                      l
+    -al, -la, -ala, -all,...     a, l
+    --al, --all                  all
+
+The suprising part is that C<--a> sets option C<a> (due to auto
+completion), not C<all>.
 
 Note: disabling C<bundling> also disables C<bundling_override>.
 
@@ -1981,7 +1989,7 @@ Johan Vromans <jvromans@squirrel.nl>
 
 =head1 COPYRIGHT AND DISCLAIMER
 
-This program is Copyright 2001,1990 by Johan Vromans.
+This program is Copyright 2002,1990 by Johan Vromans.
 This program is free software; you can redistribute it and/or
 modify it under the terms of the Perl Artistic License or the
 GNU General Public License as published by the Free Software
