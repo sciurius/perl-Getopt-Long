@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Jan 11 13:11:35 1997
-# Update Count    : 506
+# Last Modified On: Sun Jan 19 14:29:36 1997
+# Update Count    : 515
 # Status          : Released
 
 package Getopt::Long;
@@ -418,6 +418,10 @@ to be the last part of the bundle, e.g.
 is equivalent to
 
     scale -h 24 -w 80
+
+If $Getopt::Long::bundling is set to the value 2, long option names
+override option bundles. In the above example, B<-vax> would be
+interpreted as the option "vax", not the bundle "v", "a", "x".
 
 B<Note:> Using option bundling can easily lead to unexpected results,
 especially when mixing long options and bundles. Caveat emptor.
@@ -875,6 +879,7 @@ sub find_option {
 
     my $tryopt = $opt;		# option to try
     my $optbl = \%opctl;	# table to look it up (long names)
+    my $type;
 
     if ( $bundling && $starter eq '-' ) {
 	# Unbundle single letter option.
@@ -885,6 +890,15 @@ sub find_option {
 		      "$starter$tryopt$rest\n") if $debug;
 	$rest = undef unless $rest ne '';
 	$optbl = \%bopctl;	# look it up in the short names table
+
+	# If bundling == 2, long options can override bundles.
+	if ( $bundling == 2 and
+	     defined ($type = $opctl{$tryopt.$rest}) ) {
+	    print STDERR ("=> $starter$tryopt rebundled to ",
+			  "$starter$tryopt$rest\n") if $debug;
+	    $tryopt .= $rest;
+	    undef $rest;
+	}
     } 
 
     # Try auto-abbreviation.
@@ -933,7 +947,7 @@ sub find_option {
     }
 
     # Check validity by fetching the info.
-    my $type = $optbl->{$tryopt};
+    $type = $optbl->{$tryopt} unless defined $type;
     unless  ( defined $type ) {
 	return 0 if $passthrough;
 	warn ("Unknown option: ", $opt, "\n");
