@@ -152,7 +152,7 @@ Network (CPAN), see "http://www.perl.com/CPAN/authors/Johan_Vromans".
 
 * Copyright and disclaimer
 
-Module Getopt::Long is Copyright 1990,1996 by Johan Vromans.
+Module Getopt::Long is Copyright 1990,1997 by Johan Vromans.
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation; either version 2

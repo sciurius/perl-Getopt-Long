@@ -1,16 +1,16 @@
-Version 2.4 of module Getopt::Long is now available via CPAN. It
+Version 2.6 of module Getopt::Long is now available via CPAN. It
 should soon appear in directory authors/Johan_Vromans as file
-GetoptLong-2.4.tar.gz.
+GetoptLong-2.6.tar.gz.
 
 Module Getopt::Long implements an extended getopt function called
 GetOptions(). This function implements the POSIX standard for command
 line options, with GNU extensions, while still capable of handling
-the traditional one-letter options.
+the traditional one-letter options (including option bundling).
 
 The kit contains:
 
   README         -- Introductionary text
-  GetoptLong.pm  -- version 2.4 of Getopt::Long (subroutine GetOptions)
+  GetoptLong.pm  -- version 2.6 of Getopt::Long (subroutine GetOptions)
   newgetopt.pl   -- version 1.17 of newgetopt.pl (subroutine NGetOpt)
   Makefile.PL    -- Makefile for installation
   skel.pl        -- Skeleton program to use Getopt::Long
@@ -23,30 +23,11 @@ it to http://www.perl.com/CPAN. It will automagically be redirected to
 a CPAN site in your neighborhood.
 URL: http://www.perl.com/CPAN/authors/Johan_Vromans
 
-New features in this version
-----------------------------
+Changes w.r.t version 2.4
+-------------------------
 
-* Pass-through of unrecognized options. Makes it easy to write wrapper
-  programs that process some of the command line options but pass the
-  others to another program.
+* Handle ignorecase even if autoabbrev is off. 
 
-* Options can be of type HASH, now you can say
-
-    --define foo=bar
-
-  and have $opt_define{"foo"} set to "bar".
-
-* An enhanced skeleton program, skel2.pl, that combines the power of
-  Getopt::Long with Pod::Usage. 
-  Module Pod::Usage can be obtained from CPAN,
-  http://www.perl.com/CPAN/authors/Brad_Appleton. 
-
-Possible incompatibility
-------------------------
-
-Previous versions of Getopt::Long always downcased the option variable
-names when ignorecase was in effect. This bug has been corrected. As a
-consequence, &GetOptions ("Foo") will now set variable $opt_Foo
-instead of $opt_foo.
+* POD corrections.
 
 ---- README ----
