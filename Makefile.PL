@@ -2,17 +2,7 @@
 
 use ExtUtils::MakeMaker 5.0;
 
-require "./GetoptLong.pl";
-
-sub MY::postamble {
-    '
-GetoptLong.pm: GetoptLong.pl GetoptLongAl.pl GetoptLong.pod
-	$(RM_F) GetoptLong.pm
-	$(PERL) -e \'open(STDOUT,">GetoptLong.pm");\' \\
-		-e \'print while <>; close(STDOUT);\' \\
-		GetoptLong.pl GetoptLongAl.pl GetoptLong.pod 
-';
-}
+require "./GetoptLong.pm";
 
 WriteMakefile(
 	NAME      => "Getopt::Long",
@@ -24,7 +14,5 @@ WriteMakefile(
 		       "GetoptLong.pm" => '$(INST_LIB)/Getopt/Long.pm'
 		     },
 	dist      => { COMPRESS => 'gzip', SUFFIX => 'gz', 
-		     },
-	clean     => { FILES => "GetoptLong.pm"
 		     },
  );
