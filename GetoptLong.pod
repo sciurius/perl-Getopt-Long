@@ -334,7 +334,7 @@ This will leave the non-options in @ARGV:
 =head1 CONFIGURATION OPTIONS
 
 B<GetOptions> can be configured by calling subroutine
-B<Getopt::Long::config>. This subroutine takes a list of quoted
+B<Getopt::Long::Configure>. This subroutine takes a list of quoted
 strings, each specifying a configuration option to be set, e.g.
 B<ignore_case>. Options can be reset by prefixing with B<no_>, e.g.
 B<no_ignore_case>. Case does not matter. Multiple calls to B<config>
