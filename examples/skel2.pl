@@ -4,8 +4,8 @@ my $RCS_Id = '$Id$ ';
 # Author          : Johan Vromans
 # Created On      : Sun Sep 15 18:39:01 1996
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Dec 25 16:22:48 1997
-# Update Count    : 12
+# Last Modified On: Sun Jan 11 21:35:04 1998
+# Update Count    : 13
 # Status          : Unknown, Use with caution!
 
 
@@ -16,6 +16,7 @@ my $RCS_Id = '$Id$ ';
 # require 'common.pl';
 
 use strict;
+use Getopt::Long 2.13;
 
 my $my_package = 'Sciurix';
 my ($my_name, $my_version) = $RCS_Id =~ /: (.+).pl,v ([\d.]+)/;
@@ -42,11 +43,8 @@ sub options () {
     my $ident = 0;		# handled locally
     my $man = 0;		# handled locally
 
-    # Process options. Load Getopt::Long only if needed.
-    if ( @ARGV > 0 && $ARGV[0] =~ /^[-+]/ ) {
-	# The next require / import is equivalent to "use Getopt::Long".
-	require "Getopt/Long.pm";
-	import Getopt::Long 2.13;
+    # Process options.
+    if ( @ARGV > 0 ) {
 	GetOptions('ident'	=> \$ident,
 		   'verbose'	=> \$verbose,
 		   'trace'	=> \$trace,
