@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Sep 21 16:38:32 2001
-# Update Count    : 759
+# Last Modified On: Sat Sep 22 17:06:58 2001
+# Update Count    : 762
 # Status          : Released
 
 ################ Copyright ################
@@ -34,10 +34,11 @@ use 5.004;
 
 use strict;
 
-use vars qw($VERSION $VERSION_STRING);
-$VERSION        =  2.26_04;
+use vars qw($VERSION);
+$VERSION        =  2.26_01;
 # For testing versions only.
-#$VERSION_STRING = "2.25_13";
+use vars qw($VERSION_STRING);
+$VERSION_STRING = "2.26_01";
 
 use Exporter;
 
@@ -232,10 +233,9 @@ sub GetOptions {
 
     $error = '';
 
-    print STDERR ("GetOpt::Long $Getopt::Long::VERSION ",
-		  "called from package \"$pkg\".",
-		  "\n  ",
-		  'GetOptionsAl $Revision$ ',
+    print STDERR ("GetOpt::Long $Getopt::Long::VERSION (",
+		  '$Revision$', ")",
+		  "Called from package \"$pkg\".",
 		  "\n  ",
 		  "ARGV: (@ARGV)",
 		  "\n  ",

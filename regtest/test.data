@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Sep 21 14:56:49 2001
-# Update Count    : 190
+# Last Modified On: Fri Sep 21 15:48:54 2001
+# Update Count    : 191
 # Status          : In progress
 
 ################ No args ################
@@ -1059,6 +1059,12 @@ T: Callbacks
 P: xx=s \\&ok
 A: -xx bar foo
    $v1 bar
+   @ARGV foo
+
+T: Callbacks
+P: xx=s% \\&ok
+A: -xx bar=blech foo
+   $v1 bar|blech
    @ARGV foo
 
 T: Callbacks (non-option)

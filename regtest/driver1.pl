@@ -8,8 +8,8 @@ package MyTest;			# not main
 # Author          : Johan Vromans
 # Created On      : Mon Aug  6 11:53:07 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Sep 21 15:06:25 2001
-# Update Count    : 354
+# Last Modified On: Fri Sep 21 15:48:17 2001
+# Update Count    : 358
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -556,7 +556,15 @@ sub vfy_array {
 }
 
 sub cb1 {
-    $v1 = @_ > 1 ? $_[1] : 'x';
+    if ( @_ == 1 ) {
+	$v1 = 'x';
+    }
+    elsif ( @_ == 2 ) {
+	$v1 = $_[1];
+    }
+    else {
+	$v1 = join("|", @_[1..$#_]);
+    }
 }
 
 sub cb2 {
