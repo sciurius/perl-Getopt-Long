@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Dec 21 12:51:29 2001
-# Update Count    : 993
+# Last Modified On: Fri Dec 21 13:49:22 2001
+# Update Count    : 1001
 # Status          : Released
 
 ################ Copyright ################
@@ -672,10 +672,15 @@ sub ParseOptionSpec ($$) {
     }
 
     # Process all names. First is canonical, the rest are aliases.
+    my $dups = "";
     foreach ( @names ) {
 
 	$_ = lc ($_)
 	  if $ignorecase > (($bundling && length($_) == 1) ? 1 : 0);
+
+	if ( exists $opctl->{$_} ) {
+	    $dups .= "Duplicate specification \"$opt\" for option \"$_\"\n";
+	}
 
 	if ( $spec eq '!' ) {
 	    $opctl->{"no$_"} = $entry;
@@ -687,6 +692,7 @@ sub ParseOptionSpec ($$) {
 	}
     }
 
+    return (undef, $dups) if $dups;
     ($names[0], $orig);
 }
 
@@ -1794,6 +1800,10 @@ especially when mixing long options and bundles. Caveat emptor.
 If enabled, case is ignored when matching long option names. If,
 however, bundling is enabled as well, single character options will be
 treated case-sensitive.
+
+With C<ignore_case>, option specifications for options that only
+differ in case, e.g., C<"foo"> and C<"Foo">, will be flagged as
+duplicates.
 
 Note: disabling C<ignore_case> also disables C<ignore_case_always>.
 
