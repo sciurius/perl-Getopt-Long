@@ -27,6 +27,17 @@ EOD
     "";
 }
 
+if ( $Getopt::Long::VERSION =~ /_/ ) {
+    print STDERR <<EOD;
+
+WARNING: This is Getopt::Long version $Getopt::Long::VERSION.
+The underscore in the version number indicates that this is
+an intermediate, preview or beta release.
+Please keep checking CPAN for the official release.
+
+EOD
+}
+
 WriteMakefile(
 	NAME      => "Getopt::Long",
 	VERSION   => $Getopt::Long::VERSION,
