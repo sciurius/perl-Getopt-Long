@@ -6,8 +6,12 @@ require "./GetoptLong.pm";
 
 WriteMakefile(
 	NAME      => "Getopt::Long",
-	DISTNAME  => 'GetoptLong',
 	VERSION   => $Getopt::Long::VERSION,
+
+	( $[ < 5.005 ) ? () : (
+	AUTHOR => 'Johan Vromans (jvromans@squirrel.nl)',
+        ABSTRACT => 'Extended getopt function for command line parsing',
+        ),
 
 	INSTALLDIRS => 'perl',
 	PM 	  => { "newgetopt.pl"  => '$(INST_LIB)/newgetopt.pl',

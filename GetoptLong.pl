@@ -6,18 +6,19 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Feb 12 10:51:35 1999
-# Update Count    : 708
+# Last Modified On: Wed Aug  4 10:08:50 1999
+# Update Count    : 709
 # Status          : Released
 
 ################ Copyright ################
 
 # This program is Copyright 1990,1999 by Johan Vromans.
 # This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-# 
+# modify it under the terms of the Perl Artistic License or the
+# GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any
+# later version.
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
