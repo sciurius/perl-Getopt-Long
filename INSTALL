@@ -1,0 +1,26 @@
+INSTALLATION
+============
+
+First unpack the kit, if you have not already done so:
+
+   gzip -d < GetoptLong-x.y.tar.gz | tar xf -
+   cd GetoptLong-x.y
+
+Getopt::Long can be installed with:
+
+   perl Makefile.PL
+   make
+   make install
+
+This will install Getopt/Long.pm, newgetopt.pl and the Getopt::Long
+documentation. Note that "make install" will usually require super
+user privilege unless your Perl is installed in a location you have
+write access to.
+
+The kit contains two program skeleton files that can be used to start
+writing application programs: skel.pl and skel2.pl. The first skeleton
+uses Getopt::Long in a standard way. The second skeleton combines
+Getopt::Long with the Pod::Usage module that extracts help texts from
+the embedded documentation. The Pod::Usage module is not part of
+standard Perl, it can be fetched from CPAN.
+
