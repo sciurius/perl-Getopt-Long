@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri May  9 12:21:35 2003
-# Update Count    : 1196
+# Last Modified On: Mon May 19 17:43:33 2003
+# Update Count    : 1330
 # Status          : Released
 
 ################ Copyright ################
@@ -35,20 +35,25 @@ use 5.004;
 use strict;
 
 use vars qw($VERSION);
-$VERSION        =  2.3202;
+$VERSION        =  2.33;
 # For testing versions only.
-use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.32_02";
+#use vars qw($VERSION_STRING);
+#$VERSION_STRING = "2.32_06";
 
 use Exporter;
-
-use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+use vars qw(@ISA @EXPORT @EXPORT_OK);
 @ISA = qw(Exporter);
-%EXPORT_TAGS = qw();
+
+# Exported subroutines.
+sub GetOptions(@);		# always
+sub Configure(@);		# on demand
+sub HelpMessage(@);		# on demand
+sub VersionMessage(@);		# in demand
+
 BEGIN {
     # Init immediately so their contents can be used in the 'use vars' below.
-    @EXPORT      = qw(&GetOptions $REQUIRE_ORDER $PERMUTE $RETURN_IN_ORDER);
-    @EXPORT_OK   = qw();
+    @EXPORT    = qw(&GetOptions $REQUIRE_ORDER $PERMUTE $RETURN_IN_ORDER);
+    @EXPORT_OK = qw(&HelpMessage &VersionMessage &Configure);
 }
 
 # User visible variables.
@@ -58,24 +63,27 @@ use vars qw($error $debug $major_version $minor_version);
 use vars qw($autoabbrev $getopt_compat $ignorecase $bundling $order
 	    $passthrough);
 # Official invisible variables.
-use vars qw($genprefix $caller $gnu_compat);
+use vars qw($genprefix $caller $gnu_compat $auto_help $auto_version);
 
 # Public subroutines.
-sub Configure (@);
-sub config (@);			# deprecated name
-sub GetOptions;
+sub config(@);			# deprecated name
 
 # Private subroutines.
-sub ConfigDefaults ();
-sub ParseOptionSpec ($$);
-sub OptCtl ($);
-sub FindOption ($$$$);
+sub ConfigDefaults();
+sub ParseOptionSpec($$);
+sub OptCtl($);
+sub FindOption($$$$);
 
 ################ Local Variables ################
 
+# $requested_version holds the version that was mentioned in the 'use'
+# or 'require', if any. It can be used to enable or disable specific
+# features.
+my $requested_version = 0;
+
 ################ Resident subroutines ################
 
-sub ConfigDefaults () {
+sub ConfigDefaults() {
     # Handle POSIX compliancy.
     if ( defined $ENV{"POSIXLY_CORRECT"} ) {
 	$genprefix = "(--|-)";
@@ -110,13 +118,14 @@ sub import {
 	    $dest = \@config;	# config next
 	    next;
 	}
-	push (@$dest, $_);	# push
+	push(@$dest, $_);	# push
     }
     # Hide one level and call super.
     local $Exporter::ExportLevel = 1;
+    push(@syms, qw(&GetOptions)) if @syms; # always export GetOptions
     $pkg->SUPER::import(@syms);
     # And configure.
-    Configure (@config) if @config;
+    Configure(@config) if @config;
 }
 
 ################ Initialization ################
@@ -205,6 +214,8 @@ sub getoptions {
 
 package Getopt::Long;
 
+################ Back to Normal ################
+
 # Indices in option control info.
 # Note that ParseOptions uses the fields directly. Search for 'hard-wired'.
 use constant CTL_TYPE    => 0;
@@ -233,7 +244,7 @@ use constant CTL_DEFAULT => 4;
 #use constant CTL_RANGE   => ;
 #use constant CTL_REPEAT  => ;
 
-sub GetOptions {
+sub GetOptions(@) {
 
     my @optionlist = @_;	# local copy of the option descriptions
     my $argend = '--';		# option list terminator
@@ -261,6 +272,8 @@ sub GetOptions {
 		  "order=$order,",
 		  "\n  ",
 		  "ignorecase=$ignorecase,",
+		  "autohelp=$auto_help,",
+		  "autoversion=$auto_version,",
 		  "passthrough=$passthrough,",
 		  "genprefix=\"$genprefix\".",
 		  "\n")
@@ -391,6 +404,20 @@ sub GetOptions {
     # Bail out if errors found.
     die ($error) if $error;
     $error = 0;
+
+    # Supply --version and --help support, if needed and allowed.
+    if ( defined($auto_version) ? $auto_version : ($requested_version >= 2.3203) ) {
+	if ( !defined($opctl{version}) ) {
+	    $opctl{version} = ['','version',0,CTL_DEST_CODE,undef];
+	    $linkage{version} = \&VersionMessage;
+	}
+    }
+    if ( defined($auto_help) ? $auto_help : ($requested_version >= 2.3203) ) {
+	if ( !defined($opctl{help}) && !defined($opctl{'?'}) ) {
+	    $opctl{help} = $opctl{'?'} = ['','help',0,CTL_DEST_CODE,undef];
+	    $linkage{help} = \&HelpMessage;
+	}
+    }
 
     # Show the options tables if debugging.
     if ( $debug ) {
@@ -1031,12 +1058,13 @@ sub Configure (@) {
     my $prevconfig =
       [ $error, $debug, $major_version, $minor_version,
 	$autoabbrev, $getopt_compat, $ignorecase, $bundling, $order,
-	$gnu_compat, $passthrough, $genprefix ];
+	$gnu_compat, $passthrough, $genprefix, $auto_version, $auto_help ];
 
     if ( ref($options[0]) eq 'ARRAY' ) {
 	( $error, $debug, $major_version, $minor_version,
 	  $autoabbrev, $getopt_compat, $ignorecase, $bundling, $order,
-	  $gnu_compat, $passthrough, $genprefix ) = @{shift(@options)};
+	  $gnu_compat, $passthrough, $genprefix, $auto_version, $auto_help ) =
+	    @{shift(@options)};
     }
 
     my $opt;
@@ -1071,6 +1099,12 @@ sub Configure (@) {
 	}
 	elsif ( $try eq 'gnu_compat' ) {
 	    $gnu_compat = $action;
+	}
+	elsif ( $try =~ /^(auto_?)?version$/ ) {
+	    $auto_version = $action;
+	}
+	elsif ( $try =~ /^(auto_?)?help$/ ) {
+	    $auto_help = $action;
 	}
 	elsif ( $try eq 'ignorecase' or $try eq 'ignore_case' ) {
 	    $ignorecase = $action;
@@ -1121,6 +1155,99 @@ sub Configure (@) {
 # Deprecated name.
 sub config (@) {
     Configure (@_);
+}
+
+# Issue a standard message for --version.
+#
+# The arguments are mostly the same as for Pod::Usage::pod2usage:
+#
+#  - a number (exit value)
+#  - a string (lead in message)
+#  - a hash with options. See Pod::Usage for details.
+#
+sub VersionMessage(@) {
+    # Massage args.
+    my $pa = setup_pa_args("version", @_);
+
+    my $v = $main::VERSION;
+    my $fh = $pa->{-output} ||
+      ($pa->{-exitval} eq "NOEXIT" || $pa->{-exitval} < 2) ? \*STDOUT : \*STDERR;
+
+    print $fh (defined($pa->{-message}) ? $pa->{-message} : (),
+	       $0, defined $v ? " version $v" : (),
+	       "\n",
+	       "(", __PACKAGE__, "::", "GetOptions",
+	       " version ",
+	       defined($Getopt::Long::VERSION_STRING)
+	         ? $Getopt::Long::VERSION_STRING : $VERSION, ";",
+	       " Perl version ",
+	       $] >= 5.006 ? sprintf("%vd", $^V) : $],
+	       ")\n");
+    exit($pa->{-exitval}) unless $pa->{-exitval} eq "NOEXIT";
+}
+
+# Issue a standard message for --help.
+#
+# The arguments are the same as for Pod::Usage::pod2usage:
+#
+#  - a number (exit value)
+#  - a string (lead in message)
+#  - a hash with options. See Pod::Usage for details.
+#
+sub HelpMessage(@) {
+    eval {
+	require Pod::Usage;
+	import Pod::Usage;
+	1;
+    } || die("Cannot provide help: cannot load Pod::Usage\n");
+
+    # Note that pod2usage will issue a warning if -exitval => NOEXIT.
+    pod2usage(setup_pa_args("help", @_));
+
+}
+
+# Helper routine to set up a normalized hash ref to be used as
+# argument to pod2usage.
+sub setup_pa_args($@) {
+    my $tag = shift;		# who's calling
+
+    # If called by direct binding to an option, it will get the option
+    # name and value as arguments. Remove these, if so.
+    @_ = () if @_ == 2 && $_[0] eq $tag;
+
+    my $pa;
+    if ( @_ > 1 ) {
+	$pa = { @_ };
+    }
+    else {
+	$pa = shift || {};
+    }
+
+    # At this point, $pa can be a number (exit value), string
+    # (message) or hash with options.
+
+    if ( UNIVERSAL::isa($pa, 'HASH') ) {
+	# Get rid of -msg vs. -message ambiguity.
+	$pa->{-message} = $pa->{-msg};
+	delete($pa->{-msg});
+    }
+    elsif ( $pa =~ /^-?\d+$/ ) {
+	$pa = { -exitval => $pa };
+    }
+    else {
+	$pa = { -message => $pa };
+    }
+
+    # These are _our_ defaults.
+    $pa->{-verbose} = 0 unless exists($pa->{-verbose});
+    $pa->{-exitval} = 0 unless exists($pa->{-exitval});
+    $pa;
+}
+
+# Sneak way to know what version the user requested.
+sub VERSION {
+    $requested_version = $_[1];
+    shift->SUPER::VERSION(@_);
 }
 
 1;
@@ -1729,7 +1856,6 @@ C<process("arg3")> while C<$width> is C<60>.
 This feature requires configuration option B<permute>, see section
 L<Configuring Getopt::Long>.
 
-
 =head1 Configuring Getopt::Long
 
 Getopt::Long can be configured by calling subroutine
@@ -1878,6 +2004,25 @@ options also.
 
 Note: disabling C<ignore_case_always> also disables C<ignore_case>.
 
+=item auto_version (default:disabled)
+
+Automatically provide support for the B<--version> option if
+the application did not specify a handler for this option itself.
+
+Getopt::Long will provide a standard version message that includes the
+program name, its version (if $main::VERSION is defined), and the
+versions of Getopt::Long and Perl. The message will be written to
+standard output and processing will terminate.
+
+=item auto_help (default:disabled)
+
+Automatically provide support for the B<--help> and B<-?> options if
+the application did not specify a handler for this option itself.
+
+Getopt::Long will provide a help message using module L<Pod::Usage>. The
+message, derived from the SYNOPSIS POD section, will be written to
+standard output and processing will terminate.
+
 =item pass_through (default: disabled)
 
 Options that are unknown, ambiguous or supplied with an invalid option
@@ -1910,6 +2055,83 @@ Enable debugging output.
 
 =back
 
+=head1 Exportable Methods
+
+=over
+
+=item VersionMessage
+
+This subroutine provides a standard version message. Its argument can be:
+
+=over 4
+
+=item *
+
+A string containing the text of a message to print I<before> printing
+the standard message.
+
+=item *
+
+A numeric value corresponding to the desired exit status.
+
+=item *
+
+A reference to a hash.
+
+=back
+
+If more than one argument is given then the entire argument list is
+assumed to be a hash.  If a hash is supplied (either as a reference or
+as a list) it should contain one or more elements with the following
+keys:
+
+=over 4
+
+=item C<-message>
+
+=item C<-msg>
+
+The text of a message to print immediately prior to printing the
+program's usage message.
+
+=item C<-exitval>
+
+The desired exit status to pass to the B<exit()> function.
+This should be an integer, or else the string "NOEXIT" to
+indicate that control should simply be returned without
+terminating the invoking process.
+
+=item C<-output>
+
+A reference to a filehandle, or the pathname of a file to which the
+usage message should be written. The default is C<\*STDERR> unless the
+exit value is less than 2 (in which case the default is C<\*STDOUT>).
+
+=back
+
+You cannot tie this routine directly to an option, e.g.:
+
+    GetOptions("version" => \&VersionMessage);
+
+Use this instead:
+
+    GetOptions("version" => sub { VersionMessage() });
+
+=item HelpMessage
+
+This subroutine produces a standard help message, derived from the
+program's POD section SYNOPSIS using L<Pod::Usage>. It takes the same
+arguments as VersionMessage(). In particular, you cannot tie it
+directly to an option, e.g.:
+
+    GetOptions("help" => \&HelpMessage);
+
+Use this instead:
+
+    GetOptions("help" => sub { HelpMessage() });
+
+=back
+
 =head1 Return values and Errors
 
 Configuration errors and errors in the option definitions are
@@ -1921,8 +2143,6 @@ GetOptions returns true to indicate success.
 It returns false when the function detected one or more errors during
 option parsing. These errors are signalled using warn() and can be
 trapped with C<$SIG{__WARN__}>.
-
-Errors that can't happen are signalled using Carp::croak().
 
 =head1 Legacy
 
@@ -2015,7 +2235,7 @@ That's why they're called 'options'.
 
 The command line is not split by GetOptions, but by the command line
 interpreter (CLI). On Unix, this is the shell. On Windows, it is
-COMMAND.COM or CMD.EXE. Other operating systems have other CLIs. 
+COMMAND.COM or CMD.EXE. Other operating systems have other CLIs.
 
 It is important to know that these CLIs may behave different when the
 command line contains special characters, in particular quotes or
@@ -2056,7 +2276,7 @@ Johan Vromans <jvromans@squirrel.nl>
 
 =head1 COPYRIGHT AND DISCLAIMER
 
-This program is Copyright 2002,1990 by Johan Vromans.
+This program is Copyright 2003,1990 by Johan Vromans.
 This program is free software; you can redistribute it and/or
 modify it under the terms of the Perl Artistic License or the
 GNU General Public License as published by the Free Software
