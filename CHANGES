@@ -1,3 +1,16 @@
+Changes in version 2.25
+-----------------------
+
+* Change handling of a lone "-" on the command line. It will now be
+  treated as a non-option unless an explicit specification was passed
+  to GetOptions. See the manual.
+  In the old implementation an error was signalled, so no
+  compatibility breaks are expected from this change.
+
+* Add $VERSION_STRING. This is the string form of $VERSION. Usually
+  they are identical, unless it is a pre-release in which case
+  $VERSION will be (e.g.) 2.2403 and $VERSION_STRING will be "2.24_03".
+
 Changes in version 2.24
 -----------------------
 
