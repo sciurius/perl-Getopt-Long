@@ -8,8 +8,8 @@ package MyTest;			# not main
 # Author          : Johan Vromans
 # Created On      : Mon Aug  6 11:53:07 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Sep 21 14:49:07 2001
-# Update Count    : 348
+# Last Modified On: Fri Sep 21 15:06:25 2001
+# Update Count    : 354
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -52,7 +52,7 @@ use Data::Dumper;
 $Data::Dumper::Indent = 1;
 use Text::ParseWords;
 
-my $TMPDIR = $ENV{TMPDIR} || $ENV{TEMP} || '/usr/tmp';
+my $retval = 0;
 
 ################ The Process ################
 
@@ -127,9 +127,9 @@ my $t = {
 	 done	 => -1,		# bootstrap
 	};
 
-my @sticky_config = ();
-my @sticky_opts = ();
-my @sticky_argv = ();
+my @sticky_config  = ();
+my @sticky_opts	   = ();
+my @sticky_argv	   = ();
 
 # The main program.
 my $skip = 0;
@@ -165,6 +165,8 @@ do_test() unless $t->{done};
 # Statistics.
 print STDERR ("Number of tests = $variants ($test sets).\n") if $verbose;
 
+exit ($retval);
+
 ################ Subroutines ################
 
 # Reset all variables to their default state.
@@ -189,7 +191,8 @@ sub gather {
     # New test.
     if ( /^T:\s*(\S.*)?/i ) {
 
-	die(hdr(), "Test not executed (blank line missing?)\n")
+	die(hdr(), "Test not executed (blank line missing?)\n"),
+	  $retval = 1
 	  unless $t->{done};
 
 	$test++;
@@ -288,6 +291,7 @@ sub gather {
 	    }
 	    else {
 		print STDERR (hdr(), "<$.> Unknown style: $style\n");
+		$retval = 1,
 	    }
 	}
     }
@@ -406,6 +410,7 @@ sub exec_plain {
 
     if ( !$ret && !(@errors || @warnings) ) {
 	print STDERR (hdr(), "Call failed\n");
+	$retval = 1;
     }
 
     xp_check ("error",   \@errors,   $errors);
@@ -422,6 +427,7 @@ sub exec_plain {
 		   && exists $linkage{$1})
 	       ) {
 	    print STDERR (hdr(), "Unhandled variable $var\n");
+	    $retval = 1;
 	    next;
 	}
 
@@ -449,6 +455,7 @@ sub exec_plain {
 	    }
 	    else {
 		print STDERR (hdr(), "VFY scalar takes zero or one values\n");
+		$retval = 1;
 	    }
 	}
 
@@ -468,6 +475,7 @@ sub exec_plain {
 
 	else {
 	    print STDERR (hdr(), "Unknow VFY\n");
+	    $retval = 1;
 	}
     }
 }
@@ -490,17 +498,20 @@ sub xp_check {
 	}
 	unless ( $ok ) {
 	    print STDERR (hdr(), "Unexpected $tag: $msg\n");
+	    $retval = 1;
 	}
     }
     foreach ( @$expected ) {
 	next unless $_;
 	print STDERR (hdr(), "Expected error: $_\n");
+	$retval = 1;
     }
 }
 
 # Verify the value of a scalar.
 sub vfy_scalar {
     my ($var, $ist, $soll) = @_;
+    $retval = 1,
     print STDERR (hdr(), "$var is ",
 		  defined($ist) ? "'$ist'" : "undef",
 		  ", not ",
@@ -517,6 +528,7 @@ sub vfy_numeric {
       if $ist && $ist =~ /^0([0-7]+|b[01]+|x[0-9a-f]+)$/i;
     $soll = oct($soll)
       if $soll && $soll =~ /^0([0-7]+|b[01]+|x[0-9a-f]+)$/i;
+    $retval = 1,
     print STDERR (hdr(), "$var is ",
 		  defined($ist) ? "$ist" : "undef",
 		  ", not ",
@@ -540,6 +552,7 @@ sub vfy_array {
 		  !defined($soll) ? "undef" :
 		  (@$soll ? ("'".join("' '",@$soll)."'") : "()"),
 		  "\n");
+    $retval = 1;
 }
 
 sub cb1 {
