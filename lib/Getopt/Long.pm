@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Sep 26 23:16:05 2001
-# Update Count    : 975
+# Last Modified On: Thu Sep 27 17:38:47 2001
+# Update Count    : 980
 # Status          : Released
 
 ################ Copyright ################
@@ -252,7 +252,7 @@ sub GetOptions {
     my %linkage;		# linkage
     my $userlinkage;		# user supplied HASH
     my $opt;			# current option
-    my $genprefix = $genprefix;	# so we can call the same module many times
+    my $prefix = $genprefix;	# current prefix
 
     $error = '';
 
@@ -291,10 +291,11 @@ sub GetOptions {
 	 && !($optionlist[0] eq '<>'
 	      && @optionlist > 0
 	      && ref($optionlist[1])) ) {
-	$genprefix = shift (@optionlist);
+	$prefix = shift (@optionlist);
 	# Turn into regexp. Needs to be parenthesized!
-	$genprefix =~ s/(\W)/\\$1/g;
-	$genprefix = "([" . $genprefix . "])";
+	$prefix =~ s/(\W)/\\$1/g;
+	$prefix = "([" . $prefix . "])";
+	print STDERR ("=> prefix=\"$prefix\"\n") if $debug;
     }
 
     # Verify correctness of optionlist.
@@ -303,7 +304,7 @@ sub GetOptions {
 	my $opt = shift (@optionlist);
 
 	# Strip leading prefix so people can specify "--foo=i" if they like.
-	$opt = $+ if $opt =~ /^$genprefix+(.*)$/s;
+	$opt = $+ if $opt =~ /^$prefix+(.*)$/s;
 
 	if ( $opt eq '<>' ) {
 	    if ( (defined $userlinkage)
@@ -407,21 +408,14 @@ sub GetOptions {
     my $goon = 1;
     while ( $goon && @ARGV > 0 ) {
 
-	#### Get next argument ####
-
+	# Get next argument.
 	$opt = shift (@ARGV);
-	print STDERR ("=> option \"", $opt, "\"\n") if $debug;
-
-	#### Determine what we have ####
+	print STDERR ("=> arg \"", $opt, "\"\n") if $debug;
 
 	# Double dash is option list terminator.
-	if ( $opt eq $argend ) {
-	    # Finish. Push back accumulated arguments and return.
-	    unshift (@ARGV, @ret)
-		if $order == $PERMUTE;
-	    return ($error == 0);
-	}
+	last if $opt eq $argend;
 
+	# Look it up.
 	my $tryopt = $opt;
 	my $found;		# success status
 	my $key;		# key (if hash type)
@@ -429,7 +423,7 @@ sub GetOptions {
 	my $ctl;		# the opctl entry
 
 	($found, $opt, $ctl, $arg, $key) =
-	  FindOption ($genprefix, $argend, $opt, \%opctl);
+	  FindOption ($prefix, $argend, $opt, \%opctl);
 
 	if ( $found ) {
 
@@ -588,11 +582,11 @@ sub GetOptions {
     }
 
     # Finish.
-    if ( $order == $PERMUTE ) {
+    if ( @ret && $order == $PERMUTE ) {
 	#  Push back accumulated arguments
 	print STDERR ("=> restoring \"", join('" "', @ret), "\"\n")
-	    if $debug && @ret > 0;
-	unshift (@ARGV, @ret) if @ret > 0;
+	    if $debug;
+	unshift (@ARGV, @ret);
     }
 
     return ($error == 0);
@@ -699,7 +693,7 @@ sub FindOption ($$$$) {
 
     my ($prefix, $argend, $opt, $opctl) = @_;
 
-    print STDERR ("=> find \"$opt\", prefix=\"$prefix\"\n") if $debug;
+    print STDERR ("=> find \"$opt\"\n") if $debug;
 
     return (0) unless $opt =~ /^$prefix(.*)$/s;
     return (0) if $opt eq "-" && !defined $opctl->{""};
