@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Sep 22 17:06:58 2001
-# Update Count    : 762
+# Last Modified On: Mon Sep 24 22:39:50 2001
+# Update Count    : 769
 # Status          : Released
 
 ################ Copyright ################
@@ -215,6 +215,8 @@ sub getoptions {
 
 package Getopt::Long;
 
+use constant CTL_TYPE => 0;
+
 sub GetOptions {
 
     my @optionlist = @_;	# local copy of the option descriptions
@@ -318,8 +320,8 @@ sub GetOptions {
 	if ( ! defined $o ) {
 	    # empty -> '-' option
 	    $linko = $o = '';
-	    $opctl{''} = $c;
-	    $bopctl{''} = $c if $bundling;
+	    $opctl{''} = [$c];
+	    $bopctl{''} = [$c] if $bundling;
 	}
 	else {
 	    # Handle alias names
@@ -336,22 +338,22 @@ sub GetOptions {
 		if ( $bundling && length($_) == 1 ) {
 		    $_ = lc ($_) if $ignorecase > 1;
 		    if ( $c eq '!' ) {
-			$opctl{"no$_"} = $c;
+			$opctl{"no$_"} = [$c];
 			# warn ("Ignoring '!' modifier for short option $_\n");
-			$opctl{$_} = $bopctl{$_} = '';
+			$opctl{$_} = $bopctl{$_} = [''];
 		    }
 		    else {
-			$opctl{$_} = $bopctl{$_} = $c;
+			$opctl{$_} = $bopctl{$_} = [$c];
 		    }
 		}
 		else {
 		    $_ = lc ($_) if $ignorecase;
 		    if ( $c eq '!' ) {
-			$opctl{"no$_"} = $c;
-			$opctl{$_} = ''
+			$opctl{"no$_"} = [$c];
+			$opctl{$_} = ['']
 		    }
 		    else {
-			$opctl{$_} = $c;
+			$opctl{$_} = [$c];
 		    }
 		}
 		if ( defined $a ) {
@@ -392,19 +394,19 @@ sub GetOptions {
 	    }
 	    elsif ( ref($optionlist[0]) =~ /^(ARRAY)$/ ) {
 		$linkage{$linko} = shift (@optionlist);
-		$opctl{$o} .= '@'
-		  if $opctl{$o} ne '' and $opctl{$o} !~ /\@$/;
-		$bopctl{$o} .= '@'
-		  if $bundling and defined $bopctl{$o} and
-		    $bopctl{$o} ne '' and $bopctl{$o} !~ /\@$/;
+		$opctl{$o}[CTL_TYPE] .= '@'
+		  if $opctl{$o}[CTL_TYPE] ne '' and $opctl{$o}[CTL_TYPE] !~ /\@$/;
+		$bopctl{$o}[CTL_TYPE] .= '@'
+		  if $bundling and defined $bopctl{$o}[CTL_TYPE] and
+		    $bopctl{$o}[CTL_TYPE] ne '' and $bopctl{$o}[CTL_TYPE] !~ /\@$/;
 	    }
 	    elsif ( ref($optionlist[0]) =~ /^(HASH)$/ ) {
 		$linkage{$linko} = shift (@optionlist);
-		$opctl{$o} .= '%'
-		  if $opctl{$o} ne '' and $opctl{$o} !~ /\%$/;
-		$bopctl{$o} .= '%'
-		  if $bundling and defined $bopctl{$o} and
-		    $bopctl{$o} ne '' and $bopctl{$o} !~ /\%$/;
+		$opctl{$o}[CTL_TYPE] .= '%'
+		  if $opctl{$o}[CTL_TYPE] ne '' and $opctl{$o}[CTL_TYPE] !~ /\%$/;
+		$bopctl{$o}[CTL_TYPE] .= '%'
+		  if $bundling and defined $bopctl{$o}[CTL_TYPE] and
+		    $bopctl{$o}[CTL_TYPE] ne '' and $bopctl{$o}[CTL_TYPE] !~ /\%$/;
 	    }
 	    else {
 		$error .= "Invalid option linkage for \"$opt\"\n";
@@ -707,7 +709,7 @@ sub FindOption ($$$$$$$) {
 	# If bundling == 2, long options can override bundles.
 	if ( $bundling == 2 and
 	     defined ($rest) and
-	     defined ($type = $opctl->{$tryopt.$rest}) ) {
+	     defined ($type = $opctl->{$tryopt.$rest}[CTL_TYPE]) ) {
 	    print STDERR ("=> $starter$tryopt rebundled to ",
 			  "$starter$tryopt$rest\n") if $debug;
 	    $tryopt .= $rest;
@@ -761,7 +763,7 @@ sub FindOption ($$$$$$$) {
     }
 
     # Check validity by fetching the info.
-    $type = $optbl->{$tryopt} unless defined $type;
+    $type = $optbl->{$tryopt}[CTL_TYPE] unless defined $type;
     unless  ( defined $type ) {
 	return (0) if $passthrough;
 	warn ("Unknown option: ", $opt, "\n");
