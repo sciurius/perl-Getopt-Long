@@ -16,6 +16,7 @@
 	$option_start = "(--|-)";
 	$order = $REQUIRE_ORDER;
 	$bundling = 0;
+	$passthrough = 0;
     }
     else {
 	$autoabbrev = 1;	# automatic abbrev of options
@@ -23,6 +24,7 @@
 	$option_start = "(--|-|\\+)";
 	$order = $PERMUTE;
 	$bundling = 0;
+	$passthrough = 0;
     }
 
     # Other configurable settings.
@@ -51,6 +53,10 @@ sub NGetOpt {
 	if defined $newgetopt::bundling;
     $Getopt::Long::ignorecase = $newgetopt::ignorecase 
 	if defined $newgetopt::ignorecase;
+    $Getopt::Long::ignorecase = $newgetopt::ignorecase 
+	if defined $newgetopt::ignorecase;
+    $Getopt::Long::passthrough = $newgetopt::passthrough 
+	if defined $newgetopt::passthrough;
 
     &GetOptions;
 }
