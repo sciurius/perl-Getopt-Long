@@ -4,8 +4,8 @@ my $RCS_Id = '$Id$ ';
 # Author          : Johan Vromans
 # Created On      : Tue Sep 15 15:59:04 1992
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Nov 15 11:05:16 1996
-# Update Count    : 25
+# Last Modified On: Fri Jan 10 16:49:53 1997
+# Update Count    : 26
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -53,11 +53,11 @@ sub app_options {
     return unless @ARGV > 0;
     
     if ( !GetOptions(
-		     ident     => \$ident,
-		     verbose   => \$verbose,
-		     trace     => \$trace,
-		     help      => \$help,
-		     debug     => \$debug,
+		     ident	=> \$ident,
+		     verbose	=> \$verbose,
+		     trace	=> \$trace,
+		     help	=> \$help,
+		     debug	=> \$debug,
 		    ) or $help )
     {
 	app_usage(2);
