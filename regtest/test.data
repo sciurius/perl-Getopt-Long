@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Jun 20 13:11:11 2003
-# Update Count    : 381
+# Last Modified On: Tue Jun 24 23:17:17 2003
+# Update Count    : 388
 # Status          : In progress
 
 ################ No args ################
@@ -1448,6 +1448,23 @@ A: -I foo -d aa=bb bar
    %h1 aa bb
    @ARGV bar
 
+################ Auto-vivification of Arrays ################
+
+P: xx=s@ \\$v1
+
+T: Auto-vivification of Arrays
+A: 
+
+T: Auto-vivification of Arrays
+A: -xx aa
+   @$v1 aa
+
+T: Auto-vivification of Arrays
+A: -xx aa -xx bb
+   @$v1 aa bb
+
+P:
+
 ################ Hashes ################
 
 T: Hashes
@@ -1535,6 +1552,23 @@ P: gsx:5 \\%h1
 A: -gsx foo bar
    %h1 foo 5
    @ARGV bar
+
+################ Auto-vivification of Hashes ################
+
+P: xx=s% \\$v1
+
+T: Auto-vivification of ref to hash ref
+A: 
+
+T: Auto-vivification of ref to hash ref
+A: -xx x1=aa
+   %$v1 x1 aa
+
+T: Auto-vivification of ref to hash ref
+A: -xx x1=aa -xx x2=bb
+   %$v1 x1 aa x2 bb
+
+P:
 
 ################ Increments ################
 
