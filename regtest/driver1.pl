@@ -8,8 +8,8 @@ package MyTest;			# not main
 # Author          : Johan Vromans
 # Created On      : Mon Aug  6 11:53:07 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Mar 13 10:25:30 2002
-# Update Count    : 411
+# Last Modified On: Thu Jun 20 07:53:07 2002
+# Update Count    : 414
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -531,9 +531,13 @@ sub exec_plain {
 	# VFY hash
 	elsif ( $var =~ /^\%/ ) {
 	    next if @a == 0 && (!$ref || !%$ref);
-	    $ref = [] if ($call & S_LINKAGE) && !defined($ref);
-	    # Verify as array.
-	    vfy_array($var, [%$ref], \@a);
+	    $ref = {} if ($call & S_LINKAGE) && !defined($ref);
+	    # Verify as array. Sort on keys.
+	    my $a = [];
+	    foreach ( sort keys %$ref ) {
+		push(@$a, $_, $ref->{$_});
+	    }
+	    vfy_array($var, $a, \@a);
 	}
 
 	else {
