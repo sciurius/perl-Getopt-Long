@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Dec 11 13:51:16 2002
-# Update Count    : 348
+# Last Modified On: Fri Apr  4 18:23:36 2003
+# Update Count    : 349
 # Status          : In progress
 
 ################ No args ################
@@ -307,6 +307,11 @@ A: -noone foo
    $v1 0
    @ARGV foo
 
+T: Negation
+A: -no-one foo
+   $v1 0
+   @ARGV foo
+
 P: one|two! \\$v1
 
 T: Negation
@@ -327,7 +332,7 @@ A: -one -notwo foo
 
 T: Negation
 P: one|two! \\$v1
-A: -noone -two foo
+A: -no-one -two foo
    $v1 1
    @ARGV foo
 

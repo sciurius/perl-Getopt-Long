@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Dec 11 13:56:09 2002
-# Update Count    : 1100
+# Last Modified On: Fri Apr  4 18:21:45 2003
+# Update Count    : 1102
 # Status          : Released
 
 ################ Copyright ################
@@ -701,6 +701,7 @@ sub ParseOptionSpec ($$) {
 
 	if ( $spec eq '!' ) {
 	    $opctl->{"no$_"} = $entry;
+	    $opctl->{"no-$_"} = $entry;
 	    $opctl->{$_} = [@$entry];
 	    $opctl->{$_}->[CTL_TYPE] = '';
 	}
@@ -856,7 +857,7 @@ sub FindOption ($$$$) {
 	    $arg = 1;
 	}
 	else {
-	    $opt =~ s/^no//i;	# strip NO prefix
+	    $opt =~ s/^no-?//i;	# strip NO prefix
 	    $arg = 0;		# supply explicit value
 	}
 	unshift (@ARGV, $starter.$rest) if defined $rest;
@@ -1431,7 +1432,7 @@ The argument specification can be
 
 The option does not take an argument and may be negated, i.e. prefixed
 by "no". E.g. C<"foo!"> will allow C<--foo> (a value of 1 will be
-assigned) and C<--nofoo> (a value of 0 will be assigned). If the
+assigned) and C<--nofoo> and C<--no-foo> (a value of 0 will be assigned). If the
 option has aliases, this applies to the aliases as well.
 
 Using negation on a single letter option when bundling is in effect is

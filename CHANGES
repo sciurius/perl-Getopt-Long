@@ -1,3 +1,16 @@
+Changes in version 2.33
+-----------------------
+
+* Negatable options (with "!") now also support the "no-" prefix.
+  On request of Ed Avis <eavis@amadeus.net>.
+
+* Some fixes with hashes and bundling.
+  Thanks to Anders Johnson <anders@wis-tech.com>.
+
+* Fix a pass_through bug where the options terminator (normally "--")
+  was not passed through in @ARGV.
+  Thanks to Philippe Verdret <philippe.verdret@xps-pro.com>.
+
 Changes in version 2.32
 -----------------------
 
