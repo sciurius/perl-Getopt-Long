@@ -1,17 +1,16 @@
 # $Id$
 
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 5.0;
 
 require "./GetoptLong.pm";
 
 WriteMakefile(
-	VERSION   => $Getopt::Long::VERSION,
 	NAME      => "Getopt::Long",
-	SKIP      => [qw(static dynamic)],
-	linkext   => {LINKTYPE => ''},
+	DISTNAME  => 'GetoptLong',
+	VERSION   => $Getopt::Long::VERSION,
+
 	INSTALLDIRS => 'perl',
 	PM 	  => { "newgetopt.pl"  => '$(INST_LIB)/newgetopt.pl',
 		       "GetoptLong.pm" => '$(INST_LIB)/Getopt/Long.pm'
-		     }
-
+		     },
  );
