@@ -1,3 +1,26 @@
+Changes in version 2.21
+-----------------------
+
+* New documentation.
+
+* User defined subroutines should use 'die' to signal errors.
+
+* User defined subroutines can preliminary terminate options
+  processing by calling die("FINISH");
+
+Changes in version 2.20
+-----------------------
+
+* Prevent the magic argument "<>" from being interpreted as option
+  starter characters if it is the first argument passed.
+  To use the characters "<>" as option starters, pass "><" instead.
+
+* Changed license: Getopt::Long may now also be used under the Perl
+  Artistic License.
+
+* Changed the file name of the distribution kit from "GetoptLong..."
+  to "Getopt-Long-..." to match the standards.
+
 Changes in version 2.19
 -----------------------
 

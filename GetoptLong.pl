@@ -6,13 +6,13 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Aug  4 10:08:50 1999
-# Update Count    : 709
+# Last Modified On: Sat Mar  4 16:32:37 2000
+# Update Count    : 719
 # Status          : Released
 
 ################ Copyright ################
 
-# This program is Copyright 1990,1999 by Johan Vromans.
+# This program is Copyright 1990,2000 by Johan Vromans.
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the Perl Artistic License or the
 # GNU General Public License as published by the Free Software
@@ -23,9 +23,9 @@ package Getopt::Long;
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # If you do not have a copy of the GNU General Public License write to
-# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, 
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge,
 # MA 02139, USA.
 
 ################ Module Preamble ################
@@ -36,7 +36,7 @@ BEGIN {
     require 5.004;
     use Exporter ();
     use vars     qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION     = "2.19";
+    $VERSION     = "2.22";
 
     @ISA         = qw(Exporter);
     @EXPORT      = qw(&GetOptions $REQUIRE_ORDER $PERMUTE $RETURN_IN_ORDER);
@@ -52,14 +52,14 @@ use vars qw($error $debug $major_version $minor_version);
 use vars qw($autoabbrev $getopt_compat $ignorecase $bundling $order
 	    $passthrough);
 # Official invisible variables.
-use vars qw($genprefix);
+use vars qw($genprefix $caller);
 
-# Public subroutines. 
+# Public subroutines.
 sub Configure (@);
 sub config (@);			# deprecated name
 sub GetOptions;
 
-# Private subroutines. 
+# Private subroutines.
 sub ConfigDefaults ();
 sub FindOption ($$$$$$$);
 sub Croak (@);			# demand loading the real Croak
@@ -98,8 +98,72 @@ sub ConfigDefaults () {
 # Version major/minor numbers.
 ($major_version, $minor_version) = $VERSION =~ /^(\d+)\.(\d+)/;
 
-# Set defaults.
-ConfigDefaults ();
+ConfigDefaults();
+
+################ Object Oriented routines ################
+
+# NOTE: The object oriented routines use $error for thread locking.
+eval "sub lock{}" if $] < 5.005;
+
+# Store a copy of the default configuration. Since ConfigDefaults has
+# just been called, what we get from Configure is the default.
+my $default_config = do { lock ($error); Configure () };
+
+sub new {
+    my $that = shift;
+    my $class = ref($that) || $that;
+
+    # Register the callers package.
+    my $self = { caller => (caller)[0] };
+
+    bless ($self, $class);
+
+    # Process construct time configuration.
+    if ( @_ > 0 ) {
+	lock ($error);
+	my $save = Configure ($default_config, @_);
+	$self->{settings} = Configure ($save);
+    }
+    # Else use default config.
+    else {
+	$self->{settings} = $default_config;
+    }
+
+    $self;
+}
+
+sub configure {
+    my ($self) = shift;
+
+    lock ($error);
+
+    # Restore settings, merge new settings in.
+    my $save = Configure ($self->{settings}, @_);
+
+    # Restore orig config and save the new config.
+    $self->{settings} = Configure ($save);
+}
+
+sub getoptions {
+    my ($self) = shift;
+
+    lock ($error);
+
+    # Restore config settings.
+    my $save = Configure ($self->{settings});
+
+    # Call main routine.
+    my $ret = 0;
+    $caller = $self->{caller};
+    eval { $ret = GetOptions (@_); };
+
+    # Restore saved settings.
+    Configure ($save);
+
+    # Handle errors and return value.
+    die ($@) if $@;
+    return $ret;
+}
 
 ################ Package return ################
 

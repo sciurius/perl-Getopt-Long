@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Mar 27 11:50:30 1998
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Nov 29 20:27:03 1999
-# Update Count    : 34
+# Last Modified On: Sat Mar  4 16:33:02 2000
+# Update Count    : 49
 # Status          : Released
 
 sub GetOptions {
@@ -14,7 +14,7 @@ sub GetOptions {
     my $argend = '--';		# option list terminator
     my %opctl = ();		# table of arg.specs (long and abbrevs)
     my %bopctl = ();		# table of arg.specs (bundles)
-    my $pkg = (caller)[0];	# current context
+    my $pkg = $caller || (caller)[0];	# current context
 				# Needed if linkage is omitted.
     my %aliases= ();		# alias table
     my @ret = ();		# accum for non-options
@@ -44,9 +44,9 @@ sub GetOptions {
 		  "\n")
 	if $debug;
 
-    # Check for ref HASH as first argument. 
+    # Check for ref HASH as first argument.
     # First argument may be an object. It's OK to use this as long
-    # as it is really a hash underneath. 
+    # as it is really a hash underneath.
     $userlinkage = undef;
     if ( ref($optionlist[0]) and
 	 "$optionlist[0]" =~ /^(?:.*\=)?HASH\([^\(]*\)$/ ) {
@@ -83,7 +83,7 @@ sub GetOptions {
 		&& ref($userlinkage->{$opt}) ) {
 		unshift (@optionlist, $userlinkage->{$opt});
 	    }
-	    unless ( @optionlist > 0 
+	    unless ( @optionlist > 0
 		    && ref($optionlist[0]) && ref($optionlist[0]) eq 'CODE' ) {
 		$error .= "Option spec <> requires a reference to a subroutine\n";
 		next;
@@ -111,7 +111,7 @@ sub GetOptions {
 	    # Force an alias if the option name is not locase.
 	    $a = $o unless $o eq lc($o);
 	    $o = lc ($o)
-		if $ignorecase > 1 
+		if $ignorecase > 1
 		    || ($ignorecase
 			&& ($bundling ? length($o) > 1  : 1));
 
@@ -174,7 +174,7 @@ sub GetOptions {
 		$opctl{$o} .= '@'
 		  if $opctl{$o} ne '' and $opctl{$o} !~ /\@$/;
 		$bopctl{$o} .= '@'
-		  if $bundling and defined $bopctl{$o} and 
+		  if $bundling and defined $bopctl{$o} and
 		    $bopctl{$o} ne '' and $bopctl{$o} !~ /\@$/;
 	    }
 	    elsif ( ref($optionlist[0]) =~ /^(HASH)$/ ) {
@@ -182,7 +182,7 @@ sub GetOptions {
 		$opctl{$o} .= '%'
 		  if $opctl{$o} ne '' and $opctl{$o} !~ /\%$/;
 		$bopctl{$o} .= '%'
-		  if $bundling and defined $bopctl{$o} and 
+		  if $bundling and defined $bopctl{$o} and
 		    $bopctl{$o} ne '' and $bopctl{$o} !~ /\%$/;
 	    }
 	    else {
@@ -235,7 +235,8 @@ sub GetOptions {
     }
 
     # Process argument list
-    while ( @ARGV > 0 ) {
+    my $goon = 1;
+    while ( $goon && @ARGV > 0 ) {
 
 	#### Get next argument ####
 
@@ -247,7 +248,7 @@ sub GetOptions {
 	# Double dash is option list terminator.
 	if ( $opt eq $argend ) {
 	    # Finish. Push back accumulated arguments and return.
-	    unshift (@ARGV, @ret) 
+	    unshift (@ARGV, @ret)
 		if $order == $PERMUTE;
 	    return ($error == 0);
 	}
@@ -255,16 +256,16 @@ sub GetOptions {
 	my $tryopt = $opt;
 	my $found;		# success status
 	my $dsttype;		# destination type ('@' or '%')
-	my $incr;		# destination increment 
+	my $incr;		# destination increment
 	my $key;		# key (if hash type)
 	my $arg;		# option argument
 
-	($found, $opt, $arg, $dsttype, $incr, $key) = 
-	  FindOption ($genprefix, $argend, $opt, 
+	($found, $opt, $arg, $dsttype, $incr, $key) =
+	  FindOption ($genprefix, $argend, $opt,
 		      \%opctl, \%bopctl, \@opctl, \%aliases);
 
 	if ( $found ) {
-	    
+
 	    # FindOption undefines $opt in case of errors.
 	    next unless defined $opt;
 
@@ -305,7 +306,18 @@ sub GetOptions {
 		    elsif ( ref($linkage{$opt}) eq 'CODE' ) {
 			print STDERR ("=> &L{$opt}(\"$opt\", \"$arg\")\n")
 			    if $debug;
-			&{$linkage{$opt}}($opt, $arg);
+			local ($@);
+			eval {
+			    &{$linkage{$opt}}($opt, $arg);
+			};
+			print STDERR ("=> die($@)\n") if $debug && $@ ne '';
+			if ( $@ =~ /^FINISH\b/ ) {
+			    $goon = 0;
+			}
+			elsif ( $@ ne '' ) {
+			    warn ($@);
+			    $error++;
+			}
 		    }
 		    else {
 			print STDERR ("Invalid REF type \"", ref($linkage{$opt}),
@@ -362,7 +374,18 @@ sub GetOptions {
 	    # Try non-options call-back.
 	    my $cb;
 	    if ( (defined ($cb = $linkage{'<>'})) ) {
-		&$cb ($tryopt);
+		local ($@);
+		eval {
+		    &$cb ($tryopt);
+		};
+		print STDERR ("=> die($@)\n") if $debug && $@ ne '';
+		if ( $@ =~ /^FINISH\b/ ) {
+		    $goon = 0;
+		}
+		elsif ( $@ ne '' ) {
+		    warn ($@);
+		    $error++;
+		}
 	    }
 	    else {
 		print STDERR ("=> saving \"$tryopt\" ",
@@ -419,7 +442,7 @@ sub FindOption ($$$$$$$) {
 	&& $opt =~ /^([^=]+)=(.*)$/s ) {
 	$opt = $1;
 	$optarg = $2;
-	print STDERR ("=> option \"", $opt, 
+	print STDERR ("=> option \"", $opt,
 		      "\", optarg = \"$optarg\"\n") if $debug;
     }
 
@@ -450,7 +473,7 @@ sub FindOption ($$$$$$$) {
 	    $tryopt .= $rest;
 	    undef $rest;
 	}
-    } 
+    }
 
     # Try auto-abbreviation.
     elsif ( $autoabbrev ) {
@@ -536,7 +559,7 @@ sub FindOption ($$$$$$$) {
     ($mand, $type, $dsttype, $key) = $type =~ /^(.)(.)([@%]?)$/;
 
     # Check if there is an option argument available.
-    if ( defined $optarg ? ($optarg eq '') 
+    if ( defined $optarg ? ($optarg eq '')
 	 : !(defined $rest || @ARGV > 0) ) {
 	# Complain if this option needs an argument.
 	if ( $mand eq "=" ) {
@@ -564,11 +587,11 @@ sub FindOption ($$$$$$$) {
     #### Check if the argument is valid for this option ####
 
     if ( $type eq "s" ) {	# string
-	# A mandatory string takes anything. 
+	# A mandatory string takes anything.
 	return (1, $opt,$arg,$dsttype,$incr,$key) if $mand eq "=";
 
-	# An optional string takes almost anything. 
-	return (1, $opt,$arg,$dsttype,$incr,$key) 
+	# An optional string takes almost anything.
+	return (1, $opt,$arg,$dsttype,$incr,$key)
 	  if defined $optarg || defined $rest;
 	return (1, $opt,$arg,$dsttype,$incr,$key) if $arg eq "-"; # ??
 
@@ -652,6 +675,18 @@ sub FindOption ($$$$$$$) {
 # Getopt::Long Configuration.
 sub Configure (@) {
     my (@options) = @_;
+
+    my $prevconfig =
+      [ $error, $debug, $major_version, $minor_version,
+	$autoabbrev, $getopt_compat, $ignorecase, $bundling, $order,
+	$passthrough, $genprefix ];
+
+    if ( ref($options[0]) eq 'ARRAY' ) {
+	( $error, $debug, $major_version, $minor_version,
+	  $autoabbrev, $getopt_compat, $ignorecase, $bundling, $order,
+	  $passthrough, $genprefix ) = @{shift(@options)};
+    }
+
     my $opt;
     foreach $opt ( @options ) {
 	my $try = lc ($opt);
@@ -700,7 +735,7 @@ sub Configure (@) {
 	elsif ( $try =~ /^prefix_pattern=(.+)$/ ) {
 	    $genprefix = $1;
 	    # Parenthesize if needed.
-	    $genprefix = "(" . $genprefix . ")" 
+	    $genprefix = "(" . $genprefix . ")"
 	      unless $genprefix =~ /^\(.*\)$/;
 	    eval { '' =~ /$genprefix/; };
 	    Croak ("Getopt::Long: invalid pattern \"$genprefix\"") if $@;
@@ -712,6 +747,7 @@ sub Configure (@) {
 	    Croak ("Getopt::Long: unknown config parameter \"$opt\"")
 	}
     }
+    $prevconfig;
 }
 
 # Deprecated name.

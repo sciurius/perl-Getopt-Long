@@ -151,16 +151,9 @@ behavior. It can be called with one or more names of options:
 	options. Default is (--|-|\+) unless environment variable
 	POSIXLY_CORRECT has been set, in which case it is (--|-).
 
-* Usable variables
+  - debug
 
-  - $Getopt::Long::error
-
-	Internal error flag. May be incremented from a call-back
-	routine to cause options parsing to fail.
-
-  - $Getopt::Long::debug           
-
-	Enable copious debugging output. Default is 0.
+	Enable copious debugging output.
 
 AVAILABILITY
 ============
@@ -173,7 +166,7 @@ Network (CPAN), see "http://www.perl.com/CPAN/authors/Johan_Vromans".
 COPYRIGHT AND DISCLAIMER
 ========================
 
-Module Getopt::Long is Copyright 1990,1999 by Johan Vromans.
+Module Getopt::Long is Copyright 2000,1990 by Johan Vromans.
 This program is free software; you can redistribute it and/or
 modify it under the terms of the Perl Artistic License or the
 GNU General Public License as published by the Free Software
