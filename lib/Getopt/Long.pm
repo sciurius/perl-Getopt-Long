@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Sep 18 15:54:04 2002
-# Update Count    : 1096
+# Last Modified On: Wed Dec 11 13:56:09 2002
+# Update Count    : 1100
 # Status          : Released
 
 ################ Copyright ################
@@ -411,7 +411,10 @@ sub GetOptions {
 	print STDERR ("=> arg \"", $opt, "\"\n") if $debug;
 
 	# Double dash is option list terminator.
-	last if $opt eq $argend;
+	if ( $opt eq $argend ) {
+	  push (@ret, $argend) if $passthrough;
+	  last;
+	}
 
 	# Look it up.
 	my $tryopt = $opt;
@@ -1875,6 +1878,9 @@ remaining options to some other program.
 If C<require_order> is enabled, options processing will terminate at
 the first unrecognized option, or non-option, whichever comes first.
 However, if C<permute> is enabled instead, results can become confusing.
+
+Note that the options terminator (default C<-->), if present, will
+also be passed through in C<@ARGV>.
 
 =item prefix
 
