@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Mar 27 11:50:30 1998
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Jul 28 19:12:29 2000
-# Update Count    : 97
+# Last Modified On: Tue Dec 26 18:01:16 2000
+# Update Count    : 98
 # Status          : Released
 
 sub GetOptions {
@@ -111,7 +111,9 @@ sub GetOptions {
 
 	if ( ! defined $o ) {
 	    # empty -> '-' option
-	    $opctl{$linko = $o = ''} = $c;
+	    $linko = $o = '';
+	    $opctl{''} = $c;
+	    $bopctl{''} = $c if $bundling;
 	}
 	else {
 	    # Handle alias names
@@ -448,7 +450,8 @@ sub FindOption ($$$$$$$) {
 
     print STDERR ("=> find \"$opt\", prefix=\"$prefix\"\n") if $debug;
 
-    return (0) unless $opt =~ /^$prefix(.*)$/s;
+    return 0 unless $opt =~ /^$prefix(.*)$/s;
+    return 0 if $opt eq "-" && !defined $opctl->{""};
 
     $opt = $+;
     my ($starter) = $1;
@@ -477,7 +480,7 @@ sub FindOption ($$$$$$$) {
 
     if ( $bundling && $starter eq '-' ) {
 	# Unbundle single letter option.
-	$rest = substr ($tryopt, 1);
+	$rest = length ($tryopt) > 0 ? substr ($tryopt, 1) : "";
 	$tryopt = substr ($tryopt, 0, 1);
 	$tryopt = lc ($tryopt) if $ignorecase > 1;
 	print STDERR ("=> $starter$tryopt unbundled from ",
