@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : ***
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Oct  1 13:29:20 1997
-# Update Count    : 1
+# Last Modified On: Wed Oct  8 17:32:23 1997
+# Update Count    : 3
 # Status          : Internal use only
 
 package foo;
@@ -20,7 +20,7 @@ sub NGetOpt {
     my $debug = $single;
     $debug = $single;
     my @config = ();
-    if ( defined $newgetopt::debug || main::debug ) {
+    if ( defined $newgetopt::debug || $main::debug ) {
 	push (@config, $newgetopt::debug || $main::debug ? "debug" : "no_debug");
     }
     if ( defined $newgetopt::order ) {

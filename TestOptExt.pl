@@ -5,17 +5,17 @@
 # Author          : Johan Vromans
 # Created On      : ***
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Oct  1 13:30:10 1997
-# Update Count    : 2
+# Last Modified On: Thu Dec 25 15:17:36 1997
+# Update Count    : 23
 # Status          : Internal use only
 
 package foo;
 BEGIN { require "./GetoptLong.pm"; import Getopt::Long; }
 
 # perl -s variables
-$debug = defined $main::debug;
-$verbose = defined $main::verbose;
-$numbered = defined $main::numbered;
+$debug = defined $main'debug ? $main'debug : 0;
+#$verbose = defined $main'verbose ? $main'verbose : 0;
+#$numbered = defined $main'numbered ? $main'numbered : 0;
 
 Getopt::Long::config ("debug") if $debug;
 $single = 0;
@@ -243,11 +243,16 @@ if ( ++$test == $single || $all ) {
 
 
     @ARGV = qw( -one -two 2 -three 1 -three 4 foo );
-    print STDOUT ("FT${test}a\n") 
-	if GetOptions (\%linkage,
-		       "one",
-		       "<>", \%linkage,
-		       "three=i@");
+    if ( defined eval { GetOptions (\%linkage,
+				    "one",
+				    "<>", \%linkage,
+				    "three=i@");
+		    } ) {
+	print STDOUT ("FT${test}a\n");
+    }
+    else {
+	print STDOUT ($@);
+    }
 }
 
 if ( ++$test == $single || $all ) {
@@ -260,11 +265,16 @@ if ( ++$test == $single || $all ) {
 
 
     @ARGV = qw( -one -two 2 -three 1 -three 4 foo );
-    print STDOUT ("FT${test}a\n") 
-	if GetOptions (\%linkage,
-		       "one",
-		       "<>", 
-		       "three=i@");
+    if ( defined eval { GetOptions (\%linkage,
+				    "one",
+				    "<>", 
+				    "three=i@");
+		    } ) {
+	print STDOUT ("FT${test}a\n");
+    }
+    else {
+	print STDOUT ($@);
+    }
 }
 
 ################ Callbacks ################
@@ -507,6 +517,52 @@ if ( ++$test == $single || $all ) {
 	unless GetOptions ("verbose|v" => \@v);
 
     print STDOUT ("FT${test}a\n") unless @v == 2;
+    print STDOUT ("FT${test}z\n") unless @ARGV == 1
+	&& "@ARGV" eq "foo";
+}
+
+################ Bundling ################
+
+if ( ++$test == $single || $all ) {
+
+    # If bundling, it is not allowed to split on aa=bb.
+    # Also, prevent warnings for undefind $bopctl{$o}.
+
+    my @v = ();
+    my %w = ();
+
+    Getopt::Long::config("bundling");
+    @ARGV = qw( -vwv=vw -wvv=vw -- foo );
+    print STDOUT ("FT${test}a\n") 
+	unless GetOptions ("v=s" => \@v, "vee=s" => \@v, "w=s" => \%w, "wee=s" => \%w);
+
+    print STDOUT ("FT${test}a\n") unless @v == 1;
+    print STDOUT ("FT${test}b\n") unless $v[0] eq 'wv=vw';
+    print STDOUT ("FT${test}c\n") unless scalar(keys(%w)) == 1;
+    print STDOUT ("FT${test}d\n") unless $w{vv} eq 'vw';
+    print STDOUT ("FT${test}z\n") unless @ARGV == 1
+	&& "@ARGV" eq "foo";
+    Getopt::Long::config("nobundling");
+}
+
+################ OO ################
+
+if ( 0 and ++$test == $single || $all ) {
+
+    # If bundling, it is not allowed to split on aa=bb.
+    # Also, prevent warnings for undefind $bopctl{$o}.
+
+    my @v = ();
+    my %w = ();
+    my $p = new Getopt::Long ("bundling");
+    @ARGV = qw( -vwv=vw -wvv=vw -- foo );
+    print STDOUT ("FT${test}a\n") 
+	unless $p->GetOptions ("v=s" => \@v, "vee=s" => \@v, "w=s" => \%w, "wee=s" => \%w);
+
+    print STDOUT ("FT${test}a\n") unless @v == 1;
+    print STDOUT ("FT${test}b\n") unless $v[0] eq 'wv=vw';
+    print STDOUT ("FT${test}c\n") unless scalar(keys(%w)) == 1;
+    print STDOUT ("FT${test}d\n") unless $w{vv} eq 'vw';
     print STDOUT ("FT${test}z\n") unless @ARGV == 1
 	&& "@ARGV" eq "foo";
 }

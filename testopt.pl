@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : ***
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Oct  1 13:28:37 1997
-# Update Count    : 1
+# Last Modified On: Thu Dec 25 16:18:28 1997
+# Update Count    : 19
 # Status          : Internal use only.
 
 package foo;
@@ -16,9 +16,9 @@ unless ( defined &NGetOpt ) {
 }
 
 # perl -s variables
-$debug = defined $main'debug; # ';
-$verbose = defined $main'verbose; # ';
-$numbered = defined $main'numbered; # ';
+$debug = defined $main'debug ? $main'debug : 0;
+$verbose = defined $main'verbose ? $main'verbose : 0;
+$numbered = defined $main'numbered ? $main'numbered : 0;
 
 $newgetopt'debug = $debug; # ';
 $single = 0;
@@ -44,7 +44,11 @@ sub doit {
     @ARGV = @_;
     print STDOUT ($numbered ? "Test $test: " : "", "@ARGV\n") if $verbose;
     $newgetopt'debug = 1 if $test == $single;	#';
-    $result = &NGetOpt (@stdopts);
+    undef $result;
+    eval {$result = &NGetOpt (@stdopts);};
+    unless ( defined $result ) {
+	print STDERR ($@);
+    }
 }
 sub doit1 {
     &doit;
@@ -721,7 +725,7 @@ if ( ++$test == $single || $all ) {
 
 if ( ++$test == $single || $all ) {
     undef $opt_eight;
-    undef $opt_opt8t;
+    undef $opt_opt8;
     &doit1 ("-opt8", "1", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_eight;
     print STDOUT ("FT${test}c\n") if defined $opt_opt8;
@@ -758,8 +762,7 @@ if ( ++$test == $single || $all ) {
 ################ Dashes in option name ################
 
 if ( ++$test == $single || $all ) {
-    undef $opt_s_ix;
-    undef $opt_seven;
+    undef $opt_opt_nine;
     &doit1 ("-opt-nine", "foo");
     print STDOUT ("FT${test}b\n") unless defined $opt_opt_nine;
     print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
@@ -962,6 +965,34 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}d\n") unless defined $opt_foo;
     print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
     $newgetopt'bundling = 1;	#';
+}
+
+if ( ++$test == $single || $all ) {
+    local (@stdopts) = ('a', 'l=i', 'w=i', 'f', 'foo');
+    undef $opt_a;
+    undef $opt_l;
+    undef $opt_w;
+    undef $opt_f;
+    &doit1 ("-al24fw80", "foo");
+    print STDOUT ("FT${test}b\n") unless defined $opt_a;
+    print STDOUT ("FT${test}c = $opt_l\n") unless $opt_l eq '24';
+    print STDOUT ("FT${test}d = $opt_w\n") unless $opt_w eq '80';
+    print STDOUT ("FT${test}e\n") unless defined $opt_f;
+    print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
+}
+
+if ( ++$test == $single || $all ) {
+    local (@stdopts) = ('a', 'l=i', 'w=f', 'f', 'foo');
+    undef $opt_a;
+    undef $opt_l;
+    undef $opt_w;
+    undef $opt_f;
+    &doit1 ("-al24w80e3f", "foo");
+    print STDOUT ("FT${test}b\n") unless defined $opt_a;
+    print STDOUT ("FT${test}c = $opt_l\n") unless $opt_l == 24;
+    print STDOUT ("FT${test}d = $opt_w\n") unless $opt_w == 80000;
+    print STDOUT ("FT${test}e\n") unless defined $opt_f;
+    print STDOUT ("FT${test}z\n") if @ARGV != 1 || $ARGV[0] ne "foo";
 }
 
 { package newgetopt; $bundling = 0;}
