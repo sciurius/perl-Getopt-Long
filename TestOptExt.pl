@@ -5,12 +5,13 @@
 # Author          : Johan Vromans
 # Created On      : ***
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Dec 25 15:17:36 1997
-# Update Count    : 23
+# Last Modified On: Fri Mar 27 12:29:20 1998
+# Update Count    : 33
 # Status          : Internal use only
 
 package foo;
-BEGIN { require "./GetoptLong.pm"; import Getopt::Long; }
+use blib;
+use Getopt::Long;
 
 # perl -s variables
 $debug = defined $main'debug ? $main'debug : 0;
@@ -543,6 +544,39 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}z\n") unless @ARGV == 1
 	&& "@ARGV" eq "foo";
     Getopt::Long::config("nobundling");
+}
+
+################ Prefix ################
+
+if ( ++$test == $single || $all ) {
+
+    my $o_foo;
+    my $o_bar;
+
+    Getopt::Long::config("default","prefix=--",
+			 $single ? "debug" : "nodebug");
+    @ARGV = qw( --foo -bar -- foo );
+    print STDOUT ("FT${test}a\n") 
+	unless GetOptions ("foo" => \$o_foo, "bar=s" => \$o_bar);
+
+    print STDOUT ("FT${test}a\n") unless $o_foo == 1;
+    print STDOUT ("FT${test}b=$o_bar\n") if defined $o_bar;
+    print STDOUT ("FT${test}z\n") unless @ARGV == 2
+	&& "@ARGV" eq "-bar foo";
+    Getopt::Long::config("default",
+			 $single ? "debug" : "nodebug");
+}
+
+if ( ++$test == $single || $all ) {
+
+    eval {
+	Getopt::Long::config("default","prefix_pattern=+--",
+			     $single ? "debug" : "nodebug");
+    };
+    print STDERR ("$@") if $@;
+
+    Getopt::Long::config("default",
+			 $single ? "debug" : "nodebug");
 }
 
 ################ OO ################
