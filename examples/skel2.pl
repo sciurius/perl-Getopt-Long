@@ -2,10 +2,10 @@
 my $RCS_Id = '$Id$ ';
 
 # Author          : Johan Vromans
-# Created On      : Tue Sep 15 15:59:04 1992
+# Created On      : Sun Sep 15 18:39:01 1996
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Sep 16 20:28:03 1996
-# Update Count    : 28
+# Last Modified On: Mon Sep 16 20:31:18 1996
+# Update Count    : 9
 # Status          : Unknown, Use with caution!
 
 ################ Documentation ################
@@ -19,8 +19,9 @@ sample - skeleton for GetOpt::Long and Pod::Usage
 sample [options] [file ...]
 
  Options:
-   -help		this message
    -ident		show identification
+   -help		brief help message
+   -man                 full documentation
    -verbose		verbose information
 
 =head1 OPTIONS
@@ -61,7 +62,9 @@ useful with the contents thereof.
 # $LIBDIR = $ENV{'LIBDIR'} || '/usr/local/lib/sample';
 # unshift (@INC, $LIBDIR);
 # require 'common.pl';
+
 use strict;
+
 my $my_package = 'Sciurix';
 my ($my_name, $my_version) = $RCS_Id =~ /: (.+).pl,v ([\d.]+)/;
 $my_version .= '*' if length('$Locker$ ') > 12;
@@ -91,7 +94,7 @@ sub options {
     if ( @ARGV > 0 && $ARGV[0] =~ /^[-+]/ ) {
 	# The next require / import is equivalent to "use Getopt::Long".
 	require "Getopt/Long.pm";
-	import Getopt::Long;
+	import Getopt::Long 2.0;
 	&GetOptions ('ident' => \$ident,
 		     'verbose' => \$verbose,
 		     'trace' => \$trace,

@@ -11,7 +11,7 @@ instead of single letters, and are introduced with a double dash `--'.
 Optionally, Getopt::Long can support the traditional bundling of
 single-letter command line options.
 
-Getopt::Long::GetOptions() comes with the Perl 5 distribution. It is
+Getopt::Long::GetOptions() is part of the Perl 5 distribution. It is
 the successor of newgetopt.pl that came with Perl 4. It is fully
 upward compatible. In fact, the Perl 5 version of newgetopt.pl is just
 a wrapper around the module.
@@ -59,7 +59,7 @@ By default, single-letter option names are case sensitive.
   - options can be negatable, e.g. "debug" will switch it on, while
     "nodebug" will switch it off.    
   - options can set values, but also add values producing an array
-    of values instead of a single scalar value.
+    of values instead of a single scalar value, or set values in a hash.
 
 * Options linkage
 
@@ -129,6 +129,11 @@ de-activate) specific behavior:
 	is in effect, case is ignored on single-character options only
 	if $Getopt::Long::ignorecase is greater than 1.
 
+  - $Getopt::Long::passthrough
+
+	Do not issue error messages for unknown options, but leave
+	them (pass-through) in @ARGV.
+
   - $Getopt::Long::error
 
 	Internal error flag. May be incremented from a call-back
@@ -156,5 +161,5 @@ of the License, or (at your option) any later version.
 -------------------------------------------------------------------
 Johan Vromans                                  jvromans@squirrel.nl
 Squirrel Consultancy                       Boskoop, the Netherlands
-http://www.xs4all.nl/~jvromans        http://www.xxlink.nl/squirrel
+http://www.squirrel.nl       http://www.squirrel.nl/people/jvromans
 ------------------ "Arms are made for hugging" --------------------
