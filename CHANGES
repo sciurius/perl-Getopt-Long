@@ -1,3 +1,14 @@
+Changes in version 2.28
+-----------------------
+
+* When an option is specified more than once, a warning is generated
+  if perl is run with -w. This is a correction to 2.27, where it would
+  unconditionally die.
+
+  An example of duplicate specification is GetOptions('foo', 'foo'),
+  but also GetOptions('foo=s', 'foo') and GetOptions('Foo', 'foo')
+  (the latter only when ignore_case is in effect).
+
 Changes in version 2.27
 -----------------------
 

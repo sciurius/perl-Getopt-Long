@@ -1,4 +1,4 @@
-Version 2.27 of module Getopt::Long has been released to CPAN. It will
+Version 2.28 of module Getopt::Long has been released to CPAN. It will
 be standard part of Perl 5.7.3 and 5.8.
 
 Module Getopt::Long implements an extended getopt function called
@@ -19,10 +19,11 @@ Alternatively, use a Web browser and point it to the CPAN search engine:
 
 Changes in this version
 -----------------------
+This is an emergency fix to 2.27.
 
 === to be filled in; see CHANGES ===
 
-Previous released version was 2.26.
+Previous released version was 2.27.
 
 ---- README ----
 

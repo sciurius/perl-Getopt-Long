@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Feb 20 14:52:37 2002
-# Update Count    : 1044
+# Last Modified On: Wed Feb 20 15:00:04 2002
+# Update Count    : 1045
 # Status          : Released
 
 ################ Copyright ################
@@ -712,8 +712,7 @@ sub ParseOptionSpec ($$) {
 	}
     }
 
-    if ( $dups ) {
-	return (undef, $dups) if $^W;
+    if ( $dups && $^W ) {
 	require 'Carp.pm';
 	$Carp::CarpLevel = 2;
 	foreach ( split(/\n+/, $dups) ) {
