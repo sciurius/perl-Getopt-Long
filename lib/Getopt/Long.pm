@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Jun 29 17:19:25 2002
-# Update Count    : 1095
+# Last Modified On: Wed Sep 18 15:54:04 2002
+# Update Count    : 1096
 # Status          : Released
 
 ################ Copyright ################
@@ -1692,7 +1692,7 @@ it will set variable C<$stdio>.
 
 =head2 Argument callback
 
-A special option 'name' C<<>> can be used to designate a subroutine
+A special option 'name' C<< <> >> can be used to designate a subroutine
 to handle non-option arguments. When GetOptions() encounters an
 argument that does not look like an option, it will immediately call this
 subroutine and passes it one parameter: the argument name.
