@@ -1,6 +1,6 @@
-Version 2.6 of module Getopt::Long is now available via CPAN. It
+Version 2.8 of module Getopt::Long is now available via CPAN. It
 should soon appear in directory authors/Johan_Vromans as file
-GetoptLong-2.6.tar.gz.
+GetoptLong-2.8.tar.gz.
 
 Module Getopt::Long implements an extended getopt function called
 GetOptions(). This function implements the POSIX standard for command
@@ -23,11 +23,16 @@ it to http://www.perl.com/CPAN. It will automagically be redirected to
 a CPAN site in your neighborhood.
 URL: http://www.perl.com/CPAN/authors/Johan_Vromans
 
-Changes w.r.t version 2.4
+Changes w.r.t version 2.6
 -------------------------
 
-* Handle ignorecase even if autoabbrev is off. 
+* A new way to configure Getopt::Long. Instead of setting module local
+  variables routine Getopt::Long::config can be called with the names
+  of options to be set or reset, e.g.
 
-* POD corrections.
+    Getopt::Long::config ("no_auto_abbrev", "ignore_case");
+
+  Configuring by using the module local variables is deprecated, but
+  it will continue to work for backwark compatibility.
 
 ---- README ----

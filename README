@@ -16,6 +16,14 @@ the successor of newgetopt.pl that came with Perl 4. It is fully
 upward compatible. In fact, the Perl 5 version of newgetopt.pl is just
 a wrapper around the module.
 
+For complete documentation, see the Getopt::Long POD document or use
+the command
+
+    perldoc Getopt::Long
+
+FEATURES
+========
+
 * Long option names
 
 Major advantage of using long option names is that it is much easier
@@ -76,28 +84,28 @@ command line options and how they must be handled:
 
 * Customization:
 
-A couple of configuration variables can be used to activate (or
-de-activate) specific behavior:
+The module contains a special method, Getopt::Long::config, to control
+configuration variables to activate (or de-activate) specific
+behavior. It can be called with one or more names of options:
 
-  - $Getopt::Long::autoabbrev      
+  - default
+
+	Restore default settings.
+
+  - auto_abbrev      
 
 	Allow option names to be abbreviated to uniqueness. 
-	Default is 1 unless environment variable POSIXLY_CORRECT
-	has been set.
 
-  - $Getopt::Long::getopt_compat   
+  - getopt_compat   
 
 	Allow '+' to start options.
-	Default is 1 unless environment variable POSIXLY_CORRECT
-	has been set.
 
-  - $Getopt::Long::order           
+  - permute
+  - require_order           
 
 	Whether non-options are allowed to be mixed with options.
-	Default is $REQUIRE_ORDER if environment variable
-	POSIXLY_CORRECT has been set, $PERMUTE otherwise.
 
-	$PERMUTE means that 
+	permute means that 
 
 	    -foo arg1 -bar arg2 arg3
 
@@ -107,7 +115,7 @@ de-activate) specific behavior:
 
 	(provided -foo does not take an argument value).
 
-	If $Getopt::Long::order is $REQUIRE_ORDER, options processing
+	require_order means that options processing
 	terminates when the first non-option is encountered.
 
 	    -foo arg1 -bar arg2 arg3
@@ -116,23 +124,23 @@ de-activate) specific behavior:
 
 	    -foo -- arg1 -bar arg2 arg3
 
-  - $Getopt::Long::bundling
+  - bundling
 
 	Setting this variable to a non-zero value will allow 
 	single-character options to be bundled. To distinguish bundles
 	from long option names, long options must be introduced with 
 	"--" and single-character options (and bundles) with "-".
 
-  - $Getopt::Long::ignorecase      
+  - ignore_case      
 
-	Ignore case when matching options. Default is 1. When bundling
-	is in effect, case is ignored on single-character options only
-	if $Getopt::Long::ignorecase is greater than 1.
+	Ignore case when matching options.
 
-  - $Getopt::Long::passthrough
+  - pass_through
 
 	Do not issue error messages for unknown options, but leave
 	them (pass-through) in @ARGV.
+
+* Usable variables
 
   - $Getopt::Long::error
 
@@ -143,14 +151,16 @@ de-activate) specific behavior:
 
 	Enable copious debugging output. Default is 0.
 
-* Availability
+AVAILABILITY
+============
 
 The official version for module Getopt::Long comes with the Perl 5
 distribution. 
 Newer versions will be made available on the Comprehensive Perl Archive
 Network (CPAN), see "http://www.perl.com/CPAN/authors/Johan_Vromans".
 
-* Copyright and disclaimer
+COPYRIGHT AND DISCLAIMER
+========================
 
 Module Getopt::Long is Copyright 1990,1997 by Johan Vromans.
 This program is free software; you can redistribute it and/or
