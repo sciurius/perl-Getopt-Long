@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Sep 26 17:18:40 2001
-# Update Count    : 892
+# Last Modified On: Wed Sep 26 18:15:27 2001
+# Update Count    : 916
 # Status          : Released
 
 ################ Copyright ################
@@ -67,9 +67,9 @@ sub GetOptions;
 
 # Private subroutines.
 sub ConfigDefaults ();
-sub ParseOptionSpec ($$$);
+sub ParseOptionSpec ($$);
 sub OptCtl ($);
-sub FindOption ($$$$$);
+sub FindOption ($$$$);
 sub Croak (@);			# demand loading the real Croak
 
 ################ Local Variables ################
@@ -239,6 +239,8 @@ use constant CTL_RANGE  => 3;
 
 use constant CTL_REPEAT => 4;
 
+use constant CTL_CNAME  => 5;
+
 sub GetOptions {
 
     my @optionlist = @_;	# local copy of the option descriptions
@@ -246,7 +248,6 @@ sub GetOptions {
     my %opctl = ();		# table of option specs
     my $pkg = $caller || (caller)[0];	# current context
 				# Needed if linkage is omitted.
-    my %aliases= ();		# alias table
     my @ret = ();		# accum for non-options
     my %linkage;		# linkage
     my $userlinkage;		# user supplied HASH
@@ -321,7 +322,7 @@ sub GetOptions {
 	}
 
 	# Parse option spec.
-	my ($o, $linko, $c) = ParseOptionSpec ($opt, \%opctl, \%aliases);
+	my ($o, $linko, $c) = ParseOptionSpec ($opt, \%opctl);
 	unless ( defined $o ) {
 	    # Failed. $linko contains the error message.
 	    $error .= $linko;
@@ -431,8 +432,7 @@ sub GetOptions {
 	my $ctl;		# the opctl entry
 
 	($found, $opt, $ctl, $arg, $key) =
-	  FindOption ($genprefix, $argend, $opt,
-		      \%opctl, \%aliases);
+	  FindOption ($genprefix, $argend, $opt, \%opctl);
 
 	if ( $found ) {
 
@@ -440,10 +440,10 @@ sub GetOptions {
 	    next unless defined $opt;
 
 	    if ( defined $arg ) {
-		if ( defined $aliases{$opt} ) {
-		    print STDERR ("=> alias \"$opt\" -> \"$aliases{$opt}\"\n")
+		if ( defined $ctl->[CTL_CNAME] ) {
+		    print STDERR ("=> alias \"$opt\" -> \"$ctl->[CTL_CNAME]\"\n")
 		      if $debug;
-		    $opt = $aliases{$opt};
+		    $opt = $ctl->[CTL_CNAME];
 		}
 
 		if ( defined $linkage{$opt} ) {
@@ -612,83 +612,94 @@ sub OptCtl ($) {
 }
 
 # Parse an option specification and fill the tables.
-sub ParseOptionSpec ($$$) {
-    my ($opt, $opctl, $aliases) = @_;
+sub ParseOptionSpec ($$) {
+    my ($opt, $opctl) = @_;
 
     # Match option spec. Allow '?' as an alias only.
     if ( $opt !~ /^((\w+[-\w]*)(\|(\?|\w[-\w]*)?)*)?([!+]|[=:][ionfse][@%]?)?$/ ) {
 	return (undef, "Error in option spec: \"$opt\"\n");
     }
 
-    my ($o, $c, $a, $linko) = ($1, $5);
-    $c = '' unless defined $c;
+    my ($name, $spec) = ($1, $5);
+    $spec = '' unless defined $spec;
 
-    # $linko keeps track of the primary name the user specified.
+    # $orig keeps track of the primary name the user specified.
     # This name will be used for the internal or external linkage.
     # In other words, if the user specifies "FoO|BaR", it will
     # match any case combinations of 'foo' and 'bar', but if a global
     # variable needs to be set, it will be $opt_FoO in the exact case
     # as specified.
+    my $orig;
 
-    if ( ! defined $o ) {
+    if ( ! defined $name ) {
 	# empty -> '-' option
-	$linko = $o = '';
-	$opctl->{''} = [$c,0,CTL_DEST_SCALAR];
+	$orig = $name = '';
+	$opctl->{''} = [$spec,0,CTL_DEST_SCALAR];
     }
     else {
 	# Handle alias names
-	my @o =  split (/\|/, $o);
-	$linko = $o = $o[0];
+	my @names =  split (/\|/, $name);
+	$orig = $name = $names[0];
+
 	# Force an alias if the option name is not locase.
-	$a = $o unless $o eq lc($o);
-	$o = lc ($o)
+	my $alias;
+	$alias = $name unless $name eq lc($name);
+	$name = lc ($name)
 	    if $ignorecase > 1
 		|| ($ignorecase
-		    && ($bundling ? length($o) > 1  : 1));
+		    && ($bundling ? length($name) > 1  : 1));
 
-	foreach ( @o ) {
+	# Construct the opctl entries.
+	my $entry;
+	my $xentry;
+	if ( $spec eq '' || $spec eq '+' ) {
+	    $entry = [$spec,0,CTL_DEST_SCALAR];
+	}
+	elsif ( $spec eq '!' ) {
+	    $entry = ['',0,CTL_DEST_SCALAR];
+	    $xentry = ['!',0,CTL_DEST_SCALAR];
+	}
+	else {
+	    my ($mand, $type, $dest) = $spec =~ /([=:])([ionfse])([@%])?/;
+	    $type = 'i' if $type eq 'n';
+	    $type = 'f' if $type eq 'e';
+	    $dest ||= '$';
+	    $dest = $dest eq '@' ? CTL_DEST_ARRAY
+	      : $dest eq '%' ? CTL_DEST_HASH : CTL_DEST_SCALAR;
+	    $entry = [$type, $mand eq '=', $dest];
+	}
+
+	# Process all aliases.
+	foreach ( @names ) {
 
 	    $_ = lc ($_)
 	      if $ignorecase > (($bundling && length($_) == 1) ? 1 : 0);
 
-	    if ( $c eq '' || $c eq '+' ) {
-		$opctl->{$_} = [$c,0,CTL_DEST_SCALAR];
-	    }
-	    elsif ( $c eq '!' ) {
-		$opctl->{$_} = ['',0,CTL_DEST_SCALAR];
-		$opctl->{"no$_"} = ['!',0,CTL_DEST_SCALAR];
-	    }
-	    else {
-		my ($mand, $type, $dest) = $c =~ /([=:])([ionfse])([@%])?/;
-		$type = 'i' if $type eq 'n';
-		$type = 'f' if $type eq 'e';
-		$dest ||= '$';
-		$dest = $dest eq '@' ? CTL_DEST_ARRAY
-		  : $dest eq '%' ? CTL_DEST_HASH : CTL_DEST_SCALAR;
-		$opctl->{$_} = [$type, $mand eq '=', $dest];
-	    }
+	    $opctl->{$_} = $entry;
+	    $opctl->{"no$_"} = $xentry if $spec eq '!';
 
-	    if ( defined $a ) {
+	    if ( defined $alias ) {
 		# Note alias.
-		$aliases->{$_} = $a;
+		$entry->[CTL_CNAME] = $alias;
+		$xentry->[CTL_CNAME] = $alias;
 	    }
 	    else {
 		# Set primary name.
-		$a = $_;
+		$alias = $_;
 	    }
 	}
     }
-    ($o, $linko);
+    ($name, $orig);
 }
 
 # Option lookup.
-sub FindOption ($$$$$) {
+sub FindOption ($$$$) {
 
     # returns (1, $opt, $ctl, $arg, $key) if okay,
     # returns (1, undef) if option in error,
     # returns (0) otherwise.
 
-    my ($prefix, $argend, $opt, $opctl, $aliases) = @_;
+    my ($prefix, $argend, $opt, $opctl) = @_;
 
     print STDERR ("=> find \"$opt\", prefix=\"$prefix\"\n") if $debug;
 
@@ -759,7 +770,8 @@ sub FindOption ($$$$$) {
 	    # See if all matches are for the same option.
 	    my %hit;
 	    foreach ( @hits ) {
-		$_ = $aliases->{$_} if defined $aliases->{$_};
+		$_ = $opctl->{$_}->[CTL_CNAME]
+		  if defined $opctl->{$_}->[CTL_CNAME];
 		$hit{$_} = 1;
 	    }
 	    # Now see if it really is ambiguous.
@@ -880,7 +892,7 @@ sub FindOption ($$$$$) {
 	}
     }
 
-    elsif ( $type eq "n" || $type eq "i" # numeric/integer
+    elsif ( $type eq "i" # numeric/integer
 	    || $type eq "o" ) { # dec/oct/hex/bin value
 
 	my $o_valid =
