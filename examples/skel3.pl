@@ -4,30 +4,36 @@ my $RCS_Id = '$Id$ ';
 # Author          : Johan Vromans
 # Created On      : Tue Sep 15 15:59:04 1992
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Mar  9 10:18:02 1996
-# Update Count    : 10
+# Last Modified On: Fri Nov 15 11:05:16 1996
+# Update Count    : 25
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
 
-# $LIBDIR = $ENV{'LIBDIR'} || '/usr/local/lib/sample';
-# unshift (@INC, $LIBDIR);
-# require 'common.pl';
 use strict;
+
+# Package or program libraries, if appropriate.
+# $LIBDIR = $ENV{'LIBDIR'} || '/usr/local/lib/sample';
+# use lib qw($LIBDIR);
+# require 'common.pl';
+
+# Package name.
 my $my_package = 'Sciurix';
+# Program name and version.
 my ($my_name, $my_version) = $RCS_Id =~ /: (.+).pl,v ([\d.]+)/;
+# Tack '*' if it is not checked in into RCS.
 $my_version .= '*' if length('$Locker$ ') > 12;
 
-################ Program parameters ################
+################ Command line parameters ################
 
 use Getopt::Long 2.00;
 my $verbose = 0;
 my ($debug, $trace, $test) = (0, 0, 0);
-&options;
+app_options();
 
 ################ Presets ################
 
-my $TMPDIR = $ENV{'TMPDIR'} || '/usr/tmp';
+my $TMPDIR = $ENV{TMPDIR} || '/usr/tmp';
 
 ################ The Process ################
 
@@ -35,31 +41,42 @@ exit 0;
 
 ################ Subroutines ################
 
-sub options {
+sub app_ident();
+sub app_usage($);
+
+sub app_options {
     my $help = 0;		# handled locally
     my $ident = 0;		# handled locally
 
-    # Process options.
-    if ( @ARGV > 0 && $ARGV[0] =~ /^[-+]/ ) {
-	&usage 
-	    unless &GetOptions ('ident' => \$ident,
-				'verbose' => \$verbose,
-				'trace' => \$trace,
-				'help' => \$help,
-				'debug' => \$debug)
-		&& !$help;
+    # Process options, if any.
+    # Make sure defaults are set before returning!
+    return unless @ARGV > 0;
+    
+    if ( !GetOptions(
+		     ident     => \$ident,
+		     verbose   => \$verbose,
+		     trace     => \$trace,
+		     help      => \$help,
+		     debug     => \$debug,
+		    ) or $help )
+    {
+	app_usage(2);
     }
-    print STDERR ("This is $my_package [$my_name $my_version]\n")
-	if $ident;
+    app_ident() if $ident;
 }
 
-sub usage {
+sub app_ident {
+    print STDERR ("This is $my_package [$my_name $my_version]\n");
+}
+
+sub app_usage {
+    my ($exit) = @_;
+    app_ident();
     print STDERR <<EndOfUsage;
-This is $my_package [$my_name $my_version]
 Usage: $0 [options] [file ...]
     -help		this message
     -ident		show identification
     -verbose		verbose information
 EndOfUsage
-    exit 1;
+    exit $exit if $exit != 0;
 }
