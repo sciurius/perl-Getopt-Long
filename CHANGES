@@ -1,3 +1,14 @@
+Changes in version 2.26
+-----------------------
+
+* New option type: 'o'. It accepts all kinds of integral numbers in
+  Perl style, including decimal (24), octal (012), hexadecimal (0x2f)
+  and binary (0b1001).
+
+* Fix problem with getopt_compat not matching +foo=bar.
+
+* Remove $VERSION_STRING for production versions.
+
 Changes in version 2.25
 -----------------------
 
