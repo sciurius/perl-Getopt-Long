@@ -1,37 +1,36 @@
-#!/usr/local/bin/perl5 -s
+#!/usr/bin/perl
 
 # TestOptExt.pl -- Testbed for Getopt::Long.pm (extended features).
 # RCS Info        : $Id$
 # Author          : Johan Vromans
 # Created On      : ***
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu May 25 19:22:17 2000
-# Update Count    : 56
+# Last Modified On: Fri Jul 28 19:29:02 2000
+# Update Count    : 117
 # Status          : Internal use only
 
 package foo;
 use blib;
 use Getopt::Long;
+use strict;
 
-# perl -s variables
-$debug = defined $main'debug ? $main'debug : 0;
-#$verbose = defined $main'verbose ? $main'verbose : 0;
-#$numbered = defined $main'numbered ? $main'numbered : 0;
-
-Getopt::Long::config ("debug") if $debug;
-$single = 0;
-$single = shift (@main::ARGV) if @main::ARGV == 1;
-$all = $single == 0;
+my $all = 1;
+my $single = 0;
+$single = shift (@ARGV) if @ARGV == 1;
+my @defcfg = qw(default);
 if ( $single ) {
     Getopt::Long::config ("debug");
     open (STDERR, ">&STDOUT");
+    push (@defcfg, "debug");
+    $all = 0;
 }
 select (STDERR); $| = 1;
 select (STDOUT); $| = 1;
 
 ################ Setup ################
 
-$test = 0;
+my $test = 0;
+use vars qw($opt_one $opt_two $opt_three @opt_three);
 
 ################ Testing internal linkage ################
 
@@ -204,83 +203,39 @@ if ( ++$test == $single || $all ) {
 
 ################ Some error situations ################
 
-# if ( ++$test == $single || $all ) {
-# 
-#     my %linkage = ();
-# 
-#     print STDERR ("Expect: Invalid option linkage for \"two=i\"\n",
-# 		  "Expect: Error in option spec: \"HASH(0x...)\"\n");
-# 
-# 
-#     @ARGV = qw( -one -two 2 -three 1 -three 4 foo );
-#     print STDOUT ("FT${test}a\n") 
-# 	if GetOptions ("one",
-# 		       "two=i", \%linkage,
-# 		       "three=i@");
-# }
-
-# if ( ++$test == $single || $all ) {
-# 
-#     my %linkage = ();
-# 
-#     print STDERR ("Expect: Invalid option linkage for \"two=i\"\n",
-# 		  "Expect: Error in option spec: \"HASH(0x...)\"\n");
-# 
-# 
-#     @ARGV = qw( -one -two 2 -three 1 -three 4 foo );
-#     print STDOUT ("FT${test}a\n") 
-# 	if GetOptions (\%linkage,
-# 		       "one",
-# 		       "two=i", \%linkage,
-# 		       "three=i@");
-# }
-
 if ( ++$test == $single || $all ) {
 
     my %linkage = ();
-
-    print STDERR ("Expect: Option spec <> requires a reference to a subroutine\n",
-		  "Expect: Error in option spec: \"HASH(0x...)\"\n");
-
-
     @ARGV = qw( -one -two 2 -three 1 -three 4 foo );
-    if ( defined eval { GetOptions (\%linkage,
-				    "one",
-				    "<>", \%linkage,
-				    "three=i@");
-		    } ) {
-	print STDOUT ("FT${test}a\n");
-    }
-    else {
-	print STDOUT ($@);
-    }
+    eval { GetOptions (\%linkage,
+		       "one",
+		       "<>", \%linkage,
+		       "three=i@");
+       };
+    print STDERR ("FT${test}a\n") unless $@;
+    print STDERR ("FT${test}b '$@'\n")
+      unless $@ =~ /^Option spec <> requires a reference to a subroutine\nError in option spec: "HASH\(0x/;
 }
 
 if ( ++$test == $single || $all ) {
 
     my $foo;
     my %linkage = ('<>' => \$foo);
-
-    print STDERR ("Expect: Option spec <> requires a reference to a subroutine\n",
-		  "Expect: Error in option spec: \"SCALAR(0x...)\"\n");
-
-
     @ARGV = qw( -one -two 2 -three 1 -three 4 foo );
-    if ( defined eval { GetOptions (\%linkage,
-				    "one",
-				    "<>", 
-				    "three=i@");
-		    } ) {
-	print STDOUT ("FT${test}a\n");
-    }
-    else {
-	print STDOUT ($@);
-    }
+    @ARGV = qw( -one -two 2 -three 1 -three 4 foo );
+    eval { GetOptions (\%linkage,
+		       "one",
+		       "<>",
+		       "three=i@");
+       };
+    print STDERR ("FT${test}a\n") unless $@;
+    print STDERR ("FT${test}b '$@'\n")
+      unless $@ =~ /^Option spec <> requires a reference to a subroutine\nError in option spec: "SCALAR\(0x/;
 }
 
 ################ Callbacks ################
 
-local (%xx);
+my %xx;
 
 sub cb {
     print STDOUT ("Callback($_[0],$_[1])\n") if $single;
@@ -289,7 +244,7 @@ sub cb {
 
 sub cbx {
     &cb;
-    print STDERR ("Option fail for \"$_[0]\"\n");
+    warn ("Option fail for \"$_[0]\"\n");
     $Getopt::Long::error++;
 }
 
@@ -311,6 +266,7 @@ if ( ++$test == $single || $all ) {
     my @o_three;
     %xx = ();
 
+    Getopt::Long::config(@defcfg);
     @ARGV = qw( -one -two 2 -three 1 -three 4 foo );
     print STDOUT ("FT${test}a\n") 
 	unless GetOptions (\%linkage,
@@ -346,6 +302,7 @@ if ( ++$test == $single || $all ) {
     my @o_three;
     %xx = ();
 
+    Getopt::Long::config(@defcfg);
     @ARGV = qw( -one -two 2 -three 1 bar -three 4 foo );
     print STDOUT ("FT${test}a\n") 
 	unless GetOptions (\%linkage,
@@ -384,6 +341,7 @@ if ( ++$test == $single || $all ) {
     my @o_three;
     %xx = ();
 
+    Getopt::Long::config(@defcfg);
     @ARGV = qw( -one -two 2 -three 1 bar -three 4 -- foo );
     print STDOUT ("FT${test}a\n") 
 	unless GetOptions (\%linkage,
@@ -423,7 +381,7 @@ if ( ++$test == $single || $all ) {
     %xx = ();
 
     @ARGV = qw( -one -two 2 -three 1 bar -three 4 -- foo );
-    Getopt::Long::config ("require_order");
+    Getopt::Long::config (@defcfg, "require_order");
     print STDOUT ("FT${test}a\n") 
 	unless GetOptions (\%linkage,
 			   "one",
@@ -452,7 +410,6 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}y\n") if exists $xx{"foo"};
     print STDOUT ("FT${test}z\n") unless @ARGV == 5
 	&& "@ARGV" eq "bar -three 4 -- foo";
-    Getopt::Long::config ("permute");
 }
 
 if ( ++$test == $single || $all ) {
@@ -462,9 +419,11 @@ if ( ++$test == $single || $all ) {
     my $o_two;
     my @o_three;
     %xx = ();
+    my $msg = '';
+    local ($SIG{__WARN__}) = sub { $msg .= "@_" };
 
     @ARGV = qw( -one -two 2 -three 1 bar -three 4 -- foo );
-    Getopt::Long::config ("require_order");
+    Getopt::Long::config (@defcfg, "require_order");
     print STDOUT ("FT${test}a\n") 
 	if GetOptions (\%linkage,
 		       "<>", \&process,
@@ -489,11 +448,12 @@ if ( ++$test == $single || $all ) {
     my @a = @{$linkage{"three"}};
     print STDOUT ("FT${test}o -- ",scalar(@a), "\n") unless scalar(@a) == 1;
     print STDOUT ("FT${test}p\n") unless $a[0] == 1;
+    print STDOUT ("FT${test}q\n")
+      unless $msg eq "Option fail for \"one\"\n";
     print STDOUT ("FT${test}x\n") if exists $xx{"bar"};
     print STDOUT ("FT${test}y\n") if exists $xx{"foo"};
     print STDOUT ("FT${test}z\n") unless @ARGV == 5
 	&& "@ARGV" eq "bar -three 4 -- foo";
-    Getopt::Long::config ("permute");
 }
 
 if ( ++$test == $single || $all ) {
@@ -503,9 +463,11 @@ if ( ++$test == $single || $all ) {
     my $o_two;
     my @o_three;
     %xx = ();
+    my $msg = '';
+    local ($SIG{__WARN__}) = sub { $msg .= "@_" };
 
     @ARGV = qw( >one >two 2 <three 1 bar <three 4 -- foo );
-    Getopt::Long::config ("require_order");
+    Getopt::Long::config (@defcfg, "require_order");
     print STDOUT ("FT${test}a\n")
 	if GetOptions (\%linkage,
 		       "<>", "<>", \&process,
@@ -530,11 +492,12 @@ if ( ++$test == $single || $all ) {
     my @a = @{$linkage{"three"}};
     print STDOUT ("FT${test}o -- ",scalar(@a), "\n") unless scalar(@a) == 1;
     print STDOUT ("FT${test}p\n") unless $a[0] == 1;
+    print STDOUT ("FT${test}q\n")
+      unless $msg eq "Option fail for \"one\"\n";
     print STDOUT ("FT${test}x\n") if exists $xx{"bar"};
     print STDOUT ("FT${test}y\n") if exists $xx{"foo"};
     print STDOUT ("FT${test}z\n") unless @ARGV == 5
 	&& "@ARGV" eq "bar <three 4 -- foo";
-    Getopt::Long::config ("permute");
 }
 
 ################ Hashes ################
@@ -543,6 +506,7 @@ if ( ++$test == $single || $all ) {
 
     my %hi = ();
 
+    Getopt::Long::config(@defcfg);
     @ARGV = qw( -hi one=2 -- foo );
     print STDOUT ("FT${test}a\n") 
 	unless GetOptions ("hi=i", \%hi);
@@ -559,6 +523,7 @@ if ( ++$test == $single || $all ) {
 
     my @v = ();
 
+    Getopt::Long::config(@defcfg);
     @ARGV = qw( -v -verbose -- foo );
     print STDOUT ("FT${test}a\n") 
 	unless GetOptions ("verbose|v" => \@v);
@@ -578,7 +543,7 @@ if ( ++$test == $single || $all ) {
     my @v = ();
     my %w = ();
 
-    Getopt::Long::config("bundling");
+    Getopt::Long::config(@defcfg, "bundling");
     @ARGV = qw( -vwv=vw -wvv=vw -- foo );
     print STDOUT ("FT${test}a\n") 
 	unless GetOptions ("v=s" => \@v, "vee=s" => \@v, "w=s" => \%w, "wee=s" => \%w);
@@ -589,7 +554,6 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}d\n") unless $w{vv} eq 'vw';
     print STDOUT ("FT${test}z\n") unless @ARGV == 1
 	&& "@ARGV" eq "foo";
-    Getopt::Long::config("nobundling");
 }
 
 ################ Prefix ################
@@ -599,8 +563,7 @@ if ( ++$test == $single || $all ) {
     my $o_foo;
     my $o_bar;
 
-    Getopt::Long::config("default","prefix=--",
-			 $single ? "debug" : "nodebug");
+    Getopt::Long::config(@defcfg, "prefix=--");
     @ARGV = qw( --foo -bar -- foo );
     print STDOUT ("FT${test}a\n") 
 	unless GetOptions ("foo" => \$o_foo, "bar=s" => \$o_bar);
@@ -609,30 +572,25 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}b=$o_bar\n") if defined $o_bar;
     print STDOUT ("FT${test}z\n") unless @ARGV == 2
 	&& "@ARGV" eq "-bar foo";
-    Getopt::Long::config("default",
-			 $single ? "debug" : "nodebug");
 }
 
 if ( ++$test == $single || $all ) {
 
     eval {
-	Getopt::Long::config("default","prefix_pattern=+--",
-			     $single ? "debug" : "nodebug");
+	Getopt::Long::config(@defcfg, "prefix_pattern=+--",);
     };
-    print STDERR ("$@") if $@;
-
-    Getopt::Long::config("default",
-			 $single ? "debug" : "nodebug");
+    print STDOUT ("FT${test}a\n") unless $@;
+    print STDOUT ("FT${test}b '$@'\n")
+      unless $@ =~ /^\QGetopt::Long: invalid pattern "(+--)" at /;
 }
 
 ################ Faking POSIXLY_CORRECT ################
-
-Getopt::Long::Configure ("posix_default");
 
 if ( ++$test == $single || $all ) {
 #    showtest();
     my $o_seven;
     my $o_foo;
+    Getopt::Long::Configure (@defcfg, "posix_default");
     @ARGV = qw(-seven 1.2 foo);
     print STDOUT ("FT${test}a\n") 
 	unless GetOptions ("foo" => \$o_foo, "seven=f" => \$o_seven);
@@ -645,6 +603,7 @@ if ( ++$test == $single || $all ) {
 #    showtest();
     my $o_seven;
     my $o_foo;
+    Getopt::Long::Configure (@defcfg, "posix_default");
     @ARGV = qw(foo -seven 1.2);
     print STDOUT ("FT${test}a\n") 
 	unless GetOptions ("foo" => \$o_foo, "seven=f" => \$o_seven);
@@ -652,19 +611,16 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}z\n") if @ARGV != 3 || $ARGV[0] ne "foo";
 }
 
-Getopt::Long::Configure ("default");
-
 ################ OO ################
 
 if ( ++$test == $single || $all ) {
-  if ( do "../src/oo-ext.pl" ) {
 
     # If bundling, it is not allowed to split on aa=bb.
     # Also, prevent warnings for undefind $bopctl{$o}.
 
     my @v = ();
     my %w = ();
-    my $p = new Getopt::Long ("bundling");
+    my $p = new Getopt::Long::Parser (config => [@defcfg, "bundling"]);
     @ARGV = qw( -vwv=vw -wvv=vw -- foo );
     print STDOUT ("FT${test}a\n") 
 	unless $p->getoptions ("v=s" => \@v, "vee=s" => \@v, "w=s" => \%w, "wee=s" => \%w);
@@ -675,10 +631,6 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}d\n") unless $w{vv} eq 'vw';
     print STDOUT ("FT${test}z\n") unless @ARGV == 1
 	&& "@ARGV" eq "foo";
-  }
-  else {
-      print STDOUT ("Skipping test $test\n");
-  }
 }
 
 ################ Interrupting ################
@@ -688,7 +640,7 @@ if ( ++$test == $single || $all ) {
     # Use die(!FINISH) to interrupt the options handling.
 
     my $a;
-    Getopt::Long::config("bundling");
+    Getopt::Long::config(@defcfg, "bundling");
     @ARGV = qw( -amenu foo );
     print STDOUT ("FT${test}a\n")
 	unless GetOptions ("a" => \$a, "m" => sub { die("!FINISH here") });
@@ -696,7 +648,83 @@ if ( ++$test == $single || $all ) {
     print STDOUT ("FT${test}c\n") unless $a == 1;
     print STDOUT ("FT${test}z\n") unless @ARGV == 2
 	&& "@ARGV" eq "-enu foo";
-    Getopt::Long::config("nobundling");
+}
+
+################ GNU Getopt Compatibility ################
+#
+# Basically, this means that if 'file' takes an optional argument, you
+# always need to specify the '=', e.g. --file=blah. A mere --file blah
+# will not work.
+# Also, if 'file' takes a mandatory argument, --file= is allowed and
+# will provide an empty argument.
+
+if ( ++$test == $single || $all ) {
+    my $a;
+    Getopt::Long::config(@defcfg);
+    @ARGV = qw( --file foo );
+    print STDOUT ("FT${test}a\n")
+	unless GetOptions ("file:s" => \$a);
+    print STDOUT ("FT${test}b\n") unless defined $a;
+    print STDOUT ("FT${test}c\n") unless $a eq 'foo';
+    print STDOUT ("FT${test}z\n") unless @ARGV == 0;
+}
+
+if ( ++$test == $single || $all ) {
+    my $a;
+    Getopt::Long::config(@defcfg, "gnu_getopt");
+    @ARGV = qw( --file foo );
+    print STDOUT ("FT${test}a\n")
+	unless GetOptions ("file:s" => \$a);
+    print STDOUT ("FT${test}b\n") unless defined $a;
+    print STDOUT ("FT${test}c\n") unless $a eq '';
+    print STDOUT ("FT${test}z\n") unless @ARGV == 1
+	&& "@ARGV" eq "foo";
+}
+
+if ( ++$test == $single || $all ) {
+    my $a;
+    Getopt::Long::config(@defcfg);
+    @ARGV = qw( --file foo );
+    print STDOUT ("FT${test}a\n")
+	unless GetOptions ("file=s" => \$a);
+    print STDOUT ("FT${test}b\n") unless defined $a;
+    print STDOUT ("FT${test}c\n") unless $a eq 'foo';
+    print STDOUT ("FT${test}z\n") unless @ARGV == 0;
+}
+
+if ( ++$test == $single || $all ) {
+    my $a;
+    Getopt::Long::config(@defcfg, "gnu_getopt");
+    @ARGV = qw( --file foo );
+    print STDOUT ("FT${test}a\n")
+	unless GetOptions ("file=s" => \$a);
+    print STDOUT ("FT${test}b\n") unless defined $a;
+    print STDOUT ("FT${test}c\n") unless $a eq 'foo';
+    print STDOUT ("FT${test}z\n") unless @ARGV == 0;
+}
+
+if ( ++$test == $single || $all ) {
+    my $a;
+    my $msg;
+    Getopt::Long::config(@defcfg);
+    @ARGV = qw( --file= foo );
+    local ($SIG{__WARN__}) = sub { $msg .= "@_"; };
+    print STDOUT ("FT${test}a\n")
+	if GetOptions ("file=s" => \$a);
+    print STDOUT ("FT${test}b '$msg'\n")
+      unless $msg eq "Option file requires an argument\n";
+}
+
+if ( ++$test == $single || $all ) {
+    my $a;
+    Getopt::Long::config(@defcfg, "gnu_getopt");
+    @ARGV = qw( --file= foo );
+    print STDOUT ("FT${test}a\n")
+	unless GetOptions ("file=s" => \$a);
+    print STDOUT ("FT${test}b\n") unless defined $a;
+    print STDOUT ("FT${test}c\n") unless $a eq '';
+    print STDOUT ("FT${test}z\n") unless @ARGV == 1
+      && "@ARGV" eq "foo";
 }
 
 ################ Wrap Up ################
