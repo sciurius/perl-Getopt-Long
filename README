@@ -101,6 +101,10 @@ behavior. It can be called with one or more names of options:
 
 	Allow '+' to start options.
 
+  - gnu_compat
+
+	Compatibility with GNU getopt_long().
+
   - permute
   - require_order           
 
@@ -154,6 +158,15 @@ behavior. It can be called with one or more names of options:
   - debug
 
 	Enable copious debugging output.
+
+* Object oriented interface:
+
+Using the object oriented interface, multiple parser objects can be
+instantiated, each having their own configuration settings:
+
+    $p1 = new Getopt::Long::Parser (config => ["posix"]);
+    $p2 = new Getopt::Long::Parser (config => ["no_posix"]);
+    if ($p1->getoptions(...options descriptions...)) ...
 
 AVAILABILITY
 ============

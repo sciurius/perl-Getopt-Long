@@ -1,6 +1,6 @@
-Version 2.23 of module Getopt::Long is now available via CPAN. It
+Version 2.24 of module Getopt::Long is now available via CPAN. It
 should soon appear in directory authors/Johan_Vromans as file
-Getopt-Long-2.23.tar.gz. It will be standard part of Perl 5.6.
+Getopt-Long-2.24.tar.gz. It will be standard part of Perl 5.6.1 and 5.7.0.
 
 Module Getopt::Long implements an extended getopt function called
 GetOptions(). This function implements the POSIX standard for command
@@ -14,33 +14,12 @@ it to http://www.perl.com/CPAN/ (include the final slash!). It will
 automagically be redirected to a CPAN site in your neighborhood. 
 URL: http://www.perl.com/CPAN/authors/Johan_Vromans
 
-Changes in version 2.23
+Changes in version 2.24
 -----------------------
 
-* When a call-back routine issues 'die', messages starting with "!"
-  are treated specially. Currently, only "!FINISH" is recognised (see
-  the next bullet point). Other messages that start with "!" are
-  ignored.
+=== to be filled in; see CHANGES ===
 
-* Change 'die("FINISH") (see changes in 2.21) to die("!FINISH"). This
-  is an incompatible change, but I guess noone is using this yet.
-
-Changes in version 2.22
------------------------
-
-* Fixes a bug in the combination of aliases and negation.
-
-  Old:  "foo|bar!" allowed negation on foo, but not on bar.
-  New:  "foo|bar!" allows negation on foo and bar.
-
-  Caveat: "foo|f!", with bundling, issues the warning that negation on
-  a short option is ignored. To obtain the desired behaviour, use
-
-	"foo|f" => $opt_foo, "nofoo" => sub { $opt_foo = 0 }
-
-  Remember that this is _only_ required when bundling is in effect.
-
-Previous released version was 2.22.
+Previous released version was 2.23, for Perl 5.6.0.
 
 ---- README ----
 

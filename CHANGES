@@ -1,3 +1,43 @@
+Changes in version 2.24
+-----------------------
+
+* Add object oriented interface:
+
+    use Getopt::Long;
+    $p = new Getopt::Long::Parser;
+    $p->configure(...configuration options...);
+    if ($p->getoptions(...options descriptions...)) ...
+
+* Add configuration at 'use' time:
+
+    use Getopt::Long qw(:config no_ignore_case bundling);
+
+* Add configuration options "gnu_getopt" and "gnu_compat".
+
+  "gnu_compat" controls whether --opt= is allowed, and what it should
+  do. Without "gnu_compat", --opt= gives an error. With "gnu_compat", 
+  --opt= will give option "opt" and empty value.
+  This is the way GNU getopt_long does it.
+
+  "gnu_getopt" is a short way of setting "gnu_compat bundling permute
+  no_getopt_compat. With "gnu_getopt", command line handling should be
+  fully compatible with GNU getopt_long.
+
+* Correct warnings when the user specified an array or hash
+  destination using a non-lowercase option, e.g. "I=s@".
+
+* Correct ambiguous use of 'set' and 'reset' in the Configuration
+  section of the documentation. 
+
+* Add configuration option "posix_default" to reset to defaults as if
+  POSIXLY_CORRECT were set.
+
+* Disallow "no" prefix on configuration options "default", "prefix" and
+  "prefix_pattern". 
+
+* Add a section "Trouble Shooting" to the documentation, with
+  frequently asked questions.
+
 Changes in version 2.23
 -----------------------
 
@@ -20,7 +60,9 @@ Changes in version 2.22
   Caveat: "foo|f!", with bundling, issues the warning that negation on
   a short option is ignored. To obtain the desired behaviour, use
 
-	"foo|f" => $opt_foo, "nofoo" => sub { $opt_foo = 0 }
+	"foo!" => \$opt_foo, "f" => \$opt_foo
+  or
+	"foo|f" => \$opt_foo, "nofoo" => sub { $opt_foo = 0 }
 
   Remember that this is _only_ required when bundling is in effect.
 
