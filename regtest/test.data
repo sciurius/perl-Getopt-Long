@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Jun 11 17:28:37 2002
-# Update Count    : 336
+# Last Modified On: Sat Jun 29 17:14:15 2002
+# Update Count    : 347
 # Status          : In progress
 
 ################ No args ################
@@ -1258,6 +1258,28 @@ A: -a24b0b10x0x10 foo
    $v2 == 0b10
    $v3 == 0x10
    @ARGV foo
+
+T: Bundling with hashes
+P: a=i \\%h1
+A: -a4=2
+   %h1 4 2
+
+T: Bundling with hashes
+P: a=f \\%h1
+A: -a4=2e1
+   %h1 4 2e1
+
+T: Bundling with hashes
+P: a=i \\%h1 b=f \\%h2
+A: -aa=2bb=1e1a3
+   %h1 3 1 a 2
+   %h2 b 1e1
+
+T: Bundling with hashes and a default
+P: a:7 \\%h1 b=f \\%h2
+A: -a4=2b5=1e1a3
+   %h1 3 7 4 2
+   %h2 5 1e1
 
 # Clear sticky config.
 O:
