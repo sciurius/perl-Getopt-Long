@@ -6,8 +6,8 @@ my $RCS_Id = '$Id$ ';
 # Author          : Johan Vromans
 # Created On      : Tue Sep 15 15:59:04 1992
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Jul 14 22:22:15 2003
-# Update Count    : 75
+# Last Modified On: Sun Sep 21 13:21:36 2003
+# Update Count    : 77
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -48,12 +48,12 @@ exit 0;
 
 ################ Command Line Options ################
 
-use Getopt::Long 2.33;		# will enable help/version
+use Getopt::Long 2.34;		# will enable help/version
 
 sub app_options {
 
     GetOptions(ident	   => \&app_ident,
-	       'verbose|v' => \$verbose,
+	       verbose	   => \$verbose,
 	       # application specific options go here
 
 	       # development options
