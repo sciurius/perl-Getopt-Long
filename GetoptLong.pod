@@ -48,7 +48,7 @@ could use the more descriptive C<--long>. To distinguish between a
 bundle of single-character options and a long one, two dashes are used
 to precede the option name. Early implementations of long options used
 a plus C<+> instead. Also, option values could be specified either
-like 
+like
 
     --size=24
 
@@ -61,7 +61,7 @@ The C<+> form is now obsolete and strongly deprecated.
 =head1 Getting Started with Getopt::Long
 
 Getopt::Long is the Perl5 successor of C<newgetopt.pl>. This was
-the firs Perl module that provided support for handling the new style
+the first Perl module that provided support for handling the new style
 of command line options, hence the name Getopt::Long. This module
 also supports single-character options and bundling. In this case, the
 options are restricted to alphabetic characters only, and the
@@ -284,11 +284,11 @@ requires a least C<--hea> and C<--hei> for the head and height options.
 =head2 Summary of Option Specifications
 
 Each option specifier consists of two parts: the name specification
-and the argument specification. 
+and the argument specification.
 
 The name specification contains the name of the option, optionally
 followed by a list of alternative names separated by vertical bar
-characters. 
+characters.
 
     length	      option name is "length"
     length|size|l     name is "length", aliases are "size" and "l"
@@ -360,6 +360,24 @@ considered an option on itself.
 =back
 
 =head1 Advanced Possibilities
+
+=head2 Object oriented interface
+
+Getopt::Long can be used in an object oriented way as well:
+
+    use Getopt::Long;
+    $p = new Getopt::Long::Parser;
+    $p->configure(...configuration options...);
+    if ($p->getoptions(...options descriptions...)) ...
+
+Configuration options can be passed to the constructor:
+
+    $p = new Getopt::Long::Parser
+             config => [...configuration options...];
+
+For thread safety, each method call will acquire an exclusive lock to
+the Getopt::Long module. So don't call these methods from a callback
+routine!
 
 =head2 Documentation and help texts
 
@@ -483,7 +501,7 @@ options,
 
     -vax
 
-would set C<a>, C<v> and C<x>, but 
+would set C<a>, C<v> and C<x>, but
 
     --vax
 
@@ -541,8 +559,8 @@ When applied to the following command line:
 
     arg1 --width=72 arg2 --width=60 arg3
 
-This will call 
-C<process("arg1")> while C<$width> is C<80>, 
+This will call
+C<process("arg1")> while C<$width> is C<80>,
 C<process("arg2")> while C<$width> is C<72>, and
 C<process("arg3")> while C<$width> is C<60>.
 
@@ -554,9 +572,14 @@ L<Configuring Getopt::Long>.
 
 Getopt::Long can be configured by calling subroutine
 Getopt::Long::Configure(). This subroutine takes a list of quoted
-strings, each specifying a configuration option to be set, e.g.
-C<ignore_case>, or reset, e.g. C<no_ignore_case>. Case does not
+strings, each specifying a configuration option to be enabled, e.g.
+C<ignore_case>, or disabled, e.g. C<no_ignore_case>. Case does not
 matter. Multiple calls to Configure() are possible.
+
+Alternatively, as of version 2.24, the configuration options may be
+passed together with the C<use> statement:
+
+    use Getopt::Long qw(:config no_ignore_case bundling);
 
 The following options are available:
 
@@ -567,34 +590,53 @@ The following options are available:
 This option causes all configuration options to be reset to their
 default values.
 
+=item posix_default
+
+This option causes all configuration options to be reset to their
+default values as if the environment variable POSIXLY_CORRECT had
+been set.
+
 =item auto_abbrev
 
 Allow option names to be abbreviated to uniqueness.
-Default is set unless environment variable
-POSIXLY_CORRECT has been set, in which case C<auto_abbrev> is reset.
+Default is enabled unless environment variable
+POSIXLY_CORRECT has been set, in which case C<auto_abbrev> is disabled.
 
 =item getopt_compat
 
 Allow C<+> to start options.
-Default is set unless environment variable
-POSIXLY_CORRECT has been set, in which case C<getopt_compat> is reset.
+Default is enabled unless environment variable
+POSIXLY_CORRECT has been set, in which case C<getopt_compat> is disabled.
+
+=item gnu_compat
+
+C<gnu_compat> controls whether C<--opt=> is allowed, and what it should
+do. Without C<gnu_compat>, C<--opt=> gives an error. With C<gnu_compat>,
+C<--opt=> will give option C<opt> and empty value.
+This is the way GNU getopt_long() does it.
+
+=item gnu_getopt
+
+This is a short way of setting C<gnu_compat> C<bundling> C<permute>
+C<no_getopt_compat>. With C<gnu_getopt>, command line handling should be
+fully compatible with GNU getopt_long().
 
 =item require_order
 
 Whether command line arguments are allowed to be mixed with options.
-Default is set unless environment variable
-POSIXLY_CORRECT has been set, in which case C<require_order> is reset.
+Default is disabled unless environment variable
+POSIXLY_CORRECT has been set, in which case C<require_order> is enabled.
 
 See also C<permute>, which is the opposite of C<require_order>.
 
 =item permute
 
 Whether command line arguments are allowed to be mixed with options.
-Default is set unless environment variable
-POSIXLY_CORRECT has been set, in which case C<permute> is reset.
+Default is enabled unless environment variable
+POSIXLY_CORRECT has been set, in which case C<permute> is disabled.
 Note that C<permute> is the opposite of C<require_order>.
 
-If C<permute> is set, this means that 
+If C<permute> is enabled, this means that
 
     --foo arg1 --bar arg2 arg3
 
@@ -611,7 +653,7 @@ processed. The only exception is when C<--> is used:
 will call the call-back routine for arg1 and arg2, and terminate
 GetOptions() leaving C<"arg2"> in C<@ARGV>.
 
-If C<require_order> is set, options processing
+If C<require_order> is enabled, options processing
 terminates when the first non-option is encountered.
 
     --foo arg1 --bar arg2 arg3
@@ -620,40 +662,40 @@ is equivalent to
 
     --foo -- arg1 --bar arg2 arg3
 
-=item bundling (default: reset)
+=item bundling (default: disabled)
 
-Setting this option will allow single-character options to be bundled.
+Enabling this option will allow single-character options to be bundled.
 To distinguish bundles from long option names, long options I<must> be
 introduced with C<--> and single-character options (and bundles) with
 C<->.
 
-Note: resetting C<bundling> also resets C<bundling_override>.
+Note: disabling C<bundling> also disables C<bundling_override>.
 
-=item bundling_override (default: reset)
+=item bundling_override (default: disabled)
 
-If C<bundling_override> is set, bundling is enabled as with
-C<bundling> but now long option names override option bundles. 
+If C<bundling_override> is enabled, bundling is enabled as with
+C<bundling> but now long option names override option bundles.
 
-Note: resetting C<bundling_override> also resets C<bundling>.
+Note: disabling C<bundling_override> also disables C<bundling>.
 
 B<Note:> Using option bundling can easily lead to unexpected results,
 especially when mixing long options and bundles. Caveat emptor.
 
-=item ignore_case  (default: set)
+=item ignore_case  (default: enabled)
 
-If set, case is ignored when matching long option names. Single
+If enabled, case is ignored when matching long option names. Single
 character options will be treated case-sensitive.
 
-Note: resetting C<ignore_case> also resets C<ignore_case_always>.
+Note: disabling C<ignore_case> also disables C<ignore_case_always>.
 
-=item ignore_case_always (default: reset)
+=item ignore_case_always (default: disabled)
 
 When bundling is in effect, case is ignored on single-character
-options also. 
+options also.
 
-Note: resetting C<ignore_case_always> also resets C<ignore_case>.
+Note: disabling C<ignore_case_always> also disables C<ignore_case>.
 
-=item pass_through (default: reset)
+=item pass_through (default: disabled)
 
 Options that are unknown, ambiguous or supplied with an invalid option
 value are passed through in C<@ARGV> instead of being flagged as
@@ -661,7 +703,7 @@ errors. This makes it possible to write wrapper scripts that process
 only part of the user supplied command line arguments, and pass the
 remaining options to some other program.
 
-This can be very confusing, especially when C<permute> is also set.
+This can be very confusing, especially when C<permute> is also enabled.
 
 =item prefix
 
@@ -674,9 +716,9 @@ A Perl pattern that identifies the strings that introduce options.
 Default is C<(--|-|\+)> unless environment variable
 POSIXLY_CORRECT has been set, in which case it is C<(--|-)>.
 
-=item debug (default: reset)
+=item debug (default: disabled)
 
-Enable copious debugging output.
+Enable debugging output.
 
 =back
 
@@ -687,11 +729,10 @@ signalled using die() and will terminate the calling program unless
 the call to Getopt::Long::GetOptions() was embedded in C<eval { ...
 }>, or die() was trapped using C<$SIG{__DIE__}>.
 
-A return value of 1 (true) indicates success.
-
-A return status of 0 (false) indicates that the function detected one
-or more errors during option parsing. These errors are signalled using
-warn() and can be trapped with C<$SIG{__WARN__}>.
+GetOptions returns true to indicate success.
+It returns false when the function detected one or more errors during
+option parsing. These errors are signalled using warn() and can be
+trapped with C<$SIG{__WARN__}>.
 
 Errors that can't happen are signalled using Carp::croak().
 
@@ -755,9 +796,9 @@ argument is strongly deprecated> anyway.
 =head2 Configuration variables
 
 Previous versions of Getopt::Long used variables for the purpose of
-configuring. Although manipulating these variables still work, it
-is strongly encouraged to use the new C<config> routine. Besides, it
-is much easier.
+configuring. Although manipulating these variables still work, it is
+strongly encouraged to use the C<Configure> routine that was introduced
+in version 2.17. Besides, it is much easier.
 
 =head1 Trouble Shooting
 
@@ -778,6 +819,10 @@ long names only, e.g.,
 
     GetOptions("foo!" => \$foo, "f" => \$foo);
 
+=head2 GetOptions does not return a false result when an option is not supplied
+
+That's why they're called 'options'.
+
 =head1 AUTHOR
 
 Johan Vromans <jvromans@squirrel.nl>
@@ -797,7 +842,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 If you do not have a copy of the GNU General Public License write to
-the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, 
+the Free Software Foundation, Inc., 675 Mass Ave, Cambridge,
 MA 02139, USA.
 
 =cut
