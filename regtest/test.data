@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri May  9 13:28:19 2003
-# Update Count    : 370
+# Last Modified On: Fri Jun 20 13:11:11 2003
+# Update Count    : 381
 # Status          : In progress
 
 ################ No args ################
@@ -1198,7 +1198,7 @@ A: -a -b-c --noa foo
 
 T: Bundling
 A: -a -b-c -noa foo
-W: Unknown option: noa
+W: Unknown option: n
 
 T: Bundling
 A: -a -c-b foo
@@ -1300,6 +1300,17 @@ A: -a4=2b5=1e1a3
    %h1 3 7 4 2
    %h2 5 1e1
 
+T: Bundling and unknown options
+P: a \\$v1 b \\$v2
+A: -acb
+W: Unknown option: c
+
+T: Bundling and illegal values
+P: a=i \\$v1 b \\$v2
+A: -acb
+W: Value "cb" invalid for option a (number expected)
+W: Unknown option: c
+
 # Clear sticky config.
 O:
 
@@ -1341,7 +1352,14 @@ T: Bundling + getopt_compat
 O: bundling getopt_compat
 P: v1=s
 A: +v1=bar foo
-W: Unknown option: v1=bar
+W: Unknown option: v
+
+T: Bundling + getopt_compat
+O: bundling getopt_compat
+P: v1=s
+A: --v1=bar foo
+   $opt_v1 bar
+   @ARGV foo
 
 T: Bundling override + getopt_compat
 O: bundling_override getopt_compat
