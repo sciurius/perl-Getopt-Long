@@ -4,29 +4,42 @@ my $RCS_Id = '$Id$ ';
 # Author          : Johan Vromans
 # Created On      : Sun Sep 15 18:39:01 1996
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Jan 11 21:35:04 1998
-# Update Count    : 13
+# Last Modified On: Fri Mar 27 12:33:58 1998
+# Update Count    : 15
 # Status          : Unknown, Use with caution!
-
 
 ################ Common stuff ################
 
+use strict;
+
+# Package or program libraries, if appropriate.
 # $LIBDIR = $ENV{'LIBDIR'} || '/usr/local/lib/sample';
-# unshift (@INC, $LIBDIR);
+# use lib qw($LIBDIR);
 # require 'common.pl';
 
-use strict;
-use Getopt::Long 2.13;
-
+# Package name.
 my $my_package = 'Sciurix';
+# Program name and version.
 my ($my_name, $my_version) = $RCS_Id =~ /: (.+).pl,v ([\d.]+)/;
+# Tack '*' if it is not checked in into RCS.
 $my_version .= '*' if length('$Locker$ ') > 12;
 
-################ Program parameters ################
+################ Command line parameters ################
 
-my $verbose = 0;
-my ($debug, $trace, $test) = (0, 0, 0);
-options();
+use Getopt::Long 2.13;
+sub app_options();
+
+my $verbose = 0;		# verbose processing
+
+# Development options (not shown with -help).
+my $debug = 0;			# debugging
+my $trace = 0;			# trace (show process)
+my $test = 0;			# test (no actual processing)
+
+app_options();
+
+# Options post-processing.
+$trace |= ($debug || $test);
 
 ################ Presets ################
 
@@ -38,7 +51,7 @@ exit 0;
 
 ################ Subroutines ################
 
-sub options () {
+sub app_options() {
     my $help = 0;		# handled locally
     my $ident = 0;		# handled locally
     my $man = 0;		# handled locally
