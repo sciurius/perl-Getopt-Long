@@ -6,13 +6,13 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Jun 14 21:21:07 1998
-# Update Count    : 706
+# Last Modified On: Fri Feb 12 10:51:35 1999
+# Update Count    : 708
 # Status          : Released
 
 ################ Copyright ################
 
-# This program is Copyright 1990,1998 by Johan Vromans.
+# This program is Copyright 1990,1999 by Johan Vromans.
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
@@ -35,7 +35,7 @@ BEGIN {
     require 5.004;
     use Exporter ();
     use vars     qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION     = "2.17";
+    $VERSION     = "2.19";
 
     @ISA         = qw(Exporter);
     @EXPORT      = qw(&GetOptions $REQUIRE_ORDER $PERMUTE $RETURN_IN_ORDER);

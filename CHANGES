@@ -1,3 +1,11 @@
+Changes in version 2.19
+-----------------------
+
+* Fix a warning bug with bundling_override.
+
+There's no version 2.18
+-----------------------
+
 Changes in version 2.17
 -----------------------
 
@@ -44,7 +52,8 @@ Changes in version 2.16
 
 This version is identical to 2.15, which was not released.
 
-There's no version 2.14.
+There's no version 2.14
+-----------------------
 
 Changes in version 2.13
 -----------------------

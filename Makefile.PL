@@ -13,6 +13,6 @@ WriteMakefile(
 	PM 	  => { "newgetopt.pl"  => '$(INST_LIB)/newgetopt.pl',
 		       "GetoptLong.pm" => '$(INST_LIB)/Getopt/Long.pm'
 		     },
-	dist      => { COMPRESS => 'gzip', SUFFIX => 'gz', 
+	dist      => { COMPRESS => 'gzip', SUFFIX => 'gz',
 		     },
  );
