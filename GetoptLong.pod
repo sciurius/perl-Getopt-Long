@@ -251,10 +251,10 @@ the desired error message as its argument. GetOptions() will catch the
 die(), issue the error message, and record that an error result must
 be returned upon completion.
 
-It is also possible for a user-defined subroutine to preliminary
-terminate options processing by calling die() with argument
-C<"FINISH">. GetOptions will react as if it encountered a double dash
-C<-->.
+If the text of the error message starts with an exclamantion mark C<!>
+it is interpreted specially by GetOptions(). There is currently one
+special command implemented: C<die("!FINISH")> will cause GetOptions()
+to stop processing options, as if it encountered a double dash C<-->.
 
 =head2 Options with multiple names
 

@@ -1,6 +1,6 @@
-Version 2.22 of module Getopt::Long is now available via CPAN. It
+Version 2.23 of module Getopt::Long is now available via CPAN. It
 should soon appear in directory authors/Johan_Vromans as file
-Getopt-Long-2.22.tar.gz. It will be standard part of Perl 5.6.
+Getopt-Long-2.23.tar.gz. It will be standard part of Perl 5.6.
 
 Module Getopt::Long implements an extended getopt function called
 GetOptions(). This function implements the POSIX standard for command
@@ -14,26 +14,33 @@ it to http://www.perl.com/CPAN/ (include the final slash!). It will
 automagically be redirected to a CPAN site in your neighborhood. 
 URL: http://www.perl.com/CPAN/authors/Johan_Vromans
 
+Changes in version 2.23
+-----------------------
+
+* When a call-back routine issues 'die', messages starting with "!"
+  are treated specially. Currently, only "!FINISH" is recognised (see
+  the next bullet point). Other messages that start with "!" are
+  ignored.
+
+* Change 'die("FINISH") (see changes in 2.21) to die("!FINISH"). This
+  is an incompatible change, but I guess noone is using this yet.
+
 Changes in version 2.22
 -----------------------
 
 * Fixes a bug in the combination of aliases and negation.
 
-Changes in version 2.21
------------------------
+  Old:  "foo|bar!" allowed negation on foo, but not on bar.
+  New:  "foo|bar!" allows negation on foo and bar.
 
-* New documentation.
+  Caveat: "foo|f!", with bundling, issues the warning that negation on
+  a short option is ignored. To obtain the desired behaviour, use
 
-* User defined subroutines should use 'die' to signal errors.
+	"foo|f" => $opt_foo, "nofoo" => sub { $opt_foo = 0 }
 
-* User defined subroutines can preliminary terminate options
-  processing by calling die("FINISH");
+  Remember that this is _only_ required when bundling is in effect.
 
-* Correct erroneous install of Getopt::Long manpage.
-  Previous versions seem to install Getopt::GetoptLong instead of
-  Getopt::Long.
-
-Previous released version was 2.20.
+Previous released version was 2.22.
 
 ---- README ----
 
