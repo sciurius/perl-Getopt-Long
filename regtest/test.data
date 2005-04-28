@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Feb  4 11:35:24 2005
-# Update Count    : 462
+# Last Modified On: Fri Apr 22 22:28:27 2005
+# Update Count    : 463
 # Status          : In progress
 
 ################ No args ################
@@ -2015,3 +2015,8 @@ O: bundling
 P: foo \\$v1
 A: --invalid
 W: Unknown option: invalid
+
+T: RT #12380
+P: no-a no-b|no-c
+A: --no-
+W: Option no- is ambiguous (no-a, no-b, no-c)
