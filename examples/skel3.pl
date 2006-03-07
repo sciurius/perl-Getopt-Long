@@ -6,8 +6,8 @@ my $RCS_Id = '$Id$ ';
 # Author          : Johan Vromans
 # Created On      : Tue Sep 15 15:59:04 1992
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Sep 21 13:21:36 2003
-# Update Count    : 77
+# Last Modified On: Tue Mar  7 12:04:33 2006
+# Update Count    : 78
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -120,7 +120,7 @@ Johan Vromans <jvromans@squirrel.nl>
 
 =head1 COPYRIGHT
 
-This programs is Copyright 2003, Squirrel Consultancy.
+This programs is Copyright 2006,2003, Squirrel Consultancy.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Perl Artistic License or the GNU General
