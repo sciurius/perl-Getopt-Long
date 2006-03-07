@@ -17,10 +17,17 @@ documentation. Note that "make install" will usually require super
 user privilege unless your Perl is installed in a location you have
 write access to.
 
-The kit contains an "examples" directory with a program skeleton file
-that can be used to start writing application programs: skel.pl. It
-uses Getopt::Long in a standard way, automatically providing version
-and help information. For the latter, it uses the Pod::Usage module to
+It is also possible to use the CPAN or CPANPLUS tools to install
+Getopt::Long directly from CPAN, e.g.,
+
+  perl -MCPAN -e "install Getopt::Long"
+
+RPM fans can try "rpm -ta Getopt-Long-x.y.tar.gz".
+
+The kit contains an "examples" directory with some program skeleton
+files that can be used to start writing application programs. It uses
+Getopt::Long in a standard way, automatically providing version and
+help information. For the latter, it uses the Pod::Usage module to
 extracts help texts from the embedded documentation. The Pod::Usage
 module is part of standard Perl as of Perl version 5.6. For older
 versions of Perl, it can be fetched from CPAN. Use
