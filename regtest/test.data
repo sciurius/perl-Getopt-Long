@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Apr 22 22:28:27 2005
-# Update Count    : 463
+# Last Modified On: Wed Feb 15 10:04:20 2006
+# Update Count    : 468
 # Status          : In progress
 
 ################ No args ################
@@ -284,11 +284,10 @@ O: posix_defaults
 A: +abc ++ foo
    @ARGV +abc ++ foo
 
-####BUG
-#T: Option introducers
-#O: no_getopt_compat
-#A: +abc ++ foo
-#   @ARGV +abc ++ foo
+T: Option introducers
+O: no_getopt_compat
+A: +abc ++ foo
+   @ARGV +abc ++ foo
 
 # Clear sticky parameters
 P:
@@ -1397,9 +1396,9 @@ T: No bundling + no getopt_compat
 O: no_bundling no_getopt_compat
 P: v1=s
 A: +v1=bar
-W: Unknown option: v1=bar
+   @ARGV +v1=bar
 
-T: Bundling + no getopt_compat
+T: No bundling + getopt_compat
 O: no_bundling getopt_compat
 P: v1=s
 A: +v1=bar foo
@@ -2020,3 +2019,15 @@ T: RT #12380
 P: no-a no-b|no-c
 A: --no-
 W: Option no- is ambiguous (no-a, no-b, no-c)
+
+# From: Abigail <abigail@abigail.nl>
+# Subject: Getopt::Long::Configure 'no_getopt_compat'
+# Date: Tue, 14 Feb 2006 23:58:07 +0100
+# According to the manual page, configuring Getopt::Long with the
+# 'no_getopt_compat' should disable options starting with a '+'.
+
+T: no_getopt_compat
+O: no_getopt_compat
+P: foo=s
+A: +foo bar
+   @ARGV +foo bar
