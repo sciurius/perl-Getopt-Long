@@ -72,6 +72,7 @@ EOD
 
 print STDERR ("\n");
 
+my $x =
 WriteMakefile(
 	NAME      => "Getopt::Long",
 	VERSION   => $version,
@@ -89,3 +90,24 @@ WriteMakefile(
 		     },
 	PREREQ_PM => { "Pod::Usage" => 1.14 },
  );
+
+# Write .spec file.
+WriteSpecfile($x->{DISTNAME}, $x->{VERSION});
+
+sub WriteSpecfile {
+    my $name    = shift;
+    my $version = shift;
+
+    my $fh;
+    if ( open ($fh, "rpm/$name.spec.in") ) {
+	print "Writing RPM spec file...\n";
+	my $newfh;
+	open ($newfh, ">perl-$name.spec");
+	while ( <$fh> ) {
+	    s/%define modname [\w---]+/%define modname $name/;
+	    s/%define modversion \d+\.\d+/%define modversion $version/;
+	    print $newfh $_;
+	}
+	close($newfh);
+    }
+}
