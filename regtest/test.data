@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Feb 15 10:04:20 2006
-# Update Count    : 468
+# Last Modified On: Tue May 23 15:11:58 2006
+# Update Count    : 471
 # Status          : In progress
 
 ################ No args ################
@@ -2031,3 +2031,26 @@ O: no_getopt_compat
 P: foo=s
 A: +foo bar
    @ARGV +foo bar
+
+# From: khali@linux-fr.org
+# Date: Tue, 23 May 2006 08:33:39 -0400 (EDT)
+# When using an option with an optional hash value, values (not keys)
+# starting with a dash trigger an unexpected error:
+# 
+# perl -MGetopt::Long -we "GetOptions('replace:s%');" -- --replace a=-b
+# Unknown option: b
+
+T: Optional hash value
+P: foo:s% \\$v1
+A: --foo a=-b
+   %$v1 a -b
+
+T: Optional hash value
+P: foo:s% \\$v1
+A: --foo=a=-b
+   %$v1 a -b
+
+T: Mandatory hash value
+P: foo=s% \\$v1
+A: --foo a=-b
+   %$v1 a -b
