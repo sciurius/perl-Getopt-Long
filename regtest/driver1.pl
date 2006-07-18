@@ -8,8 +8,8 @@ package MyTest;			# not main
 # Author          : Johan Vromans
 # Created On      : Mon Aug  6 11:53:07 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Sep 21 12:54:25 2003
-# Update Count    : 442
+# Last Modified On: Tue Jul 18 23:13:31 2006
+# Update Count    : 447
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -61,8 +61,12 @@ if ( $line ) {
 
 ################ Presets ################
 
-use Data::Dumper;
-$Data::Dumper::Indent = 1;
+# Old Perls do not have Data::Dumper.
+my $candump = 0;
+eval { require Data::Dumper;
+       $candump = 1;
+       $Data::Dumper::Indent = 1;
+};
 use Text::ParseWords;
 
 my $retval = 0;
@@ -447,7 +451,7 @@ sub exec_plain {
     my @errors   = @{$t->{errors}};
     my @warnings = @{$t->{warnings}};
 
-    if ( $debug ) {
+    if ( $debug && $candump ) {
 	print STDERR (hdr(), Data::Dumper->Dump([$t], ["t"]), "\n");
     }
     reset_vars();

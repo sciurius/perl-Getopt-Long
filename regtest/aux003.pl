@@ -2,11 +2,11 @@
 
 use Getopt::Long 2.3203 qw(:config version);
 
-if ( open (my $fh, "-|") ) {
-    my $res = <$fh>;
+if ( open FH, "-|" ) {
+    my $res = <FH>;
     die("res = $res, should be $0\n")
       unless $res eq "$0\n";
-    $res = <$fh>;
+    $res = <FH>;
     my $exp = "(Getopt::Long::GetOptions version ".
       ($Getopt::Long::VERSION_STRING||$Getopt::Long::VERSION) . "; Perl version " .
 	($] >= 5.006 ? sprintf("%vd", $^V) : $]) . ")";
