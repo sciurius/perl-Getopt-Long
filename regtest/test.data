@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue May 23 15:11:58 2006
-# Update Count    : 471
+# Last Modified On: Mon Jul 17 14:45:55 2006
+# Update Count    : 483
 # Status          : In progress
 
 ################ No args ################
@@ -495,6 +495,23 @@ T: Int opt (mandatory)
 A: -v1=327
    $opt_v1 == 327
 
+R: 2.3502
+
+T: Int opt (mandatory)
+A: -v1 _327 foo
+   $opt_v1 == 327
+   @ARGV foo
+
+T: Int opt (mandatory)
+A: -v1 32_7_
+   $opt_v1 == 327
+
+T: Int opt (mandatory)
+A: -v1=3_2_7
+   $opt_v1 == 327
+
+R:
+
 T: Int opt (mandatory)
 A: --v1=
 W: Option v1 requires an argument
@@ -630,6 +647,25 @@ A: -v1 -6 foo
    $opt_v1 == -6
    @ARGV foo
 
+R: 2.3502
+
+T: Ext Int opt (mandatory)
+A: -v1 0_327 foo
+   $opt_v1 == 0327
+   @ARGV foo
+
+T: Ext Int opt (mandatory)
+A: -v1 0b_001_01001 foo
+   $opt_v1 == 0b00101001
+   @ARGV foo
+
+T: Ext Int opt (mandatory)
+A: -v1 0x___327 foo
+   $opt_v1 == 0x327
+   @ARGV foo
+
+R:
+
 T: Ext Int opt (mandatory)
 A: -v1 019 foo
 W: Value "019" invalid for option v1 (extended number expected)
@@ -691,6 +727,25 @@ T: Float opt (mandatory)
 A: -v3 -6.4e-1 foo
    $opt_v3 == -0.64
    @ARGV foo
+
+R: 2.3502
+
+T: Float opt (mandatory)
+A: -v3 -_6 foo
+   $opt_v3 == -6
+   @ARGV foo
+
+T: Float opt (mandatory)
+A: -v3 -6._4 foo
+   $opt_v3 == -6.4
+   @ARGV foo
+
+T: Float opt (mandatory)
+A: -v3 -6.4_e-1 foo
+   $opt_v3 == -0.64
+   @ARGV foo
+
+R:
 
 T: Float opt (mandatory)
 A: -v3 bar foo
@@ -1960,6 +2015,24 @@ T: Repeat args
 P: foo=s{,2} \\@a1
 A: --foo 
 W: Option foo requires an argument
+
+R: 2.3502
+
+T: Repeat args, numeric w/ underscore
+P: foo=i{,2} \\@a1
+A: --foo _123 _4_56
+   @a1 123 456
+
+T: Repeat args, numeric w/ underscore
+P: foo=i{2} \\@a1
+A: --foo _123 _4_56
+   @a1 123 456
+
+T: Repeat args, numeric w/ underscore
+P: foo=i{,3} \\@a1
+A: --foo _123 _4_56 _
+   @a1 123 456
+   @ARGV _
 
 R:
 
