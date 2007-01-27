@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri May 12 11:13:53 2000
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Apr 30 12:58:33 2002
-# Update Count    : 12
+# Last Modified On: Thu Nov 16 14:16:45 2006
+# Update Count    : 13
 # Status          : Unknown, Use with caution!
 
 PERL	= perl -w -Mblib
@@ -20,5 +20,5 @@ kit:
 
 aux:
 	for test in aux*.pl; do \
-	  $(PERL) $$test; \
+	  $(PERL) $$test || echo FAIL; \
 	done
