@@ -6,13 +6,13 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Apr 28 21:14:19 2005
-# Update Count    : 1456
+# Last Modified On: Sat Jan 27 20:59:00 2007
+# Update Count    : 1552
 # Status          : Released
 
 ################ Copyright ################
 
-# This program is Copyright 1990,2005 by Johan Vromans.
+# This program is Copyright 1990,2007 by Johan Vromans.
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the Perl Artistic License or the
 # GNU General Public License as published by the Free Software
@@ -35,10 +35,10 @@ use 5.004;
 use strict;
 
 use vars qw($VERSION);
-$VERSION        =  2.3404;
+$VERSION        =  2.36;
 # For testing versions only.
 use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.34_04";
+$VERSION_STRING = "2.36";
 
 use Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
@@ -46,6 +46,8 @@ use vars qw(@ISA @EXPORT @EXPORT_OK);
 
 # Exported subroutines.
 sub GetOptions(@);		# always
+sub GetOptionsFromArray($@);	# on demand
+sub GetOptionsFromString($@);	# on demand
 sub Configure(@);		# on demand
 sub HelpMessage(@);		# on demand
 sub VersionMessage(@);		# in demand
@@ -53,7 +55,8 @@ sub VersionMessage(@);		# in demand
 BEGIN {
     # Init immediately so their contents can be used in the 'use vars' below.
     @EXPORT    = qw(&GetOptions $REQUIRE_ORDER $PERMUTE $RETURN_IN_ORDER);
-    @EXPORT_OK = qw(&HelpMessage &VersionMessage &Configure);
+    @EXPORT_OK = qw(&HelpMessage &VersionMessage &Configure
+		    &GetOptionsFromArray &GetOptionsFromString);
 }
 
 # User visible variables.
@@ -72,7 +75,7 @@ sub config(@);			# deprecated name
 sub ConfigDefaults();
 sub ParseOptionSpec($$);
 sub OptCtl($);
-sub FindOption($$$$);
+sub FindOption($$$$$);
 sub ValidValue ($$$$$);
 
 ################ Local Variables ################
@@ -247,9 +250,44 @@ use constant CTL_AMAX    => 5;
 #use constant CTL_RANGE   => ;
 #use constant CTL_REPEAT  => ;
 
-sub GetOptions(@) {
+# Rather liberal patterns to match numbers.
+use constant PAT_INT   => "[-+]?_*[0-9][0-9_]*";
+use constant PAT_XINT  =>
+  "(?:".
+	  "[-+]?_*[1-9][0-9_]*".
+  "|".
+	  "0x_*[0-9a-f][0-9a-f_]*".
+  "|".
+	  "0b_*[01][01_]*".
+  "|".
+	  "0[0-7_]*".
+  ")";
+use constant PAT_FLOAT => "[-+]?[0-9._]+(\.[0-9_]+)?([eE][-+]?[0-9_]+)?";
 
-    my @optionlist = @_;	# local copy of the option descriptions
+sub GetOptions(@) {
+    # Shift in default array.
+    unshift(@_, \@ARGV);
+    # Try to keep caller() and Carp consitent.
+    goto &GetOptionsFromArray;
+}
+
+sub GetOptionsFromString($@) {
+    my ($string) = shift;
+    require Text::ParseWords;
+    my $args = [ Text::ParseWords::shellwords($string) ];
+    $caller ||= (caller)[0];	# current context
+    my $ret = GetOptionsFromArray($args, @_);
+    return ( $ret, $args ) if wantarray;
+    if ( @$args ) {
+	$ret = 0;
+	warn("GetOptionsFromString: Excess data \"@$args\" in string \"$string\"\n");
+    }
+    $ret;
+}
+
+sub GetOptionsFromArray($@) {
+
+    my ($argv, @optionlist) = @_;	# local copy of the option descriptions
     my $argend = '--';		# option list terminator
     my %opctl = ();		# table of option specs
     my $pkg = $caller || (caller)[0];	# current context
@@ -270,7 +308,7 @@ sub GetOptions(@) {
 	   '$Revision$', ") ",
 	   "called from package \"$pkg\".",
 	   "\n  ",
-	   "ARGV: (@ARGV)",
+	   "argv: (@$argv)",
 	   "\n  ",
 	   "autoabbrev=$autoabbrev,".
 	   "bundling=$bundling,",
@@ -291,7 +329,7 @@ sub GetOptions(@) {
     # as it is really a hash underneath.
     $userlinkage = undef;
     if ( @optionlist && ref($optionlist[0]) and
-	 "$optionlist[0]" =~ /^(?:.*\=)?HASH\([^\(]*\)$/ ) {
+	 UNIVERSAL::isa($optionlist[0],'HASH') ) {
 	$userlinkage = shift (@optionlist);
 	print STDERR ("=> user linkage: $userlinkage\n") if $debug;
     }
@@ -314,6 +352,11 @@ sub GetOptions(@) {
     %opctl = ();
     while ( @optionlist ) {
 	my $opt = shift (@optionlist);
+
+	unless ( defined($opt) ) {
+	    $error .= "Undefined argument in option spec\n";
+	    next;
+	}
 
 	# Strip leading prefix so people can specify "--foo=i" if they like.
 	$opt = $+ if $opt =~ /^$prefix+(.*)$/s;
@@ -378,7 +421,7 @@ sub GetOptions(@) {
 	    elsif ( $rl eq "HASH" ) {
 		$opctl{$name}[CTL_DEST] = CTL_DEST_HASH;
 	    }
-	    elsif ( $rl eq "SCALAR" ) {
+	    elsif ( $rl eq "SCALAR" || $rl eq "REF" ) {
 #		if ( $opctl{$name}[CTL_DEST] == CTL_DEST_ARRAY ) {
 #		    my $t = $linkage{$orig};
 #		    $$t = $linkage{$orig} = [];
@@ -451,10 +494,10 @@ sub GetOptions(@) {
 
     # Process argument list
     my $goon = 1;
-    while ( $goon && @ARGV > 0 ) {
+    while ( $goon && @$argv > 0 ) {
 
 	# Get next argument.
-	$opt = shift (@ARGV);
+	$opt = shift (@$argv);
 	print STDERR ("=> arg \"", $opt, "\"\n") if $debug;
 
 	# Double dash is option list terminator.
@@ -471,7 +514,7 @@ sub GetOptions(@) {
 	my $ctl;		# the opctl entry
 
 	($found, $opt, $ctl, $arg, $key) =
-	  FindOption ($prefix, $argend, $opt, \%opctl);
+	  FindOption ($argv, $prefix, $argend, $opt, \%opctl);
 
 	if ( $found ) {
 
@@ -490,7 +533,8 @@ sub GetOptions(@) {
 		    print STDERR ("=> ref(\$L{$opt}) -> ",
 				  ref($linkage{$opt}), "\n") if $debug;
 
-		    if ( ref($linkage{$opt}) eq 'SCALAR' ) {
+		    if ( ref($linkage{$opt}) eq 'SCALAR'
+			 || ref($linkage{$opt}) eq 'REF' ) {
 			if ( $ctl->[CTL_TYPE] eq '+' ) {
 			    print STDERR ("=> \$\$L{$opt} += \"$arg\"\n")
 			      if $debug;
@@ -546,9 +590,16 @@ sub GetOptions(@) {
 			    local $@;
 			    local $SIG{__DIE__}  = '__DEFAULT__';
 			    eval {
-				&{$linkage{$opt}}($opt,
-						  $ctl->[CTL_DEST] == CTL_DEST_HASH ? ($key) : (),
-						  $arg);
+				&{$linkage{$opt}}
+				  (Getopt::Long::CallBack->new
+				   (name    => $opt,
+				    ctl     => $ctl,
+				    opctl   => \%opctl,
+				    linkage => \%linkage,
+				    prefix  => $prefix,
+				   ),
+				   $ctl->[CTL_DEST] == CTL_DEST_HASH ? ($key) : (),
+				   $arg);
 			    };
 			    $@;
 			};
@@ -618,14 +669,15 @@ sub GetOptions(@) {
 
 		# Need more args?
 		if ( $argcnt < $ctl->[CTL_AMIN] ) {
-		    if ( @ARGV ) {
-			if ( ValidValue($ctl, $ARGV[0], 1, $argend, $prefix) ) {
-			    $arg = shift(@ARGV);
+		    if ( @$argv ) {
+			if ( ValidValue($ctl, $argv->[0], 1, $argend, $prefix) ) {
+			    $arg = shift(@$argv);
+			    $arg =~ tr/_//d if $ctl->[CTL_TYPE] =~ /^[iIo]$/;
 			    ($key,$arg) = $arg =~ /^([^=]+)=(.*)/
 			      if $ctl->[CTL_DEST] == CTL_DEST_HASH;
 			    next;
 			}
-			warn("Value \"$ARGV[0]\" invalid for option $opt\n");
+			warn("Value \"$$argv[0]\" invalid for option $opt\n");
 			$error++;
 		    }
 		    else {
@@ -635,8 +687,9 @@ sub GetOptions(@) {
 		}
 
 		# Any more args?
-		if ( @ARGV && ValidValue($ctl, $ARGV[0], 0, $argend, $prefix) ) {
-		    $arg = shift(@ARGV);
+		if ( @$argv && ValidValue($ctl, $argv->[0], 0, $argend, $prefix) ) {
+		    $arg = shift(@$argv);
+		    $arg =~ tr/_//d if $ctl->[CTL_TYPE] =~ /^[iIo]$/;
 		    ($key,$arg) = $arg =~ /^([^=]+)=(.*)/
 		      if $ctl->[CTL_DEST] == CTL_DEST_HASH;
 		    next;
@@ -680,7 +733,7 @@ sub GetOptions(@) {
 	# ...otherwise, terminate.
 	else {
 	    # Push this one back and exit.
-	    unshift (@ARGV, $tryopt);
+	    unshift (@$argv, $tryopt);
 	    return ($error == 0);
 	}
 
@@ -691,7 +744,7 @@ sub GetOptions(@) {
 	#  Push back accumulated arguments
 	print STDERR ("=> restoring \"", join('" "', @ret), "\"\n")
 	    if $debug;
-	unshift (@ARGV, @ret);
+	unshift (@$argv, @ret);
     }
 
     return ($error == 0);
@@ -837,13 +890,13 @@ sub ParseOptionSpec ($$) {
 }
 
 # Option lookup.
-sub FindOption ($$$$) {
+sub FindOption ($$$$$) {
 
     # returns (1, $opt, $ctl, $arg, $key) if okay,
     # returns (1, undef) if option in error,
     # returns (0) otherwise.
 
-    my ($prefix, $argend, $opt, $opctl) = @_;
+    my ($argv, $prefix, $argend, $opt, $opctl) = @_;
 
     print STDERR ("=> find \"$opt\"\n") if $debug;
 
@@ -961,7 +1014,7 @@ sub FindOption ($$$$) {
 	# Pretend one char when bundling.
 	if ( $bundling == 1 && length($starter) == 1 ) {
 	    $opt = substr($opt,0,1);
-            unshift (@ARGV, $starter.$rest) if defined $rest;
+            unshift (@$argv, $starter.$rest) if defined $rest;
 	}
 	warn ("Unknown option: ", $opt, "\n");
 	$error++;
@@ -993,7 +1046,7 @@ sub FindOption ($$$$) {
 	    $opt =~ s/^no-?//i;	# strip NO prefix
 	    $arg = 0;		# supply explicit value
 	}
-	unshift (@ARGV, $starter.$rest) if defined $rest;
+	unshift (@$argv, $starter.$rest) if defined $rest;
 	return (1, $opt, $ctl, $arg);
     }
 
@@ -1009,7 +1062,7 @@ sub FindOption ($$$$) {
     # Check if there is an option argument available.
     if ( defined $optarg
 	 ? ($optarg eq '')
-	 : !(defined $rest || @ARGV > 0) ) {
+	 : !(defined $rest || @$argv > 0) ) {
 	# Complain if this option needs an argument.
 	if ( $mand ) {
 	    return (0) if $passthrough;
@@ -1030,7 +1083,7 @@ sub FindOption ($$$$) {
 
     # Get (possibly optional) argument.
     $arg = (defined $rest ? $rest
-	    : (defined $optarg ? $optarg : shift (@ARGV)));
+	    : (defined $optarg ? $optarg : shift (@$argv)));
 
     # Get key if this is a "name=value" pair for a hash option.
     my $key;
@@ -1042,7 +1095,7 @@ sub FindOption ($$$$) {
 	    warn ("Option $opt, key \"$key\", requires a value\n");
 	    $error++;
 	    # Push back.
-	    unshift (@ARGV, $starter.$rest) if defined $rest;
+	    unshift (@$argv, $starter.$rest) if defined $rest;
 	    return (1, undef);
 	}
     }
@@ -1055,6 +1108,10 @@ sub FindOption ($$$$) {
 	# A mandatory string takes anything.
 	return (1, $opt, $ctl, $arg, $key) if $mand;
 
+	# Same for optional string as a hash value
+	return (1, $opt, $ctl, $arg, $key)
+	  if $ctl->[CTL_DEST] == CTL_DEST_HASH;
+
 	# An optional string takes almost anything.
 	return (1, $opt, $ctl, $arg, $key)
 	  if defined $optarg || defined $rest;
@@ -1064,7 +1121,7 @@ sub FindOption ($$$$) {
 	if ($arg eq $argend ||
 	    $arg =~ /^$prefix.+/) {
 	    # Push back.
-	    unshift (@ARGV, $arg);
+	    unshift (@$argv, $arg);
 	    # Supply empty value.
 	    $arg = '';
 	}
@@ -1074,24 +1131,23 @@ sub FindOption ($$$$) {
             || $type eq 'I'	# numeric/integer w/ incr default
 	    || $type eq 'o' ) { # dec/oct/hex/bin value
 
-	my $o_valid =
-	  $type eq 'o' ? "[-+]?[1-9][0-9]*|0x[0-9a-f]+|0b[01]+|0[0-7]*"
-	    : "[-+]?[0-9]+";
+	my $o_valid = $type eq 'o' ? PAT_XINT : PAT_INT;
 
 	if ( $bundling && defined $rest
 	     && $rest =~ /^($key_valid)($o_valid)(.*)$/si ) {
 	    ($key, $arg, $rest) = ($1, $2, $+);
 	    chop($key) if $key;
 	    $arg = ($type eq 'o' && $arg =~ /^0/) ? oct($arg) : 0+$arg;
-	    unshift (@ARGV, $starter.$rest) if defined $rest && $rest ne '';
+	    unshift (@$argv, $starter.$rest) if defined $rest && $rest ne '';
 	}
-	elsif ( $arg =~ /^($o_valid)$/si ) {
+	elsif ( $arg =~ /^$o_valid$/si ) {
+	    $arg =~ tr/_//d;
 	    $arg = ($type eq 'o' && $arg =~ /^0/) ? oct($arg) : 0+$arg;
 	}
 	else {
 	    if ( defined $optarg || $mand ) {
 		if ( $passthrough ) {
-		    unshift (@ARGV, defined $rest ? $starter.$rest : $arg)
+		    unshift (@$argv, defined $rest ? $starter.$rest : $arg)
 		      unless defined $optarg;
 		    return (0);
 		}
@@ -1101,12 +1157,12 @@ sub FindOption ($$$$) {
 		      "number expected)\n");
 		$error++;
 		# Push back.
-		unshift (@ARGV, $starter.$rest) if defined $rest;
+		unshift (@$argv, $starter.$rest) if defined $rest;
 		return (1, undef);
 	    }
 	    else {
 		# Push back.
-		unshift (@ARGV, defined $rest ? $starter.$rest : $arg);
+		unshift (@$argv, defined $rest ? $starter.$rest : $arg);
 		if ( $type eq 'I' ) {
 		    # Fake incremental type.
 		    my @c = @$ctl;
@@ -1123,16 +1179,21 @@ sub FindOption ($$$$) {
 	# We require at least one digit before a point or 'e',
 	# and at least one digit following the point and 'e'.
 	# [-]NN[.NN][eNN]
+	my $o_valid = PAT_FLOAT;
 	if ( $bundling && defined $rest &&
-	     $rest =~ /^($key_valid)([-+]?[0-9]+(\.[0-9]+)?([eE][-+]?[0-9]+)?)(.*)$/s ) {
+	     $rest =~ /^($key_valid)($o_valid)(.*)$/s ) {
+	    $arg =~ tr/_//d;
 	    ($key, $arg, $rest) = ($1, $2, $+);
 	    chop($key) if $key;
-	    unshift (@ARGV, $starter.$rest) if defined $rest && $rest ne '';
+	    unshift (@$argv, $starter.$rest) if defined $rest && $rest ne '';
 	}
-	elsif ( $arg !~ /^[-+]?[0-9.]+(\.[0-9]+)?([eE][-+]?[0-9]+)?$/ ) {
+	elsif ( $arg =~ /^$o_valid$/ ) {
+	    $arg =~ tr/_//d;
+	}
+	else {
 	    if ( defined $optarg || $mand ) {
 		if ( $passthrough ) {
-		    unshift (@ARGV, defined $rest ? $starter.$rest : $arg)
+		    unshift (@$argv, defined $rest ? $starter.$rest : $arg)
 		      unless defined $optarg;
 		    return (0);
 		}
@@ -1140,12 +1201,12 @@ sub FindOption ($$$$) {
 		      $opt, " (real number expected)\n");
 		$error++;
 		# Push back.
-		unshift (@ARGV, $starter.$rest) if defined $rest;
+		unshift (@$argv, $starter.$rest) if defined $rest;
 		return (1, undef);
 	    }
 	    else {
 		# Push back.
-		unshift (@ARGV, defined $rest ? $starter.$rest : $arg);
+		unshift (@$argv, defined $rest ? $starter.$rest : $arg);
 		# Supply default value.
 		$arg = 0.0;
 	    }
@@ -1182,10 +1243,7 @@ sub ValidValue ($$$$$) {
             || $type eq 'I'	# numeric/integer w/ incr default
 	    || $type eq 'o' ) { # dec/oct/hex/bin value
 
-	my $o_valid =
-	  $type eq 'o' ? "[-+]?[1-9][0-9]*|0x[0-9a-f]+|0b[01]+|0[0-7]*"
-	    : "[-+]?[0-9]+";
-
+	my $o_valid = $type eq 'o' ? PAT_XINT : PAT_INT;
 	return $arg =~ /^$o_valid$/si;
     }
 
@@ -1193,7 +1251,8 @@ sub ValidValue ($$$$$) {
 	# We require at least one digit before a point or 'e',
 	# and at least one digit following the point and 'e'.
 	# [-]NN[.NN][eNN]
-	return $arg =~ /^[-+]?[0-9.]+(\.[0-9]+)?([eE][-+]?[0-9]+)?$/;
+	my $o_valid = PAT_FLOAT;
+	return $arg =~ /^$o_valid$/;
     }
     die("ValidValue: Cannot happen\n");
 }
@@ -1236,12 +1295,14 @@ sub Configure (@) {
 	}
 	elsif ( $try eq 'getopt_compat' ) {
 	    $getopt_compat = $action;
+            $genprefix = $action ? "(--|-|\\+)" : "(--|-)";
 	}
 	elsif ( $try eq 'gnu_getopt' ) {
 	    if ( $action ) {
 		$gnu_compat = 1;
 		$bundling = 1;
 		$getopt_compat = 0;
+                $genprefix = "(--|-)";
 		$order = $PERMUTE;
 	    }
 	}
@@ -1257,7 +1318,7 @@ sub Configure (@) {
 	elsif ( $try eq 'ignorecase' or $try eq 'ignore_case' ) {
 	    $ignorecase = $action;
 	}
-	elsif ( $try eq 'ignore_case_always' ) {
+	elsif ( $try eq 'ignorecase_always' or $try eq 'ignore_case_always' ) {
 	    $ignorecase = $action ? 2 : 0;
 	}
 	elsif ( $try eq 'bundling' ) {
@@ -1406,6 +1467,24 @@ sub VERSION {
     shift->SUPER::VERSION(@_);
 }
 
+package Getopt::Long::CallBack;
+
+sub new {
+    my ($pkg, %atts) = @_;
+    bless { %atts }, $pkg;
+}
+
+sub name {
+    my $self = shift;
+    ''.$self->{name};
+}
+
+use overload
+  # Treat this object as an oridinary string for legacy API.
+  '""'	   => \&name,
+  '0+'	   => sub { 0 },
+  fallback => 1;
+
 1;
 
 ################ Documentation ################
@@ -1477,12 +1556,15 @@ The C<+> form is now obsolete and strongly deprecated.
 
 =head1 Getting Started with Getopt::Long
 
-Getopt::Long is the Perl5 successor of C<newgetopt.pl>. This was
-the first Perl module that provided support for handling the new style
-of command line options, hence the name Getopt::Long. This module
-also supports single-character options and bundling. In this case, the
-options are restricted to alphabetic characters only, and the
-characters C<?> and C<->.
+Getopt::Long is the Perl5 successor of C<newgetopt.pl>. This was the
+first Perl module that provided support for handling the new style of
+command line options, hence the name Getopt::Long. This module also
+supports single-character options and bundling. Single character
+options may be any alphabetic character, a question mark, and a dash.
+Long options may consist of a series of letters, digits, and dashes.
+Although this is currently not enforced by Getopt::Long, multiple
+consecutive dashes are not allowed, and the option name must not end
+with a dash.
 
 To use Getopt::Long from a Perl program, you must include the
 following line in your Perl program:
@@ -1617,7 +1699,7 @@ destination:
 Used with the example above, C<@libfiles> (or C<@$libfiles>) would
 contain two strings upon completion: C<"lib/srdlib"> and
 C<"lib/extlib">, in that order. It is also possible to specify that
-only integer or floating point numbers are acceptible values.
+only integer or floating point numbers are acceptable values.
 
 Often it is useful to allow comma-separated lists of values as well as
 multiple occurrences of the options. This is easy using Perl's split()
@@ -1668,7 +1750,7 @@ When used with command line options:
 the hash C<%defines> (or C<%$defines>) will contain two keys, C<"os">
 with value C<"linux> and C<"vendor"> with value C<"redhat">. It is
 also possible to specify that only integer or floating point numbers
-are acceptible values. The keys are always taken to be strings.
+are acceptable values. The keys are always taken to be strings.
 
 =head2 User-defined subroutines to handle options
 
@@ -1698,7 +1780,7 @@ the desired error message as its argument. GetOptions() will catch the
 die(), issue the error message, and record that an error result must
 be returned upon completion.
 
-If the text of the error message starts with an exclamantion mark C<!>
+If the text of the error message starts with an exclamation mark C<!>
 it is interpreted specially by GetOptions(). There is currently one
 special command implemented: C<die("!FINISH")> will cause GetOptions()
 to stop processing options, as if it encountered a double dash C<-->.
@@ -1751,10 +1833,11 @@ The argument specification can be
 
 =item !
 
-The option does not take an argument and may be negated, i.e. prefixed
-by "no". E.g. C<"foo!"> will allow C<--foo> (a value of 1 will be
-assigned) and C<--nofoo> and C<--no-foo> (a value of 0 will be assigned). If the
-option has aliases, this applies to the aliases as well.
+The option does not take an argument and may be negated by prefixing
+it with "no" or "no-". E.g. C<"foo!"> will allow C<--foo> (a value of
+1 will be assigned) as well as C<--nofoo> and C<--no-foo> (a value of
+0 will be assigned). If the option has aliases, this applies to the
+aliases as well.
 
 Using negation on a single letter option when bundling is in effect is
 pointless and will result in a warning.
@@ -1903,18 +1986,58 @@ messages. For example:
 
     =head1 DESCRIPTION
 
-    B<This program> will read the given input file(s) and do someting
+    B<This program> will read the given input file(s) and do something
     useful with the contents thereof.
 
     =cut
 
 See L<Pod::Usage> for details.
 
-=head2 Storing options in a hash
+=head2 Parsing options from an arbitrary array
+
+By default, GetOptions parses the options that are present in the
+global array C<@ARGV>. A special entry C<GetOptionsFromArray> can be
+used to parse options from an arbitrary array.
+
+    use Getopt::Long qw(GetOptionsFromArray);
+    $ret = GetOptionsFromArray(\@myopts, ...);
+
+When used like this, the global C<@ARGV> is not touched at all.
+
+The following two calls behave identically:
+
+    $ret = GetOptions( ... );
+    $ret = GetOptionsFromArray(\@ARGV, ... );
+
+=head2 Parsing options from an arbitrary string
+
+A special entry C<GetOptionsFromString> can be used to parse options
+from an arbitrary string.
+
+    use Getopt::Long qw(GetOptionsFromString);
+    $ret = GetOptionsFromString($string, ...);
+
+The contents of the string are split into arguments using a call to
+C<Text::ParseWords::shellwords>. As with C<GetOptionsFromArray>, the
+global C<@ARGV> is not touched.
+
+It is possible that, upon completion, not all arguments in the string
+have been processed. C<GetOptionsFromString> will, when called in list
+context, return both the return status and an array reference to any
+remaining arguments:
+
+    ($ret, $args) = GetOptionsFromString($string, ... );
+
+If any arguments remain, and C<GetOptionsFromString> was not called in
+list context, a message will be given and C<GetOptionsFromString> will
+return failure.
+
+=head2 Storing options values in a hash
 
 Sometimes, for example when there are a lot of options, having a
 separate variable for each of them can be cumbersome. GetOptions()
-supports, as an alternative mechanism, storing options in a hash.
+supports, as an alternative mechanism, storing options values in a
+hash.
 
 To obtain this, a reference to a hash must be passed I<as the first
 argument> to GetOptions(). For each option that is specified on the
@@ -1975,7 +2098,7 @@ The first level of bundling can be enabled with:
 
 Configured this way, single-character options can be bundled but long
 options B<must> always start with a double dash C<--> to avoid
-abiguity. For example, when C<vax>, C<a>, C<v> and C<x> are all valid
+ambiguity. For example, when C<vax>, C<a>, C<v> and C<x> are all valid
 options,
 
     -vax
@@ -2128,7 +2251,7 @@ is equivalent to
     --foo --bar arg1 arg2 arg3
 
 If an argument callback routine is specified, C<@ARGV> will always be
-empty upon succesful return of GetOptions() since all options have been
+empty upon successful return of GetOptions() since all options have been
 processed. The only exception is when C<--> is used:
 
     --foo arg1 --bar arg2 -- arg3
@@ -2165,7 +2288,7 @@ auto_abbrev enabled, possible arguments and option settings are:
     -al, -la, -ala, -all,...     a, l
     --al, --all                  all
 
-The suprising part is that C<--a> sets option C<a> (due to auto
+The surprising part is that C<--a> sets option C<a> (due to auto
 completion), not C<all>.
 
 Note: disabling C<bundling> also disables C<bundling_override>.
@@ -2424,6 +2547,25 @@ configuring. Although manipulating these variables still work, it is
 strongly encouraged to use the C<Configure> routine that was introduced
 in version 2.17. Besides, it is much easier.
 
+=head1 Tips and Techniques
+
+=head2 Pushing multiple values in a hash option
+
+Sometimes you want to combine the best of hashes and arrays. For
+example, the command line:
+
+  --list add=first --list add=second --list add=third
+
+where each successive 'list add' option will push the value of add
+into array ref $list->{'add'}. The result would be like
+
+  $list->{add} = [qw(first second third)];
+
+This can be accomplished with a destination routine:
+
+  GetOptions('list=s%' =>
+               sub { push(@{$list{$_[1]}}, $_[2]) });
+
 =head1 Trouble Shooting
 
 =head2 GetOptions does not return a false result when an option is not supplied
@@ -2475,7 +2617,7 @@ Johan Vromans <jvromans@squirrel.nl>
 
 =head1 COPYRIGHT AND DISCLAIMER
 
-This program is Copyright 1990,2005 by Johan Vromans.
+This program is Copyright 1990,2007 by Johan Vromans.
 This program is free software; you can redistribute it and/or
 modify it under the terms of the Perl Artistic License or the
 GNU General Public License as published by the Free Software
