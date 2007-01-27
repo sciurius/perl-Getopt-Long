@@ -12,7 +12,11 @@ t/gol-linkage.t       Test user linkage
 t/gol-oo.t            Test OO interface
 t/gol-xargv.t         Test parsing from array
 t/gol-xstring.t       Test parsing from string
-examples/skel.pl      Skeleton program to use Getopt::Long
+examples/README       Explanation of skeleton programs
+examples/skel1.pl     Skeleton program to use Getopt::Long
+examples/skel2.pl     Skeleton program to use Getopt::Long
+examples/skel3.pl     Skeleton program to use Getopt::Long
+examples/skel4.pl     Skeleton program to use Getopt::Long
 examples/parsetime.pl Sample user handler for options
 perl-Getopt-Long.spec RPM spec file for (some) RedHat based systems
 META.yml              Meta information
