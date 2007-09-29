@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Jul 17 14:45:55 2006
-# Update Count    : 483
+# Last Modified On: Sun Sep 16 17:43:18 2007
+# Update Count    : 496
 # Status          : In progress
 
 ################ No args ################
@@ -427,8 +427,14 @@ A: -v2
 W: Option v2 requires an argument
 
 T: String opt (mandatory)
-A: --v2=
+A: --v2= foo
 W: Option v2 requires an argument
+
+T: String opt (mandatory)
+O: gnu_compat
+A: --v2= foo
+   $opt_v2 ""
+   @ARGV foo
 
 T: String opt (mandatory, multiple)
 P: a1=s@
@@ -2127,3 +2133,60 @@ T: Mandatory hash value
 P: foo=s% \\$v1
 A: --foo a=-b
    %$v1 a -b
+
+# From: "David Boyce" <dsb@boyski.com>
+# Subject: bug report for Getopt::Long (null required arguments)
+# Date: Fri, 2 Mar 2007 13:21:44 -0500
+
+T: Null required arguments
+P: v1=s
+A: --v1= xxx
+W: Option v1 requires an argument
+   $opt_v1 ""
+   @ARGV xxx
+
+T: Null required arguments
+P: v1=s
+A: --v1 "" xxx
+   $opt_v1 ""
+   @ARGV xxx
+
+T: Null required arguments
+P: v1:s
+A: --v1= xxx
+   $opt_v1 ""
+   @ARGV xxx
+
+T: Null required arguments
+P: v1:s
+A: --v1 "" xxx
+   $opt_v1 ""
+   @ARGV xxx
+
+O: gnu_compat
+
+T: Null required arguments
+P: v1=s
+A: --v1= xxx
+   $opt_v1 ""
+   @ARGV xxx
+
+T: Null required arguments
+P: v1=s
+A: --v1 "" xxx
+   $opt_v1 ""
+   @ARGV xxx
+
+T: Null required arguments
+P: v1:s
+A: --v1= xxx
+   $opt_v1 ""
+   @ARGV xxx
+
+T: Null required arguments
+P: v1:s
+A: --v1 "" xxx
+   $opt_v1 ""
+   @ARGV xxx
+
+O:
