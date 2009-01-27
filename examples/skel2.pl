@@ -6,8 +6,8 @@ my $RCS_Id = '$Id$ ';
 # Author          : Johan Vromans
 # Created On      : Sun Sep 15 18:39:01 1996
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Oct 22 15:29:44 1999
-# Update Count    : 18
+# Last Modified On: Tue Jan 27 15:58:13 2009
+# Update Count    : 19
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -59,6 +59,13 @@ sub app_options {
     my $ident = 0;		# handled locally
     my $man = 0;		# handled locally
 
+    my $pod2usage = sub {
+        # Load Pod::Usage only if needed.
+        require Pod::Usage;
+        Pod::Usage->import;
+        &pod2usage;
+    };
+
     # Process options.
     if ( @ARGV > 0 ) {
 	GetOptions('ident'	=> \$ident,
@@ -67,17 +74,14 @@ sub app_options {
 		   'help|?'	=> \$help,
 		   'man'	=> \$man,
 		   'debug'	=> \$debug)
-	  or pod2usage(2);
+	  or $pod2usage->(2);
     }
     if ( $ident or $help or $man ) {
 	print STDERR ("This is $my_package [$my_name $my_version]\n");
     }
     if ( $man or $help ) {
-	# Load Pod::Usage only if needed.
-	require "Pod/Usage.pm";
-	import Pod::Usage;
-	pod2usage(1) if $help;
-	pod2usage(VERBOSE => 2) if $man;
+	$pod2usage->(1) if $help;
+	$pod2usage->(VERBOSE => 2) if $man;
     }
 }
 
