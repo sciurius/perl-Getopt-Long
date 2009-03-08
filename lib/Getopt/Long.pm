@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Sep 29 15:38:55 2007
-# Update Count    : 1571
+# Last Modified On: Thu Oct  2 13:49:52 2008
+# Update Count    : 1599
 # Status          : Released
 
 ################ Copyright ################
@@ -35,10 +35,10 @@ use 5.004;
 use strict;
 
 use vars qw($VERSION);
-$VERSION        =  2.37;
+$VERSION        =  2.3703;
 # For testing versions only.
 use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.37";
+$VERSION_STRING = "2.37_03";
 
 use Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
@@ -46,8 +46,8 @@ use vars qw(@ISA @EXPORT @EXPORT_OK);
 
 # Exported subroutines.
 sub GetOptions(@);		# always
-sub GetOptionsFromArray($@);	# on demand
-sub GetOptionsFromString($@);	# on demand
+sub GetOptionsFromArray(@);	# on demand
+sub GetOptionsFromString(@);	# on demand
 sub Configure(@);		# on demand
 sub HelpMessage(@);		# on demand
 sub VersionMessage(@);		# in demand
@@ -205,7 +205,7 @@ sub getoptions {
 	# Locally set exception handler to default, otherwise it will
 	# be called implicitly here, and again explicitly when we try
 	# to deliver the messages.
-	local ($SIG{__DIE__}) = '__DEFAULT__';
+	local ($SIG{__DIE__}) = 'DEFAULT';
 	$ret = Getopt::Long::GetOptions (@_);
     };
 
@@ -271,7 +271,7 @@ sub GetOptions(@) {
     goto &GetOptionsFromArray;
 }
 
-sub GetOptionsFromString($@) {
+sub GetOptionsFromString(@) {
     my ($string) = shift;
     require Text::ParseWords;
     my $args = [ Text::ParseWords::shellwords($string) ];
@@ -285,7 +285,7 @@ sub GetOptionsFromString($@) {
     $ret;
 }
 
-sub GetOptionsFromArray($@) {
+sub GetOptionsFromArray(@) {
 
     my ($argv, @optionlist) = @_;	# local copy of the option descriptions
     my $argend = '--';		# option list terminator
@@ -460,6 +460,14 @@ sub GetOptionsFromArray($@) {
 		eval ("\$linkage{\$orig} = \\\$".$pkg."::opt_$ov;");
 	    }
 	}
+
+	if ( $opctl{$name}[CTL_TYPE] eq 'I'
+	     && ( $opctl{$name}[CTL_DEST] == CTL_DEST_ARRAY
+		  || $opctl{$name}[CTL_DEST] == CTL_DEST_HASH )
+	   ) {
+	    $error .= "Invalid option linkage for \"$opt\"\n";
+	}
+
     }
 
     # Bail out if errors found.
@@ -588,7 +596,7 @@ sub GetOptionsFromArray($@) {
 			    if $debug;
 			my $eval_error = do {
 			    local $@;
-			    local $SIG{__DIE__}  = '__DEFAULT__';
+			    local $SIG{__DIE__}  = 'DEFAULT';
 			    eval {
 				&{$linkage{$opt}}
 				  (Getopt::Long::CallBack->new
@@ -706,8 +714,17 @@ sub GetOptionsFromArray($@) {
 		  if $debug;
 		my $eval_error = do {
 		    local $@;
-		    local $SIG{__DIE__}  = '__DEFAULT__';
-		    eval { &$cb ($tryopt) };
+		    local $SIG{__DIE__}  = 'DEFAULT';
+		    eval {
+			&$cb
+			  (Getopt::Long::CallBack->new
+			   (name    => $tryopt,
+			    ctl     => $ctl,
+			    opctl   => \%opctl,
+			    linkage => \%linkage,
+			    prefix  => $prefix,
+			   ));
+		    };
 		    $@;
 		};
 		print STDERR ("=> die($eval_error)\n")
@@ -777,7 +794,7 @@ sub ParseOptionSpec ($$) {
 		     # Option name
 		     (?: \w+[-\w]* )
 		     # Alias names, or "?"
-		     (?: \| (?: \? | \w[-\w]* )? )*
+		     (?: \| (?: \? | \w[-\w]* ) )*
 		   )?
 		   (
 		     # Either modifiers ...
@@ -950,7 +967,7 @@ sub FindOption ($$$$$) {
     }
 
     # Try auto-abbreviation.
-    elsif ( $autoabbrev ) {
+    elsif ( $autoabbrev && $opt ne "" ) {
 	# Sort the possible long option names.
 	my @names = sort(keys (%$opctl));
 	# Downcase if allowed.
@@ -1016,7 +1033,12 @@ sub FindOption ($$$$$) {
 	    $opt = substr($opt,0,1);
             unshift (@$argv, $starter.$rest) if defined $rest;
 	}
-	warn ("Unknown option: ", $opt, "\n");
+	if ( $opt eq "" ) {
+	    warn ("Missing option after ", $starter, "\n");
+	}
+	else {
+	    warn ("Unknown option: ", $opt, "\n");
+	}
 	$error++;
 	return (1, undef);
     }
@@ -1481,9 +1503,8 @@ sub name {
 }
 
 use overload
-  # Treat this object as an oridinary string for legacy API.
+  # Treat this object as an ordinary string for legacy API.
   '""'	   => \&name,
-  '0+'	   => sub { 0 },
   fallback => 1;
 
 1;
@@ -1749,7 +1770,7 @@ When used with command line options:
     --define os=linux --define vendor=redhat
 
 the hash C<%defines> (or C<%$defines>) will contain two keys, C<"os">
-with value C<"linux> and C<"vendor"> with value C<"redhat">. It is
+with value C<"linux"> and C<"vendor"> with value C<"redhat">. It is
 also possible to specify that only integer or floating point numbers
 are acceptable values. The keys are always taken to be strings.
 
@@ -1760,7 +1781,8 @@ an option is encountered on the command line can be achieved by
 designating a reference to a subroutine (or an anonymous subroutine)
 as the option destination. When GetOptions() encounters the option, it
 will call the subroutine with two or three arguments. The first
-argument is the name of the option. For a scalar or array destination,
+argument is the name of the option. (Actually, it is an object that
+stringifies to the name of the option.) For a scalar or array destination,
 the second argument is the value to be stored. For a hash destination,
 the second arguments is the key to the hash, and the third argument
 the value to be stored. It is up to the subroutine to store the value,
@@ -1785,6 +1807,12 @@ If the text of the error message starts with an exclamation mark C<!>
 it is interpreted specially by GetOptions(). There is currently one
 special command implemented: C<die("!FINISH")> will cause GetOptions()
 to stop processing options, as if it encountered a double dash C<-->.
+
+In version 2.37 the first argument to the callback function was
+changed from string to object. This was done to make room for
+extensions and more detailed control. The object stringifies to the
+option name so this change should not introduce compatibility
+problems.
 
 =head2 Options with multiple names
 
@@ -2155,7 +2183,8 @@ it will set variable C<$stdio>.
 A special option 'name' C<< <> >> can be used to designate a subroutine
 to handle non-option arguments. When GetOptions() encounters an
 argument that does not look like an option, it will immediately call this
-subroutine and passes it one parameter: the argument name.
+subroutine and passes it one parameter: the argument name. Well, actually
+it is an object that stringifies to the argument name.
 
 For example:
 
@@ -2567,7 +2596,7 @@ This can be accomplished with a destination routine:
   GetOptions('list=s%' =>
                sub { push(@{$list{$_[1]}}, $_[2]) });
 
-=head1 Trouble Shooting
+=head1 Troubleshooting
 
 =head2 GetOptions does not return a false result when an option is not supplied
 
