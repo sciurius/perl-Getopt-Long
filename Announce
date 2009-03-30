@@ -1,5 +1,5 @@
-Version 2.34 of module Getopt::Long has been released to CPAN. It will
-be standard part of Perl 5.8.1 and 5.9.
+Version 2.38 of module Getopt::Long has been released to CPAN. It will
+be standard part of Perl versions 5.8.10 and 5.10.1.
 
 Module Getopt::Long implements an extended getopt function called
 GetOptions(). This function implements the POSIX standard for command
@@ -20,9 +20,16 @@ Alternatively, use a Web browser and point it to the CPAN search engine:
 Changes in this version
 -----------------------
 
-=== to be filled in; see CHANGES ===
+* Bugfix for Ticket 35759: First arg to callback function evaluates
+  to false when used in bool context.
 
-Previous released version was 2.33.
+* Fix problem with prototypes of GetOptionsFrom* functions.
+
+* Fix restoring default die handler.
+
+* Bugfix for Ticket 24941: Autoabbrev with + incorrect.
+
+Previous released version was 2.37.
 
 ---- README ----
 

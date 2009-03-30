@@ -6,27 +6,9 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Oct  2 13:49:52 2008
-# Update Count    : 1599
+# Last Modified On: Mon Mar 30 22:51:17 2009
+# Update Count    : 1601
 # Status          : Released
-
-################ Copyright ################
-
-# This program is Copyright 1990,2007 by Johan Vromans.
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the Perl Artistic License or the
-# GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any
-# later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# If you do not have a copy of the GNU General Public License write to
-# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge,
-# MA 02139, USA.
 
 ################ Module Preamble ################
 
@@ -35,10 +17,10 @@ use 5.004;
 use strict;
 
 use vars qw($VERSION);
-$VERSION        =  2.3703;
+$VERSION        =  2.38;
 # For testing versions only.
-use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.37_03";
+#use vars qw($VERSION_STRING);
+#$VERSION_STRING = "2.38";
 
 use Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
@@ -2647,7 +2629,7 @@ Johan Vromans <jvromans@squirrel.nl>
 
 =head1 COPYRIGHT AND DISCLAIMER
 
-This program is Copyright 1990,2007 by Johan Vromans.
+This program is Copyright 1990,2009 by Johan Vromans.
 This program is free software; you can redistribute it and/or
 modify it under the terms of the Perl Artistic License or the
 GNU General Public License as published by the Free Software
