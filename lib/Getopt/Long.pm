@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Mar 30 22:51:17 2009
-# Update Count    : 1601
+# Last Modified On: Wed Dec  2 11:56:11 2009
+# Update Count    : 1606
 # Status          : Released
 
 ################ Module Preamble ################
@@ -17,10 +17,10 @@ use 5.004;
 use strict;
 
 use vars qw($VERSION);
-$VERSION        =  2.38;
+$VERSION        =  2.3801;
 # For testing versions only.
-#use vars qw($VERSION_STRING);
-#$VERSION_STRING = "2.38";
+use vars qw($VERSION_STRING);
+$VERSION_STRING = "2.38_01";
 
 use Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
@@ -491,7 +491,7 @@ sub GetOptionsFromArray(@) {
 	print STDERR ("=> arg \"", $opt, "\"\n") if $debug;
 
 	# Double dash is option list terminator.
-	if ( $opt eq $argend ) {
+	if ( defined($opt) && $opt eq $argend ) {
 	  push (@ret, $argend) if $passthrough;
 	  last;
 	}
@@ -899,10 +899,11 @@ sub FindOption ($$$$$) {
 
     print STDERR ("=> find \"$opt\"\n") if $debug;
 
-    return (0) unless $opt =~ /^$prefix(.*)$/s;
+    return (0) unless defined($opt);
+    return (0) unless $opt =~ /^($prefix)(.*)$/s;
     return (0) if $opt eq "-" && !defined $opctl->{''};
 
-    $opt = $+;
+    $opt = substr( $opt, length($1) ); # retain taintedness
     my $starter = $1;
 
     print STDERR ("=> split \"$starter\"+\"$opt\"\n") if $debug;
@@ -913,10 +914,11 @@ sub FindOption ($$$$$) {
     # If it is a long option, it may include the value.
     # With getopt_compat, only if not bundling.
     if ( ($starter=~/^$longprefix$/
-          || ($getopt_compat && ($bundling == 0 || $bundling == 2)))
-	  && $opt =~ /^([^=]+)=(.*)$/s ) {
-	$opt = $1;
-	$optarg = $2;
+	  || ($getopt_compat && ($bundling == 0 || $bundling == 2)))
+	 && (my $oppos = index($opt, '=', 1)) > 0) {
+	my $optorg = $opt;
+	$opt = substr($optorg, 0, $oppos);
+	$optarg = substr($optorg, $oppos + 1); # retain tainedness
 	print STDERR ("=> option \"", $opt,
 		      "\", optarg = \"$optarg\"\n") if $debug;
     }
@@ -1503,9 +1505,10 @@ Getopt::Long - Extended processing of command line options
   my $data   = "file.dat";
   my $length = 24;
   my $verbose;
-  $result = GetOptions ("length=i" => \$length,    # numeric
-                        "file=s"   => \$data,      # string
-			"verbose"  => \$verbose);  # flag
+  GetOptions ("length=i" => \$length,    # numeric
+              "file=s"   => \$data,      # string
+              "verbose"  => \$verbose)   # flag
+  or die("Error in command line arguments\n");
 
 =head1 DESCRIPTION
 
