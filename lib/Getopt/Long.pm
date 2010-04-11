@@ -6,8 +6,8 @@ package Getopt::Long;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Dec  2 11:56:11 2009
-# Update Count    : 1606
+# Last Modified On: Sun Apr 11 14:22:38 2010
+# Update Count    : 1609
 # Status          : Released
 
 ################ Module Preamble ################
@@ -1565,13 +1565,13 @@ The C<+> form is now obsolete and strongly deprecated.
 
 Getopt::Long is the Perl5 successor of C<newgetopt.pl>. This was the
 first Perl module that provided support for handling the new style of
-command line options, hence the name Getopt::Long. This module also
-supports single-character options and bundling. Single character
-options may be any alphabetic character, a question mark, and a dash.
-Long options may consist of a series of letters, digits, and dashes.
-Although this is currently not enforced by Getopt::Long, multiple
-consecutive dashes are not allowed, and the option name must not end
-with a dash.
+command line options, in particular long option names, hence the Perl5
+name Getopt::Long. This module also supports single-character options
+and bundling. Single character options may be any alphabetic
+character, a question mark, and a dash. Long options may consist of a
+series of letters, digits, and dashes. Although this is currently not
+enforced by Getopt::Long, multiple consecutive dashes are not allowed,
+and the option name must not end with a dash.
 
 To use Getopt::Long from a Perl program, you must include the
 following line in your Perl program:
@@ -1735,7 +1735,7 @@ The destination for the option must be an array or array reference.
 
 It is also possible to specify the minimal and maximal number of
 arguments an option takes. C<foo=s{2,4}> indicates an option that
-takes at least two and at most 4 arguments. C<foo=s{,}> indicates one
+takes at least two and at most 4 arguments. C<foo=s{1,}> indicates one
 or more values; C<foo:s{,}> indicates zero or more option values.
 
 =head2 Options with hash values
@@ -2023,6 +2023,12 @@ The following two calls behave identically:
     $ret = GetOptions( ... );
     $ret = GetOptionsFromArray(\@ARGV, ... );
 
+This also means that a first argument hash reference now becomes the
+second argument:
+
+    $ret = GetOptions(\%opts, ... );
+    $ret = GetOptionsFromArray(\@ARGV, \%opts, ... );
+
 =head2 Parsing options from an arbitrary string
 
 A special entry C<GetOptionsFromString> can be used to parse options
@@ -2045,6 +2051,9 @@ remaining arguments:
 If any arguments remain, and C<GetOptionsFromString> was not called in
 list context, a message will be given and C<GetOptionsFromString> will
 return failure.
+
+As with GetOptionsFromArray, a first argument hash reference now
+becomes the second argument.
 
 =head2 Storing options values in a hash
 
