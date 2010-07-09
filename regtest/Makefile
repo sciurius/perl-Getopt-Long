@@ -1,10 +1,9 @@
 # Makefile -- Makefile for regression testst
-# RCS Info        : $Id$
 # Author          : Johan Vromans
 # Created On      : Fri May 12 11:13:53 2000
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Nov 16 14:16:45 2006
-# Update Count    : 13
+# Last Modified On: Fri Jul  9 14:26:01 2010
+# Update Count    : 19
 # Status          : Unknown, Use with caution!
 
 PERL	= perl -w -Mblib
@@ -20,5 +19,6 @@ kit:
 
 aux:
 	for test in aux*.pl; do \
-	  $(PERL) $$test || echo FAIL; \
+	  $(PERL) $$test || echo "FAILED: $$test"; \
 	done
+	perl -T -Mlib=../blib/lib taint01.pl -opt1 value1 -opt2=value2 || echo "FAILED: taint01.pl"

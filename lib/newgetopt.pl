@@ -1,4 +1,4 @@
-# $Id$
+# Id: newgetopt.pl,v 1.18 2001/09/21 13:34:59 jv
 
 # This library is no longer being maintained, and is included for backward
 # compatibility with Perl 4 programs which may require it.

@@ -1,32 +1,23 @@
 #!/usr/bin/perl -w
-my $RCS_Id = '$Id$ ';
 
-# Skeleton to test Getopt::Long.
-
-package MyTest;			# not main
-
+# Test driver for test Getopt::Long.
 # Author          : Johan Vromans
 # Created On      : Mon Aug  6 11:53:07 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Jul 18 23:13:31 2006
-# Update Count    : 447
+# Last Modified On: Fri Jul  9 14:37:49 2010
+# Update Count    : 453
 # Status          : Unknown, Use with caution!
+
+package MyTest;			# not main
 
 ################ Common stuff ################
 
 use strict;
 
-# Package or program libraries, if appropriate.
-# $LIBDIR = $ENV{'LIBDIR'} || '/usr/local/lib/sample';
-# use lib qw($LIBDIR);
-# require 'common.pl';
-
 # Package name.
 my $my_package = 'Sciurix';
 # Program name and version.
-my ($my_name, $my_version) = $RCS_Id =~ /: (.+).pl,v ([\d.]+)/;
-# Tack '*' if it is not checked in into RCS.
-$my_version .= '*' if length('$Locker$ ') > 12;
+my ($my_name, $my_version) = qw( driver1 1.15 );
 
 ################ Command line parameters ################
 
@@ -66,6 +57,7 @@ my $candump = 0;
 eval { require Data::Dumper;
        $candump = 1;
        $Data::Dumper::Indent = 1;
+       $Data::Dumper::Indent = 1; # no warning
 };
 use Text::ParseWords;
 
@@ -645,6 +637,11 @@ sub vfy_array {
 }
 
 sub cb1 {
+    # EXPERIMENTAL. The first arg to <> cannot be the CallBack object
+    # since it may be passed to other modules that get confused (e.g.,
+    # Archive::Tar).
+    # Pass it as second arg instead.
+    pop if UNIVERSAL::isa($_[-1], 'Getopt::Long::CallBack');
     if ( @_ == 1 ) {
 	$v1 = 'x';
     }

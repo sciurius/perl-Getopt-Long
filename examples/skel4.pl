@@ -1,24 +1,18 @@
 #!/usr/bin/perl
-my $RCS_Id = '$Id$ ';
 
-# Skeleton for a Getopt::Long application.
+# Skeleton for an application using Getopt::Long.
 
 # Author          : Johan Vromans
 # Created On      : Tue Sep 15 15:59:04 1992
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Jul 19 13:44:04 2006
-# Update Count    : 82
+# Last Modified On: Fri Jul  9 14:31:06 2010
+# Update Count    : 83
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
 
 use strict;
 use warnings;
-
-# Package or program libraries, if appropriate.
-# $LIBDIR = $ENV{'LIBDIR'} || '/usr/share/lib/sample';
-# use lib qw($LIBDIR);
-# require 'common.pl';
 
 ################ Setup  ################
 
@@ -57,9 +51,7 @@ sub app_setup {
     # Package name.
     $my_package = 'Sciurix';
     # Program name and version.
-    ($my_name, $my_version) = $RCS_Id =~ /: (.+).pl,v ([\d.]+)/;
-    # Tack '*' if it is not checked in into RCS.
-    $my_version .= '*' if length('$Locker$ ') > 12;
+    ($my_name, $my_version) = qw( MyProg 0.01 );
 
     my $options =
       {

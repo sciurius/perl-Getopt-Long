@@ -1,4 +1,10 @@
-# $Id$
+# Makefile.PL -- Makefile generator for Getopt::Long
+# Author          : Johan Vromans
+# Created On      : Sat Mar 16 11:43:21 1996
+# Last Modified By: Johan Vromans
+# Last Modified On: Fri Jul  9 14:23:45 2010
+# Update Count    : 112
+# Status          : Unknown, Use with caution!
 
 use Config;
 use ExtUtils::MakeMaker 5.0;

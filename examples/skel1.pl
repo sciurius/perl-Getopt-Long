@@ -1,13 +1,12 @@
 #!/usr/bin/perl -w
-my $RCS_Id = '$Id$ ';
 
-# Skeleton for Getopt::Long.
+# Skeleton for an application using Getopt::Long.
 
 # Author          : Johan Vromans
 # Created On      : Tue Sep 15 15:59:04 1992
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Oct 22 15:29:52 1999
-# Update Count    : 42
+# Last Modified On: Fri Jul  9 14:28:48 2010
+# Update Count    : 43
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -22,9 +21,7 @@ use strict;
 # Package name.
 my $my_package = 'Sciurix';
 # Program name and version.
-my ($my_name, $my_version) = $RCS_Id =~ /: (.+).pl,v ([\d.]+)/;
-# Tack '*' if it is not checked in into RCS.
-$my_version .= '*' if length('$Locker$ ') > 12;
+my ($my_name, $my_version) = qw( MyProg 0.01 );
 
 ################ Command line parameters ################
 

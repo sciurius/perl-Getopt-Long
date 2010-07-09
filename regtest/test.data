@@ -1,10 +1,9 @@
 # test.data -- regression tests for Getopt::Long
-# RCS Info        : $Id$
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Sep  7 21:20:32 2008
-# Update Count    : 500
+# Last Modified On: Fri Jul  9 14:25:49 2010
+# Update Count    : 501
 # Status          : In progress
 
 ################ No args ################

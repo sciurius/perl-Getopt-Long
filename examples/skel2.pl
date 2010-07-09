@@ -1,30 +1,21 @@
 #!/usr/bin/perl -w
-my $RCS_Id = '$Id$ ';
-
-# Skeleton for Getopt::Long with Pod::Parser.
+# Skeleton for an application using Getopt::Long with Pod::Parser.
 
 # Author          : Johan Vromans
 # Created On      : Sun Sep 15 18:39:01 1996
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Jan 27 15:58:13 2009
-# Update Count    : 19
+# Last Modified On: Fri Jul  9 14:29:41 2010
+# Update Count    : 20
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
 
 use strict;
 
-# Package or program libraries, if appropriate.
-# $LIBDIR = $ENV{'LIBDIR'} || '/usr/local/lib/sample';
-# use lib qw($LIBDIR);
-# require 'common.pl';
-
 # Package name.
 my $my_package = 'Sciurix';
 # Program name and version.
-my ($my_name, $my_version) = $RCS_Id =~ /: (.+).pl,v ([\d.]+)/;
-# Tack '*' if it is not checked in into RCS.
-$my_version .= '*' if length('$Locker$ ') > 12;
+my ($my_name, $my_version) = qw( MyProg 0.01 );
 
 ################ Command line parameters ################
 
