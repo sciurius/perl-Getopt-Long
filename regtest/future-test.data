@@ -1,0 +1,269 @@
+# testw.data -- regression tests for Getopt::Long
+# RCS Info        : $Id: test.data,v 1.7 2001-09-22 17:38:02+02 jv Exp jv $
+# Author          : Johan Vromans
+# Created On      : Thu Sep 27 21:09:02 2001
+# Last Modified By: Johan Vromans
+# Last Modified On: Sat Sep 29 22:08:05 2001
+# Update Count    : 59
+# Status          : In progress
+
+################ Value Lists ################
+
+################ Integer Value Lists ################
+
+P: xx=i(1) \\$v1
+
+T: Integer Value Lists
+A: -xx 1 foo
+   $v1 1
+   @ARGV foo
+
+T: Integer Value Lists
+A: -xx 2 foo
+W: Value "2" invalid for option xx (expecting 1)
+
+P: xx=i(1,2,3) \\$v1
+
+T: Integer Value Lists
+A: -xx 1 foo
+   $v1 1
+   @ARGV foo
+
+T: Integer Value Lists
+A: -xx 2 foo
+   $v1 2
+   @ARGV foo
+
+T: Integer Value Lists
+A: -xx 3 foo
+   $v1 3
+   @ARGV foo
+
+T: Integer Value Lists
+A: -xx 4 foo
+W: Value "4" invalid for option xx (expecting 1,2,3)
+
+P: xx=i(1..3) \\$v1
+
+T: Integer Value Lists
+A: -xx 0 foo
+W: Value "0" invalid for option xx (expecting 1..3)
+
+T: Integer Value Lists
+A: -xx 1 foo
+   $v1 1
+   @ARGV foo
+
+T: Integer Value Lists
+A: -xx 2 foo
+   $v1 2
+   @ARGV foo
+
+T: Integer Value Lists
+A: -xx 3 foo
+   $v1 3
+   @ARGV foo
+
+T: Integer Value Lists
+A: -xx 4 foo
+W: Value "4" invalid for option xx (expecting 1..3)
+
+P:
+
+T: Integer Value Lists
+P: xx=i(1..X)
+A: -xx 4 foo
+E: Invalid value list item (1..X) for option xx
+
+T: Integer Value Lists - type dependent interpretation
+P: xx=i(0x1..0x3)
+A: -xx 4 foo
+E: Invalid value list item (0x1..0x3) for option xx
+
+T: Integer Value Lists - type dependent interpretation
+P: xx=o(0x1..0x3) \\$v1
+A: -xx 3 foo
+   $v1 3
+   @ARGV foo
+
+T: Integer Value Lists - type dependent interpretation
+P: xx=o(0x1..0x3) \\$v1
+A: -xx 4 foo
+W: Value "4" invalid for option xx (expecting 0x1..0x3)
+
+T: Integer Value Lists - type dependent interpretation
+P: xx=i(01..010) \\$v1
+A: -xx 10 foo
+   $v1 10
+   @ARGV foo
+
+T: Integer Value Lists - type dependent interpretation
+P: xx=o(01..010) \\$v1
+A: -xx 10 foo
+W: Value "10" invalid for option xx (expecting 01..010)
+
+T: Integer Value Lists - rejected value w/ pass_through
+O: pass_through
+P: xx=o(01..010) \\$v1
+A: -xx 10 foo
+   @ARGV -xx 10 foo
+
+################ Float Value Lists ################
+
+# Floats do not take value lists...
+
+T: Float Value Lists
+P: xx=f(1.1)
+A: -xx 1.1 foo
+E: Error in option spec: "xx=f(1.1)"
+
+# T: Float Value Lists
+# P: xx=f(1.1)
+# A: -xx 1.1 foo
+# E: Invalid value list item (1.1) for option xx
+# 
+# T: Float Value Lists
+# P: xx=f(1.1,2.2,3.3)
+# A: -xx 1.1 foo
+# E: Invalid value list item (1.1) for option xx
+# E: Invalid value list item (2.2) for option xx
+# E: Invalid value list item (3.3) for option xx
+# 
+# P: xx=f(2.1..2.3) \\$v1
+# 
+# T: Float Value Lists
+# A: -xx 0 foo
+# W: Value "0" invalid for option xx (expecting 2.1..2.3)
+# 
+# T: Float Value Lists
+# A: -xx 2.1 foo
+#    $v1 2.1
+#    @ARGV foo
+# 
+# T: Float Value Lists
+# A: -xx 2.2 foo
+#    $v1 2.2
+#    @ARGV foo
+# 
+# T: Float Value Lists
+# A: -xx 2.3 foo
+#    $v1 2.3
+#    @ARGV foo
+# 
+# T: Float Value Lists
+# A: -xx 2.31 foo
+# W: Value "2.31" invalid for option xx (expecting 2.1..2.3)
+
+################ String Value Lists ################
+
+P: xx=s(abc) \\$v1
+
+T: String Value Lists
+A: -xx abc foo
+   $v1 abc
+   @ARGV foo
+
+T: String Value Lists
+A: -xx pqr foo
+W: Value "pqr" invalid for option xx (expecting abc)
+
+P: xx=s(abc,def,ghi) \\$v1
+
+T: String Value Lists
+A: -xx abc foo
+   $v1 abc
+   @ARGV foo
+
+T: String Value Lists
+A: -xx ghi foo
+   $v1 ghi
+   @ARGV foo
+
+T: String Value Lists
+A: -xx def foo
+   $v1 def
+   @ARGV foo
+
+T: String Value Lists
+A: -xx pqr foo
+W: Value "pqr" invalid for option xx (expecting abc,def,ghi)
+
+P: xx=s(abc,def..deh,ghi) \\$v1
+
+T: String Value Lists
+A: -xx abc foo
+   $v1 abc
+   @ARGV foo
+
+T: String Value Lists
+A: -xx ghi foo
+   $v1 ghi
+   @ARGV foo
+
+T: String Value Lists
+A: -xx def foo
+   $v1 def
+   @ARGV foo
+
+T: String Value Lists
+A: -xx deg foo
+   $v1 deg
+   @ARGV foo
+
+T: String Value Lists
+A: -xx deh foo
+   $v1 deh
+   @ARGV foo
+
+T: String Value Lists
+P: xx|z=s(abc,def..deh,ghi) \\$v1
+O: bundling
+A: -zdeh foo
+   $v1 deh
+   @ARGV foo
+
+T: String Value Lists & bundling
+P: xx|z:s(abc,def..deh,ghi) \\$v1
+O: bundling
+A: -zdeh foo
+   $v1 deh
+   @ARGV foo
+
+T: String Value Lists
+A: -xx dei foo
+W: Value "dei" invalid for option xx (expecting abc,def..deh,ghi)
+
+T: String Value Lists -- rejected value w/ pass_through
+O: pass_through
+A: -xx dei foo
+   @ARGV -xx dei foo
+
+T: String Value Lists -- rejected value w/ pass_through
+O: pass_through
+A: -xx=dei foo
+   @ARGV -xx=dei foo
+
+P: xx:s(abc,def..deh,ghi) \\$v1
+
+T: String Value Lists -- rejected value w/ optional argument
+A: -xx=dei foo
+W: Value "dei" invalid for option xx (expecting abc,def..deh,ghi)
+
+T: String Value Lists -- rejected value w/ optional argument
+A: -xx dei foo
+   @ARGV dei foo
+   $v1 ""
+
+T: String Value Lists -- rejected value w/ optional argument
+A: -xx -xx abc foo
+   @ARGV foo
+   $v1 abc
+
+T: String Value Lists -- rejected value w/ optional argument & bundling
+P: xx|z:s(abc,def..deh,ghi) \\$v1
+O: bundling
+A: -zdei foo
+W: Unknown option: dei
+
+
+
