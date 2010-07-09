@@ -1,26 +1,26 @@
+#! perl
+
 # Getopt::Long.pm -- Universal options parsing
-
-package Getopt::Long;
-
-# RCS Status      : $Id$
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Apr 11 14:22:38 2010
-# Update Count    : 1609
+# Last Modified On: Fri Jul  9 14:47:45 2010
+# Update Count    : 1618
 # Status          : Released
 
 ################ Module Preamble ################
+
+package Getopt::Long;
 
 use 5.004;
 
 use strict;
 
 use vars qw($VERSION);
-$VERSION        =  2.3801;
+$VERSION        =  2.3802;
 # For testing versions only.
 use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.38_01";
+$VERSION_STRING = "2.38_02";
 
 use Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
@@ -286,8 +286,7 @@ sub GetOptionsFromArray(@) {
 	# Avoid some warnings if debugging.
 	local ($^W) = 0;
 	print STDERR
-	  ("Getopt::Long $Getopt::Long::VERSION (",
-	   '$Revision$', ") ",
+	  ("Getopt::Long $Getopt::Long::VERSION ",
 	   "called from package \"$pkg\".",
 	   "\n  ",
 	   "argv: (@$argv)",
@@ -698,14 +697,11 @@ sub GetOptionsFromArray(@) {
 		    local $@;
 		    local $SIG{__DIE__}  = 'DEFAULT';
 		    eval {
-			&$cb
-			  (Getopt::Long::CallBack->new
-			   (name    => $tryopt,
-			    ctl     => $ctl,
-			    opctl   => \%opctl,
-			    linkage => \%linkage,
-			    prefix  => $prefix,
-			   ));
+			# The arg to <> cannot be the CallBack object
+			# since it may be passed to other modules that
+			# get confused (e.g., Archive::Tar). Well,
+			# it's not relevant for this callback anyway.
+			&$cb($tryopt);
 		    };
 		    $@;
 		};
@@ -1940,7 +1936,7 @@ option will be incremented.
 Getopt::Long can be used in an object oriented way as well:
 
     use Getopt::Long;
-    $p = new Getopt::Long::Parser;
+    $p = Getopt::Long::Parser->new;
     $p->configure(...configuration options...);
     if ($p->getoptions(...options descriptions...)) ...
 
@@ -1968,7 +1964,7 @@ messages. For example:
 
     GetOptions('help|?' => \$help, man => \$man) or pod2usage(2);
     pod2usage(1) if $help;
-    pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+    pod2usage(-exitval => 0, -verbose => 2) if $man;
 
     __END__
 
@@ -2641,7 +2637,7 @@ Johan Vromans <jvromans@squirrel.nl>
 
 =head1 COPYRIGHT AND DISCLAIMER
 
-This program is Copyright 1990,2009 by Johan Vromans.
+This program is Copyright 1990,2010 by Johan Vromans.
 This program is free software; you can redistribute it and/or
 modify it under the terms of the Perl Artistic License or the
 GNU General Public License as published by the Free Software

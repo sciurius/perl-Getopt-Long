@@ -1,3 +1,28 @@
+Changes in version 2.39
+-----------------------
+
+* Fix unneccessary warnings when @ARGV contains undefs (yes, it
+  happens).
+
+* Passing an object as first argument to the callback handler for <>
+  turned out to be a problem in cases where the argument was passed to
+  other modules, e.g., Archive::Tar. Revert the change since the added
+  functionality of the object is not really relevant for the <>
+  callback function.
+
+* Silence the deprecation warnings from newgetopt.pl for the purpose
+  of testing. These tests will be removed along with newgetopt.pl in
+  the next major release of perl.
+  http://perl5.git.perl.org/perl.git/commit/b814bbfa9a2087bc
+
+* Eliminiate spurious warning.
+
+* Retain taintedness of command line option values.
+
+* Document that you need to check GetOptions return value :).
+
+* Several other minor documentation fixes and enhancements.
+
 Changes in version 2.38
 -----------------------
 
@@ -9,6 +34,9 @@ Changes in version 2.38
 * Fix restoring default die handler.
 
 * Bugfix for Ticket 24941: Autoabbrev with + incorrect.
+
+* Bugfix: Reject syntax 'foo|!' for option spec. This was illegal
+  anyway.
 
 Changes in version 2.37
 -----------------------
