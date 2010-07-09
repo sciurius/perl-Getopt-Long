@@ -1,0 +1,777 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<TITLE>Unix command line 101: How much do you know?</TITLE>
+<META NAME="description" content="Unix command line 101: How much do you know?">
+<META NAME="keywords" content="arguments, options,  Unix, Korn Shell, getopts, metacharacter, command line, shell programming, cat, pipe, progname">
+<META NAME="author" content="Mo Budlong">
+<META NAME="date" content="Fri Oct 1 00:01:00 GMT 1999">
+<META NAME="live" content="yes">
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" ALINK="#FF0000" VLINK="#551a8b">
+
+
+<TABLE BORDER="0" CELLPADDING="2" CELLSPACING="0" WIDTH="100%" BGCOLOR="#003399">
+<TR>
+<TD ALIGN="CENTER">
+
+<TABLE CELLPADDING="8" CELLSPACING="0" BORDER="0">
+<TR>
+<TD>
+<FONT COLOR="#CCCCCC" SIZE="-1">Advertisement: Support SunWorld, click here!</FONT><BR>
+<A href="http://ad.doubleclick.net/jump/idg.sw.com/archives;sz=468x60"><IMG src="http://ad.doubleclick.net/ad/idg.sw.com/archives;sz=468x60" vspace="5" border="0" height="60" width="468"></A>
+<BR CLEAR="ALL">
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+<TR>
+<TD ALIGN="CENTER">
+
+<TABLE BORDER="0" CELLPADDING="5" WIDTH="100%" CELLSPACING="0">
+<TR>
+
+<TD ALIGN="CENTER" VALIGN="TOP" BGCOLOR="#FFFFFF">
+<a href="/index.html"><IMG SRC="/sunworldonline/icons-rd/swlogo-35.gif" WIDTH="154" HEIGHT="35" BORDER="0"></A>
+<BR>
+<FONT SIZE="-1" FACE="Arial,Helvetica,Sans-serif">
+October 1999
+<P>
+
+<TABLE WIDTH="125" CELLSPACING="0" CELLPADDING="2" BORDER="0">
+
+<TR>
+<TD ALIGN="CENTER"><A HREF="/sunworldonline/home.html"><IMG SRC="/sunworldonline/icons-rd/sw-house.gif" WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"></A></TD>
+<TD>
+<FONT FACE="Arial,Helvetica,Sans-serif">
+<A HREF="/sunworldonline/home.html">Home</A>
+</FONT>
+</TD>
+</TR>
+<TR>
+<TD ALIGN="CENTER">&nbsp;<A HREF="/swol-10-1999/swol-10-tarantella.html"><IMG SRC="/sunworldonline/icons-rd/sw-arrow.gif" WIDTH="14" HEIGHT="13" BORDER="0"></A>
+</TD>
+<TD>
+<FONT FACE="Arial,Helvetica,Sans-serif">
+<A HREF="/swol-10-1999/swol-10-tarantella.html">Next Story</A>
+</FONT>
+</TD>
+</TR>
+<TR>
+<TD ALIGN="CENTER"><A HREF="/sunworldonline/cgi-bin/swol-mailToFriend.cgi?head=Unix%20command%20line%20101%3A%20How%20much%20do%20you%20know%3F&author=Mo%20Budlong&summary=Arguments%20and%20options%20are%20those%20mysterious%20little%20nuggets%20preceded%20by%20minus%20signs%2C%20file%20names%2C%20and%20other%20Unix%20arcana%20that%20appear%20on%20a%20command%20line%20following%20the%20command%20to%20be%20executed.%20This%20month%20Mo%20unveils%20the%20power%20of%20these%20commands%2C%20but%20not%20before%20he%20breaks%20it%20down%20with%20an%20examination%20of%20the%20Unix%20command%20line%20itself.%20%3Cem%3E%282%2C600%20words%29%3C%2Fem%3E%0A"><IMG SRC="/sunworldonline/icons-rd/sw-envelope.gif" WIDTH="14" HEIGHT="9" BORDER="0"></A></TD>
+<TD>
+<FONT FACE="Arial,Helvetica,Sans-serif">
+<A HREF="/sunworldonline/cgi-bin/swol-mailToFriend.cgi?head=Unix%20command%20line%20101%3A%20How%20much%20do%20you%20know%3F&author=Mo%20Budlong&summary=Arguments%20and%20options%20are%20those%20mysterious%20little%20nuggets%20preceded%20by%20minus%20signs%2C%20file%20names%2C%20and%20other%20Unix%20arcana%20that%20appear%20on%20a%20command%20line%20following%20the%20command%20to%20be%20executed.%20This%20month%20Mo%20unveils%20the%20power%20of%20these%20commands%2C%20but%20not%20before%20he%20breaks%20it%20down%20with%20an%20examination%20of%20the%20Unix%20command%20line%20itself.%20%3Cem%3E%282%2C600%20words%29%3C%2Fem%3E%0A">Mail&nbsp;this&nbsp;Article</A>
+</FONT>
+</TD>
+</TR>
+
+</TABLE>
+</FONT>
+</TD>
+
+<TD VALIGN="TOP" BGCOLOR="#FFFFFF">
+<FONT FACE="Arial,Helvetica,Sans-serif">
+<FORM ACTION="http://search.sunworld.com/query.html" METHOD="GET" name="seek">
+<strong>Search</strong>
+<TABLE BORDER="0" CELLPADDING="0">
+<TR>
+<TD>
+<INPUT TYPE="HIDDEN" NAME="col" SIZE="-1" VALUE="sw"> 
+<!-- This is the text box for search terms -->
+<!--See above--> 
+<INPUT TYPE="TEXT" NAME="qt" SIZE="10" MAXLENGTH="2047">
+</TD>
+<TD>&#160;<INPUT TYPE="IMAGE" SRC="/sunworldonline/icons-rd/go.gif" WIDTH="27" HEIGHT="22" ALIGN="BOTTOM" BORDER="0"></TD>
+</TR>
+</TABLE>
+<A HREF="/sunworldonline/common/swol-siteindex.html">Topical Index</A><BR>
+<A HREF="/common/swol-backissues.html">Backissues</A><BR>
+<A HREF="/sunworldonline/sunwhere.html">SunWHERE</A>
+</FORM>
+</FONT>
+</TD>
+
+<TD VALIGN="TOP" BGCOLOR="#FFFFFF">
+<FONT FACE="Arial,Helvetica,Sans-serif">
+<A HREF="/sunworldonline/subscribe.html">Subscribe, It's Free</A><BR>
+<A HREF="/sunworldonline/swol-09-1999/swol-09-letters.html">Letters to the Editor</A><BR>
+<A HREF="/sunworldonline/common/swol-calendar.html">Events Calendar</A><BR>
+<A HREF="http://www.techdispatch.com">TechDispatch Newsletters</A>
+</FONT>
+</TD>
+
+<TD VALIGN="TOP" BGCOLOR="#FFFFFF">
+<FONT FACE="Arial,Helvetica,Sans-serif">
+<strong>Technical FAQs</strong><BR>
+<A HREF="/sunworldonline/common/security-faq.html">Solaris Security</A><BR>
+<A HREF="/sunworldonline/swol-08-1998/swol-08-security.html">Secure Programming</A><BR>
+<A HREF="/sunworldonline/common/cockcroft.letters.html">Performance&#160;Q&amp;A</A><BR>
+<A HREF="/sunworldonline/swol-01-1998/swol-01-perf.html">SE Toolkit</A>
+</FONT>
+</TD>
+
+</TR>
+</TABLE>
+
+</TD>
+</TR>
+</TABLE>
+
+<BR>
+
+
+<H1 ALIGN="CENTER">
+Unix command line 101: How much do you know?
+</H1>
+
+<H3 ALIGN="CENTER">
+Arguments and options on the half-shell
+</H3>
+
+<BLOCKQUOTE>
+<STRONG>Summary</STRONG><BR>
+Arguments and options are those mysterious little nuggets preceded by minus signs, file names, and other Unix arcana that appear on a command line following the command to be executed. This month Mo unveils the power of these commands, but not before he breaks it down with an examination of the Unix command line itself. <em>(2,600 words)</em>
+
+</BLOCKQUOTE>
+
+<P>
+<HR NOSHADE>
+<P>
+
+<TABLE ALIGN="RIGHT" BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR>
+<TD ROWSPAN="3">&nbsp;</TD>
+<TD VALIGN="BOTTOM" ALIGN="CENTER">
+<FONT FACE="Arial,Helvetica,Sans-serif" COLOR="#003399" SIZE="+1">
+<STRONG>UNIX 101</STRONG></FONT>
+</TD>
+<TD ROWSPAN="3">&nbsp;</TD>
+</TR>
+<TR><TD><HR></TD></TR>
+<TR>
+<TD VALIGN="TOP" ALIGN="CENTER"><FONT FACE="Arial,Helvetica,Sans-serif" COLOR="#003399">By Mo Budlong</STRONG></FONT></TD>
+</TR>
+</TABLE>
+<!-- begin body text -->
+<IMG ALIGN="LEFT" width="30" height="28" SRC="/sunworldonline/abcs/A.gif" AL
+T="A"> Unix command line is a sequence of characters in the syntax of the
+target shell language. Of the characters found there, some are known as metacharacters, which have a special meaning to the shell. The
+metacharacters in the Korn shell are:
+<P>
+<ul>
+<li><strong><code>;</code></strong> Separates multiple commands on a command line
+<li><strong><code>&</code></strong> Causes the preceding command to execute synchronously (i.e., at the same time as the next command on the command line)
+<li><strong><code>()</code></strong> Launches commands enclosed in parentheses in a separate shell
+<li><strong><code>|</code></strong> Pipes the output of the command to the left of the pipe to the input of the command on the right of the pipe
+<li><strong><code>&gt;</code></strong> Redirects output to a file or device
+<li><strong><code>&lt;</code></strong> Redirects input from a file or device
+<li><strong>Newline</strong> Ends a command or set of commands
+<li><strong>Space</strong> Separator between command words
+<li><strong>Tab</strong> Separator between command words
+</ul>
+<P>
+(<strong>Note:</strong> Some of these metacharacters can be used in
+combinations, such as <code>||</code> and <code>&&</code>. Consult your manual for a complete
+description.)
+<P>
+With these metacharacters in mind, you can define a <em>command line
+word</em> -- a sequence of characters separated by one or more
+nonquoted metacharacters. In the following example, the <code>passwd</code> file
+is piped through the <code>cut</code> program, and fields 1 and 3 are output based on a colon
+delimiter.
+<P>
+In the following command line,
+<P>
+<pre>
+cat /etc/passwd|cut -d ":" -f 1,3 &gt;usruid.txt
+</pre>
+<P>
+the words are:
+<P>
+<pre>
+cat
+/etc/passwd
+cut
+-d
+":"
+-f
+1,3
+usruid.txt
+</pre>
+<P>
+Note that the metacharacters <code>|</code>, <code>&gt;</code>, and the space have been removed, and
+that the metacharacters <code>&</code>, <code>|</code>, <code>()</code>, <code>;</code>, and the newline are used to separate or
+terminate multiple commands within a command line.
+<P>
+In our example command line, there are two commands separated by
+the pipe (<code>|</code>) symbol:
+<P>
+<pre>
+cat /etc/passwd
+</pre>
+<P>
+and
+<P>
+<pre>
+cut -d ":" -f 1,3
+</pre>
+<P>
+The final portion of the command line -- <code>&gt;usruid.txt</code> -- could be
+thought of as the command "and output the result to <code>usruid.txt</code>,"
+although redirection is not usually considered part of a command.
+<P>
+When a command executes a Unix program, utility, or shell script,
+it's usual for the command to include arguments. In the example
+above, the argument to <code>cat</code> is <code>/etc/passwd</code>. The arguments to <code>cut</code> are
+<code>-d</code>, <code>":"</code>, <code>-f</code>, and <code>(1,3)</code>.
+<P>
+In general, arguments are all the words (note the definition of word
+above) that follow an executable program name in a command.
+Arguments within a command are separated from one another by spaces
+or tabs (metacharacters). Most Unix programs were written with
+standards for the arrangement of arguments and options.
+<P>
+<em>Options</em> are the letters or numbers that follow a minus sign.  A
+simple example of arguments and options would be the use of the <code>cat</code>
+command:
+<P>
+<pre>
+cat -v -e -t doodah.txt
+</pre>
+<P>
+In the above example, the arguments are <code>-v</code>, <code>-e</code>, <code>-t</code>, and <code>doodah.txt</code>,
+while the options are the entries for <code>-v</code>, <code>-e</code>, and <code>-t</code>. The <code>-v</code> option
+asks <code>cat</code> to display all characters, even nonprintable ones; the <code>-e</code>
+option specifies that the end of a line will be displayed as <code>$</code>; and the
+<code>-t</code> option specifies that a tab should be displayed as <code>^I</code> instead of
+expanding the tab into spaces on the screen.
+<P>
+Unfortunately, no standard terminology has been developed to
+differentiate an option from a nonoption argument, which is all the
+more confusing when one considers that an option can itself have an
+argument. In the first example using <code>cut</code>, the <code>-d</code> option has an
+option argument of <code>":"</code>, and the <code>-f</code> option has an option argument of
+<code>(1,3)</code>. In order to clarify these, various manuals have adopted
+standards for naming conventions for the parts of a Unix command.
+The following examples illustrate the parts:
+<P>
+<pre>
+cat -v -e -t doodah.txt
+</pre>
+<P>
+<pre>
+cat /etc/passwd|cut -d ":" -f 1,3 &gt;usruid.txt
+</pre>
+<P>
+The program name itself, <code>cat</code> in the first example and <code>cat</code> and
+<code>cut</code> in the second, is variously called the <em>name,</em> <em>progname,</em> <em>executable,</em> or
+<em>program-name.</em> The nonoption arguments to a command, <code>doodah.txt</code> in
+the first example and <code>/etc/passwd</code> in the second, is called an
+<em>operand</em> or <em>cmdarg.</em>
+<P>
+The options <code>-v</code>,<code>-e</code>, and <code>-t</code> in the first example, and <code>-d</code> and <code>-f</code> in
+the second, are called <em>options,</em> <em>opts,</em> or <em>switches.</em> The arguments to
+options, <code>":"</code> and <code>(1,3)</code> in the second example are called
+<em>option-arguments,</em> or <em>optargs.</em>
+<P>
+The standards used in creating Unix executables are:
+<P>
+<oL>
+<LI>Command names must be between two and nine characters long
+<P>
+<LI>Command names must include only lowercase letters and digits
+<P>
+<LI>Option names (options above) must be only one character long
+<P>
+<LI>All options must be preceded by <code>-</code>
+<P>
+<LI>Options with no arguments may be grouped  after a single
+<code>-</code> (e.g., <code>-v -e -t</code> could also be written as <code>-vet</code>)
+<P>
+<LI>The first option-argument following an option must be preceded by white space
+<P>
+<LI>Option-arguments cannot be optional
+<P>
+<LI>Groups of option-arguments following an option must either be separated by commas or by white space, and quoted (e.g., <code>-f 1,3</code> or <code>-o "xxx z yy"</code>)
+<P>
+<LI>All options must precede operands on the command line
+<P>
+<LI><code>--</code> may be used to indicate the end of the options
+<P>
+<LI>The order of the options relative to one another should not matter
+<P>
+<LI>The relative order of the operands (cmdargs) may affect their 
+significance in ways determined by the command with which they appear
+<P>
+<LI><code>-</code> preceded and followed by white space should only be
+used to mean  standard input
+</oL>
+<P>
+Not all Unix commands follow these rules, although all the newer
+ones do.  Older executables were written before the standard was
+established, but executables dating from these times are in such regular use that it
+was decided not to change them. For example, <code>cut</code> will function with
+or without rule number six, which requires a space before the
+option-argument. Both of the following commands will work on most
+systems.
+<P>
+<pre>
+cat /etc/passwd|cut -d ":" -f 1,3 &gt;usruid.txt
+cat /etc/passwd|cut -d: -f1,3 &gt;usruid.txt
+</pre>
+<P>
+The <code>find</code> command is another example of an antiquated program still
+in use today. It uses options longer than a single character, which
+violates rule number three, and allows options to appear after the
+operand, thus violating rule number nine.  In the following example,
+dot (<code>.</code>) is the operand, <code>-name</code> and <code>-print</code> are options, and <code>data.txt</code>
+is the option-argument for <code>-name</code>.
+<P>
+<pre>
+find . -name data.txt -print.
+</pre>
+<P>
+<!-- break -->
+<P>
+<P>
+<FONT SIZE="+1"><STRONG>The getopts function</STRONG></FONT><BR>
+You're probably wondering what all this blather is leading up to.
+Well, Unix provides a handy tool for separating option arguments and
+operands, and it's known as the <code>getopts</code> function. This function is called
+by following <code>getopts</code> with a string (which contains the list of valid
+option characters) and a shell variable (which receives the result
+of searching the arguments). The function can be called several
+times, and each time it steps forward through the list of arguments
+and picks up the next option. It can also pick up an
+option-argument, and the index of the argument that it has
+processed.
+<P>
+To illustrate this, imagine a shell script that will archive a file
+by copying it to an archive directory.  The default directory is
+<code>/u/arch</code>, but the path of the archive directory can be changed on the
+command line. The archive program will also stop and ask you if it
+is about to overwrite an earlier archive, but an option can be set
+to overwrite without warning. A sample command line for this archive
+program would be:
+<P>
+<pre>
+arch [-r] [-a /new/archive/path] filename
+</pre>
+<P>
+In this example, the <code>-r</code> option will automatically replace an
+existing archive file without warning, though the default is to warn. The
+<code>-a</code> option is followed by an alternative archive directory to use
+instead of <code>/u/archive</code>.  Finally, <code>filename</code> is the name of the file to
+archive.
+<P>
+The following is a listing for <code>arch</code> that covers the processing of
+the option arguments. It does not include the logic for doing the
+actual archive operation. Below the complete listing is a
+step-by-step analysis of how the program works.
+<P>
+<pre>
+#! /bin/sh
+#:------------------------------------------------------------
+--
+usage () {
+ echo "Usage:"
+ echo "arch - archives a file to /u/arch directory"
+ echo "syntax:"
+ echo "    arch [-r] [-a /new/archive/path] filename"
+ echo "where"
+ echo "    -r will automatically replace an existing archive
+file"
+ echo "       (default is to warn)"
+ echo "    -a specifies an alternative archive directory"
+ echo "    filename is the name of the file to archive"
+ exit
+}
+#:------------------------------------------------------------
+--
+
+replace="w"
+arch="/u/arch"
+filename=""
+
+optstr=":ra:"
+
+while getopts $optstr opt
+do
+
+    case $opt in
+        r) replace="r";;
+        a) arch=$OPTARG;;
+        *) usage;;
+    esac
+done
+
+shift `expr $OPTIND - 1`
+
+filename=$1
+
+echo "Archiving" $filename " to " $arch "with" $replace
+"replace option"
+
+# rest of the code goes here
+
+</pre>
+<P>
+The <code>getopts</code> function does not always work correctly with the Korn
+shell, so line 1 forces the script to run in the Bourne shell. The
+program begins lines 2 through 15 with a comment describing its
+actions that also doubles as a usage function, which is called when
+the user makes a mistake.
+<P>
+<pre>
+ 1   #! /bin/sh
+ 2  
+#:------------------------------------------------------------
+--
+ 3   usage () {
+ 4    echo "Usage:"
+ 5    echo "arch - archives a file to /u/arch directory"
+ 6    echo "syntax:"
+ 7    echo "    arch [-r] [-a /new/archive/path] filename"
+ 8    echo "where"
+ 9    echo "    -r will automatically replace an existing
+archive file"
+10    echo "       (default is to warn)"
+11    echo "    -a specifies an alternative archive
+directory"
+12    echo "    filename is the name of the file to archive"
+13    exit
+14   }
+15  
+#:------------------------------------------------------------
+--
+</pre>
+<P>
+Shell variables are set up at lines 17 and 18 and contain the default
+values used for archiving and the archive directory, and makes a replacement warning default behavior.  Line 19 sets up a variable for the file to be
+archived:
+<P>
+<pre>
+17   replace="w"
+18   arch="/u/arch"
+19   filename=""
+</pre>
+<P>
+This program has two possible options: <code>-r</code> and <code>-a</code>. The <code>-a</code>
+option requires an option-argument that names the directory to use.
+An options string should contain the list of single character
+identifiers to be used for options, or <code>ra</code>. In addition, if an
+option is to be preceded by an option argument, a colon should
+immediately follow it. Finally, <code>getopts</code> will produce an error
+message if an invalid option is placed on the command line.  In
+order to suppress the error message, start the option string with a
+colon or <code>":ra:"</code>.  That string is set up at line 21 of the script.
+<P>
+<pre>
+21   optstr=":ra:"
+</pre>
+<P>
+Whenever <code>getopts</code> is called, it locates the next available option,
+retrieves the character, and places it in the passed variable name.
+At line 23 this variable, <code>$opt</code>, is passed as the second argument to
+<code>getopts</code> after <code>$optstr</code>.  The <code>getopts</code> function returns true as long as
+it continues to find arguments that start with a leading <code>-</code>. When it
+finds <code>-r</code> on the command line, it places <code>r</code> in <code>$opt</code>. When it finds
+<code>-a</code>, it places <code>a</code> in <code>$opt</code>.  Whenever <code>getopts</code> finds an option
+expecting an option-argument, it retrieves the argument and places
+it in a variable named <code>$OPTARG</code>. The loop at lines 23 through 31
+processes all options and option-arguments by repetitively calling
+<code>getopts</code>.  Inside a case statement the various results are
+processed.
+<P>
+If <code>-r</code> was encountered, it will appear in <code>$opt</code> and <code>$replace</code> will be
+set to <code>r</code>. If <code>-a</code> was encountered, <code>a</code> will appear in <code>$opt</code>, and the
+value in <code>$OPTARG</code> will be used to set the value of <code>$arch</code>. If anything
+else is encountered, the user has entered an invalid option. This
+calls the usage function, which displays a usage message and exits
+the program.
+<P>
+<pre>
+23   while getopts $optstr opt
+24   do
+25
+26       case $opt in
+27           r) replace="r";;
+28           a) arch=$OPTARG;;
+29           *) usage;;
+30       esac
+31   done
+</pre>
+<P>
+The <code>getopts</code> function also retains one other variable, <code>$OPTIND</code>, which
+contains the index of the next argument to be processed. When the
+shell script is first started, <code>$OPTIND</code> is set to 1. If <code>-r</code> is
+processed as the first argument, <code>$OPTIND</code> will contain 2. If <code>-a</code> is
+processed as the second argument (and the name of an archive
+directory as the third argument), <code>$OPTIND</code> will contain 4. On the
+next call to <code>getopts</code>, <code>getopts</code> returns false, and the loop at lines
+23 through 31 ends.
+<P>
+At this point, <code>$OPTIND</code> still contains the value 4, which can be used
+as the index of the next argument -- the first argument not
+beginning with a hyphen (<code>-</code>).  This should be the name of the file to
+archive. At line 33, the shift command is used to shift all arguments
+by <code>$OPTIND - 1</code>; this causes the argument that was at position 4 (<code>$4</code>) to
+be shifted left three positions, making it argument <code>$1</code>. At line 35
+this value is picked up and stored in <code>$filename</code>.
+<P>
+<pre>
+33   shift `expr $OPTIND - 1`
+34   
+35   filename=$1
+</pre>
+<P>
+At this point, a good script would execute further error checking,
+such as making sure the file named in <code>$filename</code> and the archiving
+directory in <code>$arch</code> both exist. In the following example, results of
+the extracted values are displayed:
+<P>
+<pre>
+37   echo "Archiving" $filename " to " $arch "with" $replace
+"replace option"
+38   
+39   # rest of the code goes here
+</pre>
+<P>
+Using <code>getopts</code> is an excellent way to create scripts that comply with
+the Unix command standard. It also makes it fairly easy to add
+additional features to your scripts. For example, let's assume you
+want to enhance your <code>arch</code> script to put a date and time stamp on an
+archive. Simply extend the <code>$optstr</code> variable to allow for a <code>-d</code>
+option, add a variable, and extend the case statement. Voil&agrave;! You've
+just added a <code>-d</code> option to the arch command.  Of course, you have to
+add the code to handle <code>$datestamp="Y"</code>, but the user interface is easily taken care of.
+<P>
+<pre>
+replace="w"
+arch="/u/arch"
+filename=""
+datestamp="N"
+
+optstr=":ra:d"
+
+while getopts $optstr opt
+do
+
+    case $opt in
+        r) replace="r";;
+        a) arch=$OPTARG;;
+        d) datestamp="Y";;
+        *) usage;;
+    esac
+done
+</pre>
+
+<!-- end body text -->
+
+<P>
+<A NAME="bio">
+<TABLE CELLPADDING="0" CELLSPACING="3" BORDER="0">
+<TR>
+<TD VALIGN="TOP">
+<!--IMG-->
+</TD>
+<TD BGCOLOR="#000000"><IMG SRC="/sunworldonline/icons-rd/dot_clear.gif" WIDTH="2" HEIGHT="1" ALIGN="BOTTOM" BORDER="0"></TD>
+<TD VALIGN="TOP">
+<STRONG>
+<FONT SIZE="-1" FACE="Arial,Helvetica,Sans-serif">
+About the author
+</FONT>
+</STRONG><BR>
+<A NAME="author" HREF="/sunworldonline/cgi-bin/swol-mailto.cgi?mo.budlong@sunworld.com+/swol-10-1999/swol-10-unix101.html+author">Mo Budlong</A>, president of King Computer Services Inc., specializes in Unix and client/server consulting and training. He currently publishes the <em>COBOL Just In Time Course,</em> a crash course for the year 2000 problem, as well as <em>COBOL Dates and the Year 2000,</em> which offers date solutions.
+
+</TD>
+</TR>
+</TABLE>
+
+<P>
+<DIV ALIGN="CENTER">
+<FONT FACE="Arial,Helvetica,Sans-serif">
+
+<A HREF="/home.html">Home</A> |
+<A HREF="/swol-10-1999/swol-10-tarantella.html">Next&nbsp;Story</A> |
+<A HREF="/sunworldonline/cgi-bin/swol-mailToFriend.cgi?head=Unix%20command%20line%20101%3A%20How%20much%20do%20you%20know%3F&author=Mo%20Budlong&summary=Arguments%20and%20options%20are%20those%20mysterious%20little%20nuggets%20preceded%20by%20minus%20signs%2C%20file%20names%2C%20and%20other%20Unix%20arcana%20that%20appear%20on%20a%20command%20line%20following%20the%20command%20to%20be%20executed.%20This%20month%20Mo%20unveils%20the%20power%20of%20these%20commands%2C%20but%20not%20before%20he%20breaks%20it%20down%20with%20an%20examination%20of%20the%20Unix%20command%20line%20itself.%20%3Cem%3E%282%2C600%20words%29%3C%2Fem%3E%0A">Mail&nbsp;this&nbsp;Story</A> |
+
+<A HREF="#mini-ditka">Comment&nbsp;on&nbsp;this&nbsp;Story</A> |
+<A HREF="#resources">Resources&nbsp;and&nbsp;Related&nbsp;Links</A>
+</FONT>
+</DIV>
+
+<P>
+<DIV ALIGN="CENTER">
+<FORM METHOD="POST" ACTION="/sunworldonline/cgi-bin/swol-nav.cgi">
+<SELECT NAME="jump_list">
+<option value="http://www.sunworld.com/sunworldonline/index.html">
+Also this month in SunWorld
+<option value="http://www.sunworld.com/sunworldonline/index.html"> 
+Features:
+ure <OPTION VALUE="http://www.sunworld.com/sunworldonline/swol-10-1999/swol-10-raid5.html"> - RAID basics, Part 5: The power of storage area networks
+ure <OPTION VALUE="http://www.sunworld.com/sunworldonline/swol-10-1999/swol-10-tarantella.html"> - SCO Tarantella runs, not crawls, over the Web
+
+<option value="http://www.sunworld.com/sunworldonline/index.html">
+News & Views:
+<OPTION VALUE="http://www.sunworld.com/sunworldonline/swol-10-1999/swol-10-bookshelf.html"> - Big Blue is back
+<OPTION VALUE="http://www.sunworld.com/sunworldonline/swol-10-1999/swol-10-career.html"> - Finding your place
+<OPTION VALUE="http://www.sunworld.com/sunworldonline/swol-10-1999/swol-10-if.html"> - News on the latest Internet standards and struggles
+<OPTION VALUE="http://www.sunworld.com/sunworldonline/swol-10-1999/swol-10-newsbriefs_1.html"> - New Product Briefs (October 1, 1999)
+<OPTION VALUE="http://www.sunworld.com/sunworldonline/swol-10-1999/swol-10-regex.html"> - CVS in the scripting landscape
+<OPTION VALUE="http://www.sunworld.com/sunworldonline/swol-10-1999/swol-10-silicon.html"> - Wanted: Centralized open source support
+<OPTION VALUE="http://www.sunworld.com/sunworldonline/swol-10-1999/swol-10-solariscsl.html"> - Sun goes after Linux with community-source Solaris
+<OPTION VALUE="http://www.sunworld.com/sunworldonline/swol-10-1999/swol-10-sunspots.html"> - The latest tidbits on Sun deals and product news
+
+<option value="http://www.sunworld.com/sunworldonline/index.html">
+Tech Expertise:
+ <OPTION VALUE="http://www.sunworld.com/sunworldonline/swol-10-1999/swol-10-connectivity.html"> - Athlon rules!
+ <OPTION VALUE="http://www.sunworld.com/sunworldonline/swol-10-1999/swol-10-insidesolaris.html"> - Unlocking Solaris
+ <OPTION VALUE="http://www.sunworld.com/sunworldonline/swol-10-1999/swol-10-itarchitect.html"> - Understanding Java messaging and JMS
+ <OPTION VALUE="http://www.sunworld.com/sunworldonline/swol-10-1999/swol-10-jiniology.html"> - How to attach a user interface to a Jini service
+ <OPTION VALUE="http://www.sunworld.com/sunworldonline/swol-10-1999/swol-10-security.html"> - Building your firewall, Part 2
+ <OPTION VALUE="http://www.sunworld.com/sunworldonline/swol-10-1999/swol-10-supersys.html"> - Stop your fire-fighting, Part 2
+ <OPTION VALUE="http://www.sunworld.com/sunworldonline/swol-10-1999/swol-10-unix101.html"> - Unix command line 101: How much do you know?
+ <OPTION VALUE="http://www.sunworld.com/sunworldonline/swol-10-1999/swol-10-webmaster.html"> - Building cross-browser DHTML, Part 1
+
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Go">
+</FORM>
+</DIV>
+
+<DIV ALIGN="CENTER">
+<P>
+<TABLE CELLPADDING="5" CELLSPACING="0" BORDER="0">
+<TR>
+<TD>
+<FONT COLOR="#333333" SIZE="-1">Advertisement: Support SunWorld, click here!</FONT><BR>
+<A href="http://ad.doubleclick.net/jump/idg.sw.com/archives;sz=468x60"><IMG src="http://ad.doubleclick.net/ad/idg.sw.com/archives;sz=468x60" vspace="5" border="0" height="60" width="468"></A>
+<BR CLEAR="ALL">
+</TD>
+</TR>
+</TABLE>
+</DIV>
+
+<A NAME="resources">
+<P>
+<TABLE BORDER="0" WIDTH="100%" CELLPADDING="0" CELLSPACING="0">
+<TR>
+<TD VALIGN="TOP" BGCOLOR="#003399"><IMG SRC="/sunworldonline/icons-rd/blue-left.gif" WIDTH="9" HEIGHT="9" ALIGN="BOTTOM" BORDER="0"></TD>
+<TD COLSPAN="2" BGCOLOR="#003399"><FONT COLOR="#FFFFFF" FACE="Arial,Helvetica,Sans-serif"><STRONG>Resources and Related Links</STRONG></FONT></TD>
+</TR>
+<TR>
+<TD>&#160;</TD>
+<TD>
+<UL>
+<LI>Notes on <code>getopts</code>:
+<BR><A HREF="http://orca.st.usm.edu/~seyfarth/unix/unix-6-11-17.html">http://orca.st.usm.edu/~seyfarth/unix/unix-6-11-17.html</A><LI>SunOS <code>getopts</code> man pages and examples:
+<BR><A HREF="http://cmgm.stanford.edu/man2html/getopts.1.html">http://cmgm.stanford.edu/man2html/getopts.1.html</A><LI>Examples of <code>getopts</code>:
+<BR><A HREF="http://www.doc.ic.ac.uk/~mac/manuals/all-manual-pages/hpux/usr/man/man1/getopts.1.html">http://www.doc.ic.ac.uk/~mac/manuals/all-manual-pages/hpux/usr/man/man1/getopts.1.html</A><LI>Another example of <code>getopts</code>:
+<BR><A HREF="http://www.cityu.edu.hk/Unix-man/getopts.1.html">http://www.cityu.edu.hk/Unix-man/getopts.1.html</A><LI>Full listing of previous <STRONG>Unix 101</STRONG> columns:
+<BR><A HREF="http://www.sunworld.com/common/swol-backissues-columns.html#unix101">http://www.sunworld.com/common/swol-backissues-columns.html#unix101</A></ul><strong>Previous Unix 101 columns on shell programming</strong><ul><LI>"Quick lessons on shell programming," (September 1997):
+<BR><A HREF="http://www.sunworld.com/sunworldonline/swol-09-1997/swol-09-unix101.html">http://www.sunworld.com/sunworldonline/swol-09-1997/swol-09-unix101.html</A><LI>"Simple Menus, Part 2," (August 1997):
+<BR><A HREF="http://www.sunworld.com/swol-08-1997/swol-08-unix101.html">http://www.sunworld.com/swol-08-1997/swol-08-unix101.html</A><LI>"Simple Menus, Part 1, (July 1997):
+<BR><A HREF="http://www.sunworld.com/swol-07-1997/swol-07-unix101.html">http://www.sunworld.com/swol-07-1997/swol-07-unix101.html</A></ul> <strong>Other SunWorld resources</strong> <ul><LI>The <em>SunWorld</em> Topical Index -- a comprehensive listing of all <em>SunWorld</em> articles by subject:
+<BR><A HREF="http://www.sunworld.com/common/swol-siteindex.html">http://www.sunworld.com/common/swol-siteindex.html</A><LI>Visit sunWHERE -- launchpad to hundreds of online resources for Sun users:
+<BR><A HREF="http://www.sunworld.com/sunwhere.html">http://www.sunworld.com/sunwhere.html</A><LI>Explore <em>SunWorld</em>'s back issues:
+<BR><A HREF="http://www.sunworld.com/common/swol-backissues.html">http://www.sunworld.com/common/swol-backissues.html</A><LI>IDG.net, your one-stop IT resource:
+<BR><A HREF="http://www.idg.net">http://www.idg.net</A>
+</UL>
+<TD>&#160;</TD>
+</TR>
+</TABLE>
+
+<a name="mini-ditka">
+<BR>
+<TABLE BORDER="0" WIDTH="100%" CELLPADDING="0" CELLSPACING="0">
+<TR>
+<TD VALIGN="TOP" BGCOLOR="#003399"><IMG SRC="/sunworldonline/icons-rd/blue-left.gif" WIDTH="9" HEIGHT="9" ALIGN="BOTTOM" BORDER="0"></TD>
+<TD COLSPAN="2" BGCOLOR="#003399">
+<FONT COLOR="#FFFFFF" FACE="Arial,Helvetica,Sans-serif"><STRONG>Tell Us What You Thought of This Story</STRONG></FONT>
+</TD>
+</TR>
+<TR>
+<TD>&#160;</TD>
+<TD>
+<BR>
+<FORM METHOD="POST" ACTION="/sunworldonline/cgi-bin/swol-mini-survey.cgi?1999-swol-10-unix101.html">
+
+<TABLE WIDTH="100%" ALIGN="CENTER" CELLPADDING="0" BORDER="0">
+<TR><TD ALIGN="LEFT" VALIGN="TOP" ROWSPAN="1" COLSPAN="1">
+
+<INPUT TYPE="radio" NAME="worth" VALUE="3">-Very worth reading<br>
+<INPUT TYPE="radio" NAME="worth" VALUE="2">-Worth reading<br>
+<INPUT TYPE="radio" NAME="worth" VALUE="1">-Not worth reading<br>
+
+</td><td align="left" valign="top" rowspan="1" colspan="1">
+
+<INPUT TYPE="radio" NAME="length" VALUE="3">-Too long<br>
+<INPUT TYPE="radio" NAME="length" VALUE="2">-Just right<br>
+<INPUT TYPE="radio" NAME="length" VALUE="1">-Too short<br>
+
+</td><td align="left" valign="top" rowspan="1" colspan="1">
+
+<INPUT TYPE="radio" NAME="tech" VALUE="3">-Too technical<br>
+<INPUT TYPE="radio" NAME="tech" VALUE="2">-Just right<br>
+<INPUT TYPE="radio" NAME="tech" VALUE="1">-Not technical enough<br>
+
+</TD></TR></TABLE>
+
+<TABLE CELLPADDING="0" BORDER="0">
+<TR>
+<TD ALIGN="LEFT" VALIGN="TOP" ROWSPAN="1" COLSPAN="1">
+<TEXTAREA NAME="comments" COLS="40" ROWS="3" WRAP="VIRTUAL">Comments:
+</TEXTAREA>
+</TD>
+<TD>&nbsp;</TD>
+
+<TR>
+<TD ALIGN="LEFT" VALIGN="TOP" ROWSPAN="1" COLSPAN="1">
+<TEXTAREA NAME="comments" COLS="30" ROWS="1" WRAP="VIRTUAL">Name:
+</TEXTAREA>
+</TD>
+<TD>&nbsp;</TD>
+</TR> 
+
+<TR>
+<TD ALIGN="LEFT" VALIGN="TOP" ROWSPAN="1" COLSPAN="1">
+<TEXTAREA NAME="comments" COLS="30" ROWS="1" WRAP="VIRTUAL">Email:
+</TEXTAREA>
+</TD>
+<TD>&nbsp;</TD>
+</TR> 
+
+<TR>
+<TD ALIGN="LEFT" VALIGN="TOP" ROWSPAN="1" COLSPAN="1">
+<TEXTAREA NAME="comments" COLS="30" ROWS="1" WRAP="VIRTUAL">Company Name:
+</TEXTAREA>
+&nbsp;&nbsp;&nbsp;&nbsp;
+</TD>
+
+<TD ALIGN="LEFT" VALIGN="BOTTOM">
+<INPUT TYPE="submit" VALUE="Send data">
+</TD>
+</TR>
+</TABLE>
+
+</FORM>
+<TD>&#160;</TD>
+</TR>
+</TABLE>
+</a>
+
+<P>
+<DIV ALIGN="CENTER">
+<A HREF="/sunworldonline/common/swol-copyright.html"><IMG BORDER="0" width="400" height="22" SRC="/sunworldonline/icons/b-copyright99.gif" ALT="(c) Copyright 1999 Web Publishing Inc., and IDG Communication company"></A>
+</DIV>
+<P>
+If you have technical problems with this magazine, contact 
+<A NAME="webmaster" HREF="/sunworldonline/cgi-bin/swol-mailto.cgi?webmaster@sunworld.com+/swol-10-1999/swol-10-unix101.html+webmaster">webmaster@sunworld.com</A>
+<P>
+<STRONG>URL</STRONG>: http://www.sunworld.com/swol-10-1999/swol-10-unix101.html
+<BR>
+<STRONG>Last modified:</STRONG> Tuesday, October 12, 1999
+</BODY>
+</HTML>

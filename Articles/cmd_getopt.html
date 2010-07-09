@@ -1,0 +1,533 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>PerlMonth -  Modules Explained by Steven McDougall - Issue 1  </title>
+	<style type=text/css>
+	A.nav:link     	{ color: #c0c0c0; } 
+	A.nav:visited  	{ color: #ff0000; background: White; } 
+	A.nav:active   	{ color: #990000; background: White; }	
+	</style>
+</head>
+
+<body bgcolor="990000" topmargin="0" leftmargin="0" marginwidth="0" marginheight="0">
+
+<!-- start the top header -->
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+	<tr>
+		<td align="center"><br>
+			<img src="/images/newlogo.gif">
+		</td>
+		<td align="center"><br>
+		
+  &nbsp;<A HREF="/cgi-bin/adserver.cgi?id=2"><img src="/images/node_banner.gif" alt="Banner Ad" width="468" HEIGHT="60" BORDER="0"></A>
+
+		</td>
+	</tr>
+</table>
+<!-- Finish the top header -->
+<br>
+<table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
+	<tr>
+		<td width="20%" valign="top">
+                        <TABLE width="100%" border="0" cellspacing="2" cellpadding="2">
+                                
+
+                <TR ALIGN="CENTER" VALIGN="TOP">
+                        <TD ALIGN="CENTER" VALIGN="TOP">
+                        <FORM ACTION="/cgi-bin/register.cgi" METHOD="POST">
+                        <CENTER><FONT SIZE="-1" COLOR="FFffcc"><B>Monthly Notifications.</B></FONT>
+                        <FONT SIZE="-1"><INPUT TYPE="TEXT" NAME="email" VALUE="E-Mail Address" SIZE="18"><BR>
+                        <INPUT TYPE="SUBMIT" NAME="Subscribe" VALUE="Subscribe">
+                        <INPUT TYPE="RESET" NAME="Reset" VALUE="Clear"> 
+                        </FONT></CENTER>
+                        </FORM>
+                        </TD>
+                </TR>
+  
+
+  <TR>
+    <TD ALIGN="CENTER">    
+      <FORM ACTION="/cgi-bin/change_issue.cgi">
+      <FONT SIZE="1" COLOR="#FFFFFF" FACE="arial,helvetical"> 
+      Browsing Issue # 1</FONT><BR>
+      <SELECT NAME="NewIssue" SIZE="1"  ONCHANGE=submit()>
+       <OPTION VALUE="1">Select Issue</OPTION>
+    <OPTION VALUE="1">Issue 1</OPTION>
+<OPTION VALUE="2">Issue 2</OPTION>
+<OPTION VALUE="3">Issue 3</OPTION>
+<OPTION VALUE="4">Issue 4</OPTION>
+<OPTION VALUE="5">Issue 5</OPTION>
+<OPTION VALUE="6">Issue 6</OPTION>
+<OPTION VALUE="7">Issue 7</OPTION>
+<OPTION VALUE="8">Issue 8</OPTION>
+<OPTION VALUE="9">Issue 9</OPTION>
+
+</SELECT>
+<INPUT TYPE="SUBMIT" NAME="Submit" VALUE="Go">
+</FORM>
+</TD>
+</TR>
+
+   <TR>
+       <TD BGCOLOR="#000000" ALIGN="CENTER">
+       <A HREF="/index.html?issue=1"><FONT SIZE="-1" COLOR="#c0c0c0" FACE="arial,helvetica"><B>H o m e</B></FONT></A>
+       </FONT>
+       </TD>
+   </TR>
+
+  
+<TR>
+    <TD BGCOLOR="#000000" ALIGN="CENTER">
+    <a href="/columns/index.html?issue=1"><FONT SIZE="-1" COLOR="#FCE9CC" FACE="arial,helvetica"><b>C o l u m n s</FONT></b></a>
+    </TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="#c0c0c0">
+<FONT SIZE="-1" COLOR="#000000" FACE="arial,helvetica">
+<B>
+<UL>
+  
+	  <LI><A HREF="/columns/mac_perl/index.html?issue=1"><FONT SIZE="-1" COLOR="#000000" FACE="arial,helvetica">Script Different</FONT></A></LI><BR>
+	  <LI><A HREF="/columns/backend/index.html?issue=1"><FONT SIZE="-1" COLOR="#000000" FACE="arial,helvetica">The BackEnd</FONT></A></LI><BR>
+	  <LI><A HREF="/columns/perldoc/index.html?issue=1"><FONT SIZE="-1" COLOR="#000000" FACE="arial,helvetica">RTFM</FONT></A></LI><BR>
+	  <LI><A HREF="/columns/modules/index.html?issue=1"><FONT SIZE="-1" COLOR="#000000" FACE="arial,helvetica">Modules Explained</FONT></A></LI><BR>
+</UL>
+</B>
+</FONT>
+</TD>
+</TR>
+
+  
+<TR>
+    <TD BGCOLOR="#000000" ALIGN="CENTER">
+    <a href="/features/index.html?issue=1"><FONT SIZE="-1" COLOR="#c0c0c0" FACE="arial,helvetica"><b>F e a t u r e s</FONT></b></a>
+    </TD>
+</TR>
+
+  
+<TR>
+    <TD BGCOLOR="#000000" ALIGN="CENTER">
+    <a href="/authors/index.html?issue=1"><FONT SIZE="-1" COLOR="#c0c0c0" FACE="arial,helvetica"><b>A u t h o r s</FONT></b></a>
+    </TD>
+</TR>
+
+  
+<TR>
+    <TD BGCOLOR="#000000" ALIGN="CENTER">
+    <a href="/links/index.html?issue=1"><FONT SIZE="-1" COLOR="#c0c0c0" FACE="arial,helvetica"><b>L i n k s</FONT></b></a>
+    </TD>
+</TR>
+
+  
+<TR>
+    <TD BGCOLOR="#000000" ALIGN="CENTER">
+    <a href="/jobs/index.html?issue=1"><FONT SIZE="-1" COLOR="#c0c0c0" FACE="arial,helvetica"><b>J o b s</FONT></b></a>
+    </TD>
+</TR>
+
+  
+                                <!--stop navbar-->
+                                <TR>
+                                        <TD>&nbsp;<BR></TD>
+                                </TR>
+                                
+                                <TR>
+                                        <TD>&nbsp;<BR></TD>
+                                </TR>
+                                
+<TR>
+    <TD BGCOLOR="000000">
+	<center><font color="FFFFCC"><b>Get Perl !</b></font></center>
+    </TD>
+</TR>
+<TR>
+    <TD BGCOLOR="c0c0c0">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a href="http://www.cpan.org/src/stable.tar.gz">stable.tar.gz</a><br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a href="http://www.cpan.org/src/devel.tar.gz">devel.tar.gz</a><br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a href="http://www.cpan.org/src/stable.zip">stable.zip</a><br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a href="http://www.cpan.org/src/devel.zip">devel.zip</a>
+    </TD>
+</TR>
+
+                                <TR>
+                                        <TD>&nbsp;<BR></TD>
+                                </TR>
+                                
+<TR>
+    <TD BGCOLOR="000000">
+	<center><font color="FFFFCC"><b>Network Sites !</b></font></center>
+    </TD>
+</TR>
+<TR>
+    <TD BGCOLOR="c0c0c0">
+	<ul>
+	<li><a href="http://www.perlmonth.com/">PerlMonth</a><br>
+	<li><a href="http://www.linuxmonth.com/">LinuxMonth</a>
+	</ul>
+    </TD>
+</TR>
+
+                                <TR>
+                                        <TD>&nbsp;<BR></TD>
+                                </TR>
+                                
+        
+                                <TR>   
+                                        <TD align="center">&nbsp;
+					<a href="http://news.perl.org/my_portal"><img src="/images/perlnews.gif" border="0"></a>
+                                        </TD>
+                                </TR>
+	
+                                <TR>
+                                        <TD>&nbsp;<BR></TD>
+                                </TR>
+                                
+                                <TR>
+                                        <TD ALIGN="CENTER">
+					<A HREF="mailto:feedback@perlmonth.com?subject=PerlMonth"><FONT SIZE="+1" COLOR="FFFFFF">Feedback</FONT></A>
+                                        </TD>
+                                </TR>
+	
+                        </TABLE>
+		</td>
+		<!-- start content -->
+		<td width="78%" height="100%" valign="top" colspan="2" bgcolor="ffffff">
+			<!-- start the main content-->
+			<table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="ffffff">
+				<tr valign="top">
+					<td align="left"><img src="/images/990000_topleft.gif"></td>
+					<td align="right"><img src="/images/990000_topright.gif"></td>
+				</tr>
+				<tr valign="top">
+					<td colspan=2 height="100%">
+						<table width="100%" height="100%" border="0" cellspacing="0" cellpadding="14">
+							<tr>
+								<td height="100%" valign="top">
+								
+
+<BR>
+<table border="0" cellspacing="0" cellpadding="0" width="100%">
+<tr>
+<td align="left" valign="top">
+<FONT SIZE="+1" COLOR="660000"><B>Modules Explained</B></FONT><BR>
+<A HREF="/authors/stevenm/profile.html?issue=1">
+<FONT COLOR="000099"><B>Steven McDougall</B></FONT></A>
+</td>
+<td align="right" valign="top">
+<a href="/columns/modules/cmd_getopt.html?issue=1&print=1"><font color="000099"><b>Print Version</b></font></a>
+</td>
+</tr>
+</table>
+
+<H2>Parsing Command Line Options with GetOpt::</H2>
+Programs need input, and for many programs, input begins on the command line. For example, a program to print files might be invoked as
+<PRE>
+	pr -l -n -a 10:00 foo bar
+
+</PRE>
+pr is the name of the program; it is followed here by six arguments. The arguments are of two sorts: options and file names. 
+<BR><BR>
+-l, -n, and -a 10:00 are options. They control the manner in which the program executes. In this case, -l tells pr to print in landscape orientation, -n tells it to print page numbers, and -a 10:00 tells it to print after 10:00. Options are sometimes called flags or switches. foo and bar are file names. pr will read these files to obtain the actual text to print.
+<BR><BR>
+
+Parsing the Command Line
+In Perl, command line arguments are made available to the program in the global @ARGV array. This happens automatically: you don't have to declare anything or do anything to get them. If you wrote pr in Perl and entered the command line shown above, then at the beginning of program execution @ARGV would have six elements:
+<PRE>
+	$ARGV[0]	'-l'
+	$ARGV[1]	'-n'
+	$ARGV[2]	'-a'
+	$ARGV[3]	'10:00'
+	$ARGV[4]	'foo'
+	$ARGV[5]	'bar'
+</PRE>
+Now the fun starts. Given @ARGV as shown, the program has to identify -l, -n, and -a as options, associate '10:00' with -a, and identify foo and bar as file names. This is called parsing the command line.
+<BR><BR>
+
+<B>Easy to be Hard</B><BR>
+Parsing the command line is a problem. The problem isn't that it is so hard, but rather that it is so easy: for many programs, it can be done in under 20 lines of code. Because parsing the command line seems easy, it is often not identified as a distinct function of the program. It never gets a functional specification, or a design, or even the considered attention of the programmer. This leads to many bad things:
+<BR><BR>
+<B>Design by accretion</B><BR>
+As the program evolves, parsing features are added on an ad-hoc basis.
+<BR><BR>
+<B>Open code</B><BR>
+The command line is parsed in open code, scattered across the program. The parsing code isn't contained in any subroutine, module, or class.
+<BR><BR>
+<B>Non-standard interfaces</B><BR>
+Different programs are liable to parse the command line in slightly different ways. This confuses users.
+<BR><BR>
+<B>Sub-standard interfaces</B><BR>
+Programmers tend to implement only what they need -- or think they need. Features such as switch clustering, abbreviations, and help text, for example, may be omitted.
+<BR><BR>
+<B>Bugs</B><BR>
+When every program has its own parsing code, every program can have its own parsing bugs.
+<BR><BR>
+<B>Duplication</B><BR>
+You keep writing that same 50 lines of code, over and over again, in every program.
+<BR><BR>
+
+<B>The Eightfold Path</B><BR>
+In Perl, there is a better way. In fact, there are many better ways. At http://www.perl.com/CPAN-local//modules/00modlist.long.html, we find
+<PRE>
+Getopt::Declare   An easy-to-use WYSIWYG command-line parser
+Getopt::EvaP      Long/short options, multilevel help
+Getopt::Long      Advanced option handling
+Getopt::Mixed     Supports both long and short options
+Getopt::Regex     Option handling using regular expressions
+Getopt::Simple    A simplified interface to Getopt::Long
+Getopt::Std       Implements basic getopt and getopts
+Getopt::Tabular   Table-driven argument parsing with help text
+</PRE>
+Each of these is a Perl module for parsing the command line. They have been designed, written, debugged, and encapsulated. You don't have to write them again. They support standard interfaces. (Although there is perhaps a fine line between having non-standard interfaces and having 8 different standard interfaces.) 
+<BR><BR>
+
+<B>Getopt::Std</B><BR>
+If the list above seems daunting, start with Getopt::Std. Getopt::Std supports a good, simple command line style that is adequate for many programs. It automatically handles options given in any of these forms:
+<PRE>
+	pr -l -n -a 10:30 foo bar
+	pr -lna 10:30 foo bar
+	pr -lna10:30 foo bar
+</PRE>
+To use Getopt::Std, write
+<PRE>
+	use Getopt::Std;
+	my %Options;
+	getopt('a', \%Options);
+</PRE>
+Getopt::Std exports the getopt() routine. getopt() takes two parameters: a string and a hash reference. The string lists all the options that take arguments. The hash receives the options found on the command line.
+<BR><BR>
+getopt() removes the options from @ARGV and parses them. Upon return, each option appears as a hash key in %Options. For each key, the hash value is the argument of the option if it takes one, and 1 if it does not. Finally, any file names that follow the options are left in @ARGV for the program to process. For any of the command lines shown above, getopt() would set %Options and @ARGV to
+<PRE>
+	%Options = (l => 1,
+	            n => 1,
+	            a => '10:30')
+
+	@ARGV    = qw(foo bar)
+</PRE>
+Getopt::Std also has another interface:
+<PRE>
+	$ok = getopts('a:ln', \%Options);
+</PRE>	
+Like getopt(), getopts() takes a string and a hash reference. The string includes all the option letters: both those that take arguments and those that do not. Option letters that take an argument are marked with a trailing colon. Because getopts() has a list of all the valid options, it can do some simple error checking: getopts() returns false if there are invalid options on the command line, and true otherwise.
+<BR><BR>	
+
+<B>Getopt::Long</B><BR>
+If you need more power that Getopt::Std provides, consider using Getopt::Long. The name ::Long refers to an option style that uses two dashes and the complete option name, rather than a single character:
+<PRE>
+	pr --landscape --numbers --after 10:30 foo bar
+</PRE>
+However, Getopt::Long is not merely Getopt::Std with a facelift. It provides a large -- some would say bewildering -- assortment of facilities for parsing the command line in different ways. In addition, Getopt::Long has evolved over the last ten years, reflecting changes in the underlying Perl language, changes in programming style, and changes in interface style. At the same time, it maintains backward compatibility with previous versions.
+<BR><BR>
+All this makes the programming interface to Getopt::Long large and complex. For a complete description, you should read the documentation that is contained within the module itself. Here, I'll give just a brief survey, illustrating the simpler features, and reflecting current style.
+<BR><BR>
+Basic Facilities
+Conceptually, the interface to Getopt::Long is similar to that of Getopt::Std. It exports a routine named GetOptions(). GetOptions() takes a series of option specifiers, which tell it how to parse the command line, and a hash reference, where it stores the results. It returns true if there are no errors.
+<PRE>
+	$ok = GetOptions(\%Options, "landscape", "numbers!", "after=s");
+</PRE>
+Each option specifier gives the name of an option, possibly followed by an argument specifier. The name will become a hash key. The argument specifier tells how to parse the argument to that option.
+<BR><BR>
+In the example above, "landscape" has no argument specifier. This means that it takes no argument, and $Options{landscape} will be 1 or 0 according as --landscape does or does not appear on the command line. "numbers!" also takes no argument, but the ! means the it may be explicitly negated by prefixing it with "no" on the command line:
+<PRE>
+	pr --nonumbers
+</PRE>
+"after=s" takes a string argument; the argument will become the value of $Options{after}. "after:s" also takes a string argument, but the colon means that the argument is optional. Other argument specifiers are "=i" for integer arguments and "=f" for floating point arguments.
+<BR><BR>
+A double dash on the command line terminates the option list.
+<BR><BR>
+<B>Hairy Stuff</B><BR>
+If an argument specifier is suffixed with an '@', then the option may be given multiple times on the command line, and the corresponding value in %Options becomes a reference to an array containing all the values supplied for that option. For example:
+<PRE>
+	GetOptions(\%Options, "x=f@", "y=f@")
+</PRE>
+will parse
+<PRE>
+	graph --x 1 --x 2 --x 3 --y 1 --y 4 --y 9
+</PRE>
+resulting in 
+<PRE>
+	%Options = (x => [1, 2, 3],
+	            y => [1, 4, 9])
+</PRE>
+Similarly, if an argument specifier is suffixed with a '%', then the option takes key=value pairs, and the corresponding value in %Options becomes a reference to a hash of those pairs. So
+<PRE>
+	GetOptions(\%Options, "define=s%")
+</PRE>	
+will parse Stroustrup's example
+<PRE>
+	cc --define sqrt=rand --define exit=abort hello.cc
+</PRE>
+resulting in 
+<PRE>
+	%Options = (define => { sqrt => 'rand',
+	                        exit => 'abort' })
+</PRE>	                        
+<BR>                                              
+<B>The Kitchen Sink</B><BR>
+The empty string is a valid option. It is written on the command line as a single dash, and results in the null key being entered into %Options with a value of 1. This form is conventionally used to specify that the program should take input from STDIN, rather than from a named file:
+<PRE>
+	cat - 
+</PRE>
+You don't have to store all the options in %Options. Each option can have its own linkage specification, which may be a scalar ref, an array ref, a hash ref, or a code ref. For scalar, array, and hash refs, the option is stored in the referenced variable. If the linkage specification is a code ref, the option isn't stored anywhere; instead, the option name and value are passed to the referenced subroutine. 
+<BR><BR>
+Option names can have aliases, and can be abbreviated to uniqueness. You can configure Getopt::Long for compatibility with GNU, or POSIX. You can control case sensitivity. You can cluster options. You can pass options through to called programs. You can intersperse options and non-option arguments on the command line. This allows different files to be processed with different options:
+<PRE>
+	pr --numbers foo --nonumbers bar
+</PRE>
+Finally, you can specify a code ref to process arguments that aren't options. This allows GetOptions() to process the entire command line, and potentially reduces your program to a single
+<PRE>
+	GetOptions(...);
+</PRE>
+call, plus subroutines.
+<BR><BR>
+
+<B>The Rest of the Pack</B><BR>
+Getopt::Std and Getopt::Long are both supplied with the standard Perl distribution. There are currently six other Getopt:: modules available on CPAN. Here is a quick tour.
+<BR><BR>
+
+<B>Getopt::Simple </B>
+Getopt::Simple describes itself as a simple wrapper around Getopt::Long. However, nothing that supports the functionality of Getopt::Long can be entirely simple. In fact, Getopt::Simple is an object-oriented wrapper around Getopt::Long.
+<BR><BR>
+Rather than coding option descriptions into strings, Getopt::Simple lays them out in hash tables:
+<PRE>
+	$descriptions = { landscape => { type 	   => ''   },
+				         numbers   => { type => ''   },
+				         after	   => { type => '=s' }  }
+</PRE>
+getOptions() is invoked as a method on a Getopt::Simple object:
+<PRE>
+	$options = new Getopt::Simple;
+	$options->getOptions($descriptions, 
+	"Usage: pr -landscape -numbers -after time");
+</PRE>
+and options are retrieved through the $options object:
+<PRE>
+	$option->{switch}{landscape} and ...
+	$option->{switch}{after    } and ...
+</PRE>
+<BR>
+<B>Getopt::Tabular</B><BR>
+Getopt::Tabular uses a table to describe options, and then parses the command line through a procedural interface:
+<PRE>
+    @options = (['-landscape', 'boolean', 0, \$landscape',
+                               'print in landscape orientation'],
+
+                ['-numbers'  , 'boolean', 0, \$numbers'  ,
+                               'print page numbers'],
+			
+                ['-after'    , 'string' , 1, \$time'     ,
+                               'print after time'],);
+                 
+    GetOptions(\@options, \@ARGV) or exit 1;
+</PRE>
+Each line in the table describes a single option, and specifies the option name, type, number of arguments, action to take, and help text. The simplest action is to set a scalar; Getopt::Tabular can also collect arguments from the command line and assign them to an array, or pass them to a subroutine. 
+<BR><BR>
+If anything goes wrong, GetOptions() automatically formats an error message, based on the help text supplied in @options. Getopt::Tabular also supplies an entry point called SpoofGetOptions(). 
+<PRE>
+    SpoofGetOptions(\@options, \@ARGV)
+</PRE>
+parses the command line and checks it for errors, but doesn't take any action. This is particularly useful for programs that use subroutines to process arguments, because subroutines can do expensive or irreversible things.
+<BR><BR>
+
+<B>Getopt::Mixed</B><BR>
+Getopt::Mixed supports both long and short options: long because they are easy to remember; short because they are easy to type. Long options are introduced on the command line with two dashes; short options with one:
+<PRE>
+	pr --landscape -a 12:00 foo bar
+</PRE>
+The programming interface is similar to Getopt::Long:
+<PRE>
+	Getopt::Mixed::getOptions(@option_descriptions)
+</PRE>
+There is also an iterative form, which allows the program to process options one at a time:
+<PRE>
+	Getopt::Mixed::init(@option_descriptions);
+	    while (($option, $value) = Getopt::Mixed::nextOption()) { ... }
+	    Getopt::Mixed::cleanup();
+</PRE>
+The results are stored in global variables. Given the command line shown above, Getopt::Mixed would set
+<PRE>
+	$opt_landscape = 1
+	$opt_a         = '12:00'
+</PRE>
+Non-options arguments are left in @ARGV.
+<BR><BR>
+<B>Getopt::Declare</B><BR>
+Getopt::Declare doesn't parse anything directly. Rather, it builds and runs a parser. Options and their arguments are laid out in a single specification string:
+<PRE>
+	$spec = q(-l Print in landscape mode { $landscape = 1 }
+		  -n Print page numbers      { $numbers   = 1 }
+               	  -a <time:s>	Print after time { Queue($time)   });
+</PRE>
+The string describes each option, along with help text and a BLOCK to be executed when the option is found.
+<BR><BR>		      
+Getopt::Declare::new creates a parser object from a specification string:
+<PRE>
+	$parser = new Getopt::Declare $spec;
+</PRE>
+As written, this builds a parser and runs it on the command line; with additional arguments, it can parse strings or configuration files. Options and their values can be retrieved from $parser, but this is typically unnecessary, because the BLOCKs in the specification string contain arbitrary Perl code.
+<BR><BR>
+There are powerful facilities for specifying and checking option syntax and arguments. Options can be required, and groups of options can be made mutually exclusive. Usage lines are automatically generated from the help text. The parser object can be saved and later run on different input.
+<BR><BR>
+
+<B>Getopt::EvaP</B><BR>
+Getopt::EvaP is broadly similar to Getopt::Simple and Getopt::Declare. Options and help text are specified in tables. A call to EvaP() parses the command line according to the tables and returns the results in an %Options hash:
+<PRE>
+	EvaP \@option_specs, \@help_text, \%options
+</PRE>
+Perhaps the most interesting feature of Getopt::EvaP is that it has been implemented for Perl, Perl/Tk, Tcl and C. If you are developing in multiple languages, EvaP can provide a consistent user interface across all your applications.
+<BR><BR>
+        
+<B>Getopt::Regex</B><BR>
+Getopt::Regex takes a different approach to managing the potential complexity of command line syntax. Rather than implementing sophisticated parsing facilities of its own, it relies on the Perl regular expression engine. 
+<PRE>
+	GetOptions(\@ARGV, [$regex, \$scalar  , $takesarg], 
+			   [$regex, sub {...} , $takesarg], ...);
+</PRE>
+For each option, the user passes an array ref. The first element is a regular expression, the second is either a scalar ref or a code ref, and the third indicates whether the option takes an argument. 
+<BR><BR>
+An element of @ARGV is recognized as an option if it matches a $regex. When an option is found, GetOptions() sets $scalar or calls sub {...}, as appropriate. If the option takes an argument, the argument is assigned to $scalar, or passed to sub {...}.
+<BR><BR>
+<B>The Importance of Being Lazy</B><BR>
+One of the principal virtues of a programmer is Laziness, and these modules provide a wonderful opportunity to be Lazy. Before parsing your own command line, look to see if there isn't a Getopt module that will do what you need. If there is, use it. If there isn't, encapsulate your parsing code in a new Getopt:: module, and consider submitting it to CPAN. Then other programmers can be Lazy, even if you can't.
+
+  
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+			<!-- finish the main content-->
+		</td>
+		<!-- finish content-->
+		<td width="1%" valign="top">
+			&nbsp;
+		</td>
+	</tr>
+	<tr valign="bottom">
+		<td>&nbsp;</td>
+		<td align="left" bgcolor="ffffff"><img src="/images/990000_bottomleft.gif"></td>
+		<td align="right" bgcolor="ffffff"><img src="/images/990000_bottomright.gif"></td>
+		<td width="1%" valign="top">&nbsp;</td>
+	</tr>
+        <tr>                                                    
+                <td>&nbsp;</td>                         
+                <td colspan=2>                  
+                <br><center>
+
+[&nbsp;&nbsp;&nbsp;
+<A HREF="/aboutus/index.html?issue=1"><FONT COLOR="000099"><B>About Us</B></FONT></A>
+&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+<A HREF="/contactus/index.html?issue=1"><FONT COLOR="000099"><B>Contact Us</B></FONT></A>
+&nbsp;&nbsp;&nbsp;]<p>
+<font size="-1" color="gray">Copyright to all articles belong to their respective authors. Everything else &copy 1999, 2000
+<A HREF="http://www.perlmonth.com/"><FONT COLOR="000099"><B>PerlMonth</B></FONT></A>
+
+</center></br>
+                </td>           
+        </tr> 
+</table>
+<br>
+</body>
+</html>

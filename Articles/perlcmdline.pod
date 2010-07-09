@@ -1,0 +1,232 @@
+=head1 Title:  Handling Command Line Options in Perl programs 
+
+=head1 Author: Johan Vromans 
+
+=head1 Introduction 
+
+Controlling a computer by typing commands to a so-called I<command line interpreter> is still most people's favorite way of working, despite the capabilities of modern window systems. When you know the names of the commands and their options, working from the command line is much less complicated and usually faster than complex series of mouse movements and button clicks. 
+
+The way commands and options are specified depends on how the commands are interpreted, and who is handling the options. Sometimes this is the command line interpreter, but quite often the program that is run by the command has to handle the options itself. 
+
+Under most moderns command shells, including the popular Unix and Windows shells, a command line consists of the name of the program to be executed, followed by zero or more options and arguments. There are two conventions on how options look like and should be interpreted: I<option letters> and I<option words>. 
+
+In the case of option letters, options consist of a single dash followed by one or more characters, usually letters, each being interpreted individually. For example, `C<-abc>' means the same as `C<-a -b -c>'. When options take values it is usually possible to bundle the values as well. For example, `C<-aw80L24x>' means the same as `C<-a -w 80 -L 24 -x>'. 
+
+In the case of option words, options consist of a double dash followed by a single option word. When an option takes a value, the value follows the option word or can be appended to the option word using an equals sign. Using this convention, the previous example could read `C<--all --width=80 --length 24 --extend>'. With option words, it is much easier to remember options and their meanings. 
+
+In either case, options precede other program arguments and the recognition of options stops as soon as a non-option argument is encountered. A double dash on itself explicitly stops option recognition. 
+
+Often combinations are allowed, for example, a program can accept `C<-a>' being the same as `C<--all>'. Some programs accept option words with just a single dash (and will not use option letters). Sometimes options and non-option arguments may be mixed. 
+
+You've probably written programs that handle command line options like `C<-h>' for height, `-w' for width, `-v' for verbose, and so on. Some might be optional, some might be case-insensitive, some might not expect an argument afterward. With Perl, parsing options is not very hard to do, but after writing eight subroutines for eight programs, you might wonder whether there's a better way. There is -- in fact, there are several ways. 
+
+=head1 The simple way -- `C<perl -s>' 
+
+The Perl interpreter itself supports the single-character style of options. The Perl script is free to interpret the command line arguments the way it likes. Perl uses a special command line option `C<-s>' to facilitate the option handling for scripts. Assuming you start Perl as follows: C<perl -s script.pl -foo -bar myfile.dat> 
+
+Perl will remove anything that look like options (`C<-foo>' and `C<-bar>') from the command line and set corresponding variables (C<$foo> and C<$bar>) to a I<true> value. Note that the options are words but preceded with a single dash. When a command line argument is encountered that is not an option Perl will not look any further. 
+
+Although this method is very limited it is quite useful to get started. 
+
+=head1 The easy way -- C<Getopt::Std> 
+
+Perl comes standard with two modules that assist programs in handling command line options: C<Getopt::Std> and C<Getopt::Long>. 
+
+Module C<Getopt::Std> provides two subroutines, C<getopt> and C<getopts>. These routines have in common that they use a single dash to identify option letters and they stop processing options when the first non-option is detected. 
+
+Subroutine C<getopt> takes one mandatory argument, a string containing the option letters that take values. For example, when you call 
+
+  getopt ('lw');
+
+your program will accept `C<-l24 -w 80>' and set the variable C<$opt_l> to 24 and C<$opt_w> to 80. Note that the value can be bundled with the option letter but it need not. Other option letters are also accepted (and can be bundled with other letters), for example `C<-ab>' will set each of the variables C<$opt_a> and C<$opt_b> to the value C<1>. When it is not desired to have (global) variables defined, C<getopt> can be passed a reference to a hash as an optional second argument. Hash keys will be I<x> (where I<x> is the option letter) and the key value will be set to the option value or C<1> if the option did not take a value. 
+
+Subroutine C<getops> allows a little bit more control over the options. Its argument is a string containing the option letters of I<all> options that are recognized. If an option takes a value, the option letter in the string is followed by a colon. For example, using 
+
+  getops ('abl:w:');
+
+will make your program take options `C<a>' and `C<b>' without a value, and `C<l>' and `C<w>' with a value. Bundling is allowed. Other command line arguments that start with a dash but are not one of these will cause an error message to be printed. As with C<getopt>, a hash reference can be passed as an optional second argument. 
+
+The functionality provided by C<Getopt::Std> is much better than `C<perl -s>', but still limited. 
+
+=head1 The advanced way -- C<Getopt::Long> 
+
+Module C<Getopt::Long> defines subroutine C<GetOptions> that takes care of advanced handling of command line options. 
+
+C<GetOptions> makes it possible to have ultimate control over the handling of command line options. It provides support for: 
+
+=over 3
+
+=item *
+
+single-letter options, with bundling; 
+
+=item *
+
+option words, using a single dash, double dash or plus (using a plus sign was an intermediate standard used by the GNU project); 
+
+=item *
+
+a mix of the above, in which case the long options I<must> start with a double dash. 
+
+=back
+
+Other important features include: 
+
+=over 3
+
+=item *
+
+options can take (mandatory or optional) values; 
+
+=item *
+
+option values can be strings or numbers; 
+
+=item *
+
+full control over where the option value will be delivered; 
+
+=item *
+
+full checking of options and values. 
+
+=back
+
+=head2 Standard operation: option words 
+
+In its standard configuration, C<GetOptions> will handle option words, matching them in a case-insensitive way. Options may be abbreviated to uniqueness. Options and other command line arguments may be mixed, in which case the all options will be processed first and the other arguments will remain in C<@ARGV>. 
+
+The following call to C<GetOptions> will allow a single option, `C<foo>'. When this option is specified on the command line the variable C<$doit> will be set to value C<1>: 
+
+  GetOptions ('foo' => \$doit);
+
+In this call, C<'foo'> is the I<option control string>, and C<\$doit> the I<option destination>. Multiple pairs of control strings and destinations may be passed. C<GetOptions> will return a I<true> result if processing was successful and a I<false> result when errors were detected. Besides a I<false> result, C<GetOptions> will issue a descriptive error message using C<warn>. 
+
+The option word may optionally be followed by I<aliases>, alternative option words that refer to the same option, for example: 
+
+  GetOptions ('foo|bar' => \$doit);
+
+If you want to specify that an option takes a value, for example a string, append `C<=s>' to the option control string: 
+
+  GetOptions ('foo=s' => \$thevalue);
+
+When you use a colon instead of the equals, the option takes a value only when one is present: 
+
+  GetOptions ('foo:s' => \$thevalue, 'bar' => \$doit);
+
+Calling this program with arguments `C<-foo bar blech>' will deliver value C<'bar'> in C<$thevalue> but when called with `C<-foo -bar blech>' C<$thevalue> will be set to an empty string (and C<$bar> will be set to C<1>). 
+
+Besides strings, options can take numeric values; you can use `=i' or `C<:i>' for integer values and `C<=f>' or `C<:f>' for floating point values. 
+
+=head2 Using single-letter options and bundling 
+
+To use single-letter options is trivial, but to allow them to be bundled C<GetOptions> needs to be configured first. Module C<Getopt::Long> has a subroutine C<Configure> that can be called with a list of strings, each describing a configuration characteristic. For the bundling of single-letter options, you should use: 
+
+  Getopt::Long::Configure ('bundling');
+
+Now C<GetOptions> will happily accept single-letter options and bundle them: 
+
+  GetOptions ('a' => \$all, 'l=i' => \$length, 'w=i' => \$width);
+
+This will allow command line arguments of the form `C<-a -l 24 -w 80>' but also `C<-al24w80>'. You can mix these with option words: 
+
+  GetOptions ('a|all' => \$all, 'l|length=i' => \$length,
+                'w|width=i' => \$width);
+
+However, for the option words, a double dash is required: `C<--length 24>' is acceptible, but `C<-length 24>' is not. The latter will cause the leading `C<l>' to be interpreted as option letter `C<l>', and then complain that `C<ength>' is not a valid integer value. 
+
+For maximum confusion, 
+
+  Getopt::Long::Configure ('bundling_override');
+
+will allow option words with a single dash, where the words take precedence over bundled single-letter options. For example: 
+
+  GetOptions ('a' => \$a, 'v' => \$v, 'x' => \$x, 'vax' => \$vax);
+
+will treat `C<-axv>' as `C<-a -x -v>' but `C<-vax>' as a single option word. 
+
+=head2 Advanced destinations 
+
+You do not need to specified the option destination. If no destination is specified, C<GetOptions> will define variables C<$opt_>I<xxx> where I<xxx> is the name of the option, just like C<getopt> and C<getopts>. GetOptions will also accept a reference to a hash as its first argument and deliver the option values there, again just like C<getopt> and C<getopts>. 
+
+If you do specify the option destination, it does not necessarily need to be a scalar. If you specify a reference to an array, option values are pushed into this array: 
+
+  GetOptions ('foo=i' => \@values);
+
+Calling this program with arguments `C<-foo 1 -foo 2 -foo 3>' will result in C<@values> having the value C<(1,2,3)> provided it was initially empty. 
+
+Also, the option destination can be a reference to a hash. In this case, option values can have the form `I<key>C<=>I<value>'. The I<value> will be stored in the hash with the given I<key>. 
+
+Finally, the destination can be a reference to a subroutine. This subroutine will be called when the option is handled. It gets two arguments passed: the name of the option and the value. 
+
+A special option control string `C<E<lt>E<gt>>' can be used in this case to connect a subroutine to handle non-option arguments. This subroutine will be called with the name of the non-option argument. For example: 
+
+  GetOptions ('x=i' => \$x, '<>' => \&doit);
+
+When you execute this program with command line arguments `C<-x 1 foo -x 2 bar>' this will call subroutine `C<doit>' with argument C<'foo'> (and C<$x >equal to C<1>), and then call `C<doit>' with argument C<'bar'> (and C<$x> equal to 2). 
+
+=head2 Other configuration characteristics 
+
+C<GetOptions> supports several other configuration characteristics. You can switch off the default behavior to match option words in a case-insensitive way with: 
+
+  Getopt::Long::Configure ('no_ignore_case');
+
+To inhibit automatic abbreviations for option words, use C<'no_auto_abbrev'>. To stop detecting options after the first non-option command line argument, use C<'require_order'>. For a complete list see the C<Getopt::Long> documentation. 
+
+=head2 Help texts 
+
+People often ask me why C<GetOptions> does not provide facilities for help messages regarding command line options. There are two reasons why I have not implemented these. 
+
+The first reason is that although command line options have a fairly uniform appearance, help messages have not. Whatever format of messages would be supported it would please some and displease lots of others. It would also clobber the calls to C<GetOptions>, requiring long lists of parameters to get all the information passed through. 
+
+The second reason is that Perl allows a program to contain its own documentation, in so-called I<Plain Old Documentation> (POD) format, and modules exist that extract this information to supply help messages. The following subroutine uses module C<Pod::Usage> for this purpose, it also shows how C<Pod::Usage> can be demand loaded: 
+
+  sub options () {
+        my $help = 0;           # handled locally
+        my $ident = 0;          # handled locally
+        my $man = 0;            # handled locally
+
+  # Process options.
+        if ( @ARGV > 0 ) {
+            GetOptions('verbose'        => \$verbose,
+                       'trace'  => \$trace,
+                       'help|?' => \$help,
+                       'manual' => \$man,
+                       'debug'  => \$debug)
+              or pod2usage(2);
+        }
+        if ( $man or $help ) {
+            # Load Pod::Usage only if needed.
+            require "Pod/Usage.pm";
+            import Pod::Usage;
+            pod2usage(1) if $help;
+            pod2usage(VERBOSE => 2) if $man;
+        }
+    }
+
+The module C<Pod::Usage> can be downloaded from CPAN, directory C<authors/Brad_Appleton>. The latest version of C<Getopt::Long>I<footnote: "This article describes version 2.17 of Getopt::Long."> can be found in directory C<authors/Johan_Vromans>. This kit also contains a script template that uses C<Getopt::Long> with C<Pod::Usage>. 
+
+=head1 Other option handling modules 
+
+A few other option handling modules can be found on CPAN. From directory C<modules/by-category/12_Option_Argument_Parameter_Processing> the following modules can be downloaded: 
+
+C<Getopt::Mixed> (file C<Getopt-Mixed-1.008.tar.gz>) 
+
+This module provides handling option words and option letters. It was developed a couple of years ago, when C<Getopt::Std> only handled option letters and C<Getopt::Long> only handled option words. It is very much obsolete now. 
+
+C<Getopt::Regex> (file C<Getopt-Regex-0.02.tar.gz>) 
+
+An option handler that uses regular expressions to identify the options, and closures to deliver the option values. 
+
+C<Getopt::EvaP> (file C<Getopt-EvaP-2.3.1.tar.gz>) 
+
+This module uses a table-driven option handler that provides most of the features of C<Getopt::Long> but also includes first level help messages. 
+
+C<Getopt::Tabular> (file C<Getopt-Tabular-0.2.tar.gz>) 
+
+Another table-driven option handler loosely inspired by Tcl/Tk. Powerful, but very complex to set up. 
+
+=head1 __END__ 
+
+Johan Vromans <jvromans@squirrel.nl> has been engaged in software engineering since 1975. He has been a Perl user since version 2 and participated actively in the development of Perl. Besides being the author of C<Getopt::Long>, he wrote the `Perl5 Desktop Reference' and co-authored `The Webmasters Handbook'. 
+

@@ -1,0 +1,380 @@
+Content-Type: text/enriched
+Text-Width: 70
+
+<bold>Title: </bold> Handling Command Line Options in Perl programs
+
+<bold>Author:</bold> Johan Vromans
+
+
+<bold>Introduction</bold>
+
+
+Controlling a computer by typing commands to a so-called <italic>command line
+interpreter</italic> is still most people's favorite way of working, despite
+the capabilities of modern window systems. When you know the names of
+the commands and their options, working from the command line is much
+less complicated and usually faster than complex series of mouse
+movements and button clicks.
+
+The way commands and options are specified depends on how the commands
+are interpreted, and who is handling the options. Sometimes this is
+the command line interpreter, but quite often the program that is run
+by the command has to handle the options itself.
+
+Under most moderns command shells, including the popular Unix and
+Windows shells, a command line consists of the name of the
+program to be executed, followed by zero or more options and
+arguments. There are two conventions on how options look like and
+should be interpreted: <italic>option letters</italic> and <italic>option words</italic>.
+
+In the case of option letters, options consist of a single dash
+followed by one or more characters, usually letters, each being
+interpreted individually. For example, `<fixed>-abc</fixed>' means the same as `<fixed>-a -b
+-c</fixed>'. When options take values it is usually possible to bundle the
+values as well. For example, `<fixed>-aw80L24x</fixed>' means the same as `<fixed>-a -w 80
+-L 24 -x</fixed>'.
+
+In the case of option words, options consist of a double dash followed
+by a single option word. When an option takes a value, the value
+follows the option word or can be appended to the option word using an
+equals sign. Using this convention, the previous example could read
+`<fixed>--all --width=80 --length 24 --extend</fixed>'. With option words, it is much
+easier to remember options and their meanings.
+
+In either case, options precede other program arguments and the
+recognition of options stops as soon as a non-option argument is
+encountered. A double dash on itself explicitly stops option
+recognition. 
+
+Often combinations are allowed, for example, a program can accept `<fixed>-a</fixed>'
+being the same as `<fixed>--all</fixed>'. Some programs accept option words with just
+a single dash (and will not use option letters). Sometimes options and
+non-option arguments may be mixed.
+
+
+You've probably written programs that handle command line options like
+`<fixed>-h</fixed>' for height, `-w' for width, `-v' for verbose, and so on. Some
+might be optional, some might be case-insensitive, some might not
+expect an argument afterward. With Perl, parsing options is not very
+hard to do, but after writing eight subroutines for eight programs, you
+might wonder whether there's a better way. There is -- in fact, there
+are several ways.
+
+
+<bold>The simple way --</bold> `<fixed>perl -s</fixed>'
+
+
+The Perl interpreter itself supports the single-character style of
+options. The Perl script is free to interpret the command line
+arguments the way it likes. Perl uses a special command line option
+`<fixed>-s</fixed>' to facilitate the option handling for scripts. Assuming you start
+Perl as follows:
+    <fixed>perl -s script.pl -foo -bar myfile.dat</fixed>
+
+Perl will remove anything that look like options (`<fixed>-foo</fixed>' and `<fixed>-bar</fixed>')
+from the command line and set corresponding variables (<fixed>$foo</fixed> and <fixed>$bar</fixed>)
+to a <italic>true</italic> value. Note that the options are words but preceded with a
+single dash. When a command line argument is encountered that is not
+an option Perl will not look any further.
+
+Although this method is very limited it is quite useful to get
+started. 
+
+
+<bold>The easy way --</bold> <fixed>Getopt::Std</fixed>
+
+
+Perl comes standard with two modules that assist programs in handling
+command line options: <fixed>Getopt::Std</fixed> and <fixed>Getopt::Long</fixed>.
+
+Module <fixed>Getopt::Std</fixed> provides two subroutines, <fixed>getopt</fixed> and <fixed>getopts</fixed>. These
+routines have in common that they use a single dash to identify option
+letters and they stop processing options when the first non-option is
+detected.
+
+Subroutine <fixed>getopt</fixed> takes one mandatory argument, a string containing
+the option letters that take values. For example, when you call
+
+    <fixed>getopt ('lw');</fixed>
+
+your program will accept `<fixed>-l24 -w 80</fixed>' and set the variable <fixed>$opt_l</fixed> to
+24 and <fixed>$opt_w</fixed> to 80. Note that the value can be bundled with the
+option letter but it need not. Other option letters are also accepted
+(and can be bundled with other letters), for example `<fixed>-ab</fixed>' will set
+each of the variables <fixed>$opt_a</fixed> and <fixed>$opt_b</fixed> to the value <fixed>1</fixed>.
+When it is not desired to have (global) variables defined, <fixed>getopt</fixed> can
+be passed a reference to a hash as an optional second argument. Hash
+keys will be <italic>x</italic> (where <italic>x</italic> is the option letter) and the key value will
+be set to the option value or <fixed>1</fixed> if the option did not take a value.
+
+
+Subroutine <fixed>getops</fixed> allows a little bit more control over the options.
+Its argument is a string containing the option letters of <italic>all</italic> options
+that are recognized. If an option takes a value, the option letter in
+the string is followed by a colon. For example, using
+
+    <fixed>getops ('abl:w:');</fixed>
+
+will make your program take options `<fixed>a</fixed>' and `<fixed>b</fixed>' without a value, and
+`<fixed>l</fixed>' and `<fixed>w</fixed>' with a value. Bundling is allowed. Other command line
+arguments that start with a dash but are not one of these will cause
+an error message to be printed. As with <fixed>getopt</fixed>, a hash reference can
+be passed as an optional second argument.
+
+The functionality provided by <fixed>Getopt::Std</fixed> is much better than `<fixed>perl
+-s</fixed>', but still limited.
+
+
+<bold>The advanced way --</bold> <fixed>Getopt::Long</fixed>
+
+
+Module <fixed>Getopt::Long</fixed> defines subroutine <fixed>GetOptions</fixed> that takes care of
+advanced handling of command line options.
+
+<fixed>GetOptions</fixed> makes it possible to have ultimate control over the
+handling of command line options. It provides support for:
+
+ * single-letter options, with bundling;
+
+ * option words, using a single dash, double dash or plus (using a
+   plus sign was an intermediate standard used by the GNU project);
+
+ * a mix of the above, in which case the long options <italic>must</italic> start with a
+   double dash.
+
+Other important features include:
+
+ * options can take (mandatory or optional) values;
+
+ * option values can be strings or numbers;
+
+ * full control over where the option value will be delivered;
+
+ * full checking of options and values.
+
+<italic>Standard operation: option words</italic>
+
+In its standard configuration, <fixed>GetOptions</fixed> will handle option words,
+matching them in a case-insensitive way. Options may be abbreviated to
+uniqueness. Options and other command line arguments may be mixed, in
+which case the all options will be processed first and the other
+arguments will remain in <fixed>@ARGV</fixed>.
+
+The following call to <fixed>GetOptions</fixed> will allow a single option, `<fixed>foo</fixed>'.
+When this option is specified on the command line the variable <fixed>$doit</fixed>
+will be set to value <fixed>1</fixed>:
+
+    <fixed>GetOptions ('foo' => \$doit);</fixed>
+
+In this call, <fixed>'foo'</fixed> is the <italic>option control string</italic>, and <fixed>\$doit</fixed> the
+<italic>option destination</italic>. Multiple pairs of control strings and destinations
+may be passed. <fixed>GetOptions</fixed> will return a <italic>true</italic> result if processing was
+successful and a <italic>false</italic> result when errors were detected. Besides a
+<italic>false</italic> result, <fixed>GetOptions</fixed> will issue a descriptive error message using
+<fixed>warn</fixed>. 
+
+The option word may optionally be followed by <italic>aliases</italic>, alternative
+option words that refer to the same option, for example:
+
+    <fixed>GetOptions ('foo|bar' => \$doit);</fixed>
+
+If you want to specify that an option takes a value, for example a
+string, append 
+`<fixed>=s</fixed>' to the option control string:
+
+    <fixed>GetOptions ('foo=s' => \$thevalue);</fixed>
+
+When you use a colon instead of the equals, the option takes a value
+only when one is present:
+
+    <fixed>GetOptions ('foo:s' => \$thevalue, 'bar' => \$doit);</fixed>
+
+Calling this program with arguments `<fixed>-foo bar blech</fixed>' will deliver
+value <fixed>'bar'</fixed> in <fixed>$thevalue</fixed> but when called with `<fixed>-foo -bar blech</fixed>'
+<fixed>$thevalue</fixed> will be set to an empty string (and <fixed>$bar</fixed> will be set to <fixed>1</fixed>).
+
+Besides strings, options can take numeric values; you can use `=i' or
+`<fixed>:i</fixed>' for integer values and `<fixed>=f</fixed>' or `<fixed>:f</fixed>' for floating point values.
+
+<italic>Using single-letter options and bundling</italic>
+
+To use single-letter options is trivial, but to allow them to be
+bundled <fixed>GetOptions</fixed> needs to be configured first. Module <fixed>Getopt::Long</fixed>
+has a subroutine <fixed>Configure</fixed> that can be called with a list of strings,
+each describing a configuration characteristic. For the bundling of
+single-letter options, you should use:
+
+    <fixed>Getopt::Long::Configure ('bundling');</fixed>
+
+Now <fixed>GetOptions</fixed> will happily accept single-letter options and bundle
+them:
+
+    <fixed>GetOptions ('a' => \$all, 'l=i' => \$length, 'w=i' => \$width);</fixed>
+
+This will allow command line arguments of the form `<fixed>-a -l 24 -w 80</fixed>'
+but also `<fixed>-al24w80</fixed>'. You can mix these with option words:
+
+    <fixed>GetOptions ('a|all' => \$all, 'l|length=i' => \$length,
+                'w|width=i' => \$width);</fixed>
+
+However, for the option words, a double dash is required: `<fixed>--length
+24</fixed>' is acceptible, but `<fixed>-length 24</fixed>' is not. The latter will cause the
+leading `<fixed>l</fixed>' to be interpreted as option letter `<fixed>l</fixed>', and then complain
+that `<fixed>ength</fixed>' is not a valid integer value.
+
+For maximum confusion, 
+
+    <fixed>Getopt::Long::Configure ('bundling_override');</fixed>
+
+will allow option words with a single dash, where the words take
+precedence over bundled single-letter options. For example:
+
+    <fixed>GetOptions ('a' => \$a, 'v' => \$v, 'x' => \$x, 'vax' => \$vax);</fixed>
+
+will treat `<fixed>-axv</fixed>' as `<fixed>-a -x -v</fixed>' but `<fixed>-vax</fixed>' as a single option word.
+
+<italic>Advanced destinations</italic>
+
+You do not need to specified the option destination. If no
+destination is specified, <fixed>GetOptions</fixed> will define variables <fixed>$opt_</fixed><italic>xxx</italic>
+where <italic>xxx</italic> is the name of the option, just like <fixed>getopt</fixed> and <fixed>getopts</fixed>.
+GetOptions will also accept a reference to a hash as its first
+argument and deliver the option values there, again just like <fixed>getopt</fixed>
+and <fixed>getopts</fixed>.
+
+If you do specify the option destination, it does not necessarily need to be
+a scalar. If you specify a reference to an array, option values are
+pushed into this array:
+
+    <fixed>GetOptions ('foo=i' => \@values);</fixed>
+
+Calling this program with arguments `<fixed>-foo 1 -foo 2 -foo 3</fixed>' will result
+in <fixed>@values</fixed> having the value <fixed>(1,2,3)</fixed> provided it was initially empty.
+
+Also, the option destination can be a reference to a hash. In this
+case, option values can have the form `<italic>key</italic><fixed>=</fixed><italic>value</italic>'. The <italic>value</italic> will be
+stored in the hash with the given <italic>key</italic>.
+
+Finally, the destination can be a reference to a subroutine. This
+subroutine will be called when the option is handled. It gets two
+arguments passed: the name of the option and the value. 
+
+A special option control string `<fixed><<></fixed>' can be used in this case to
+connect a subroutine to handle non-option arguments. This subroutine
+will be called with the name of the non-option argument. For example:
+
+    <fixed>GetOptions ('x=i' => \$x, '<<>' => \&doit);</fixed>
+
+When you execute this program with command line arguments `<fixed>-x 1 foo -x
+2 bar</fixed>' this will call subroutine `<fixed>doit</fixed>' with argument <fixed>'foo'</fixed> (and <fixed>$x
+</fixed>equal to <fixed>1</fixed>), and then call `<fixed>doit</fixed>'  with argument <fixed>'bar'</fixed> (and <fixed>$x</fixed> equal
+to 2).
+
+<italic>Other configuration characteristics</italic>
+
+<fixed>GetOptions</fixed> supports several other configuration characteristics. You
+can switch off the default behavior to match option words in a
+case-insensitive way with: 
+
+    <fixed>Getopt::Long::Configure ('no_ignore_case');</fixed>
+
+To inhibit automatic abbreviations for option words, use
+<fixed>'no_auto_abbrev'</fixed>. To stop detecting options after the first non-option
+command line argument, use <fixed>'require_order'</fixed>. For a complete list see
+the <fixed>Getopt::Long</fixed> documentation.
+
+<italic>Help texts</italic>
+
+People often ask me why <fixed>GetOptions</fixed> does not provide facilities for
+help messages regarding command line options. There are two reasons
+why I have not implemented these.
+
+The first reason is that although command line options have a fairly
+uniform appearance, help messages have not. Whatever format of
+messages would be supported it would please some and displease lots of
+others. It would also clobber the calls to <fixed>GetOptions</fixed>, requiring long
+lists of parameters to get all the information passed through.
+
+The second reason is that Perl allows a program to contain its own
+documentation, in so-called <italic>Plain Old Documentation</italic> (POD) format, and
+modules exist that extract this information to supply help messages.
+The following subroutine uses module <fixed>Pod::Usage</fixed> for this purpose, it
+also shows how <fixed>Pod::Usage</fixed> can be demand loaded:
+
+    <fixed>sub options () {
+	my $help = 0;		# handled locally
+	my $ident = 0;		# handled locally
+	my $man = 0;		# handled locally
+
+	# Process options.
+	if ( @ARGV > 0 ) {
+	    GetOptions('verbose'	=> \$verbose,
+		       'trace'	=> \$trace,
+		       'help|?'	=> \$help,
+		       'manual'	=> \$man,
+		       'debug'	=> \$debug)
+	      or pod2usage(2);
+	}
+	if ( $man or $help ) {
+	    # Load Pod::Usage only if needed.
+	    require "Pod/Usage.pm";
+	    import Pod::Usage;
+	    pod2usage(1) if $help;
+	    pod2usage(VERBOSE => 2) if $man;
+	}
+    }</fixed>
+
+
+The module <fixed>Pod::Usage</fixed> can be downloaded from CPAN, directory
+<fixed>authors/Brad_Appleton</fixed>. The latest version of <fixed>Getopt::Long</fixed><italic>footnote:
+"This article describes version 2.17 of Getopt::Long."</italic> can be found in
+directory <fixed>authors/Johan_Vromans</fixed>. This kit also contains a script
+template that uses <fixed>Getopt::Long</fixed> with <fixed>Pod::Usage</fixed>.
+
+
+<bold>Other option handling modules</bold>
+
+
+A few other option handling modules can be found on CPAN. From directory
+<fixed>modules/by-category/12_Option_Argument_Parameter_Processing</fixed> the
+following modules can be downloaded:
+
+<fixed>Getopt::Mixed</fixed> (file <fixed>Getopt-Mixed-1.008.tar.gz</fixed>)
+
+This module provides handling option words and option letters. It was
+developed a couple of years ago, when <fixed>Getopt::Std</fixed> only handled option
+letters and <fixed>Getopt::Long</fixed> only handled option words. It is very much
+obsolete now.
+
+<fixed>Getopt::Regex</fixed> (file <fixed>Getopt-Regex-0.02.tar.gz</fixed>)
+
+An option handler that uses regular expressions to identify the
+options, and closures to deliver the option values.
+
+<fixed>Getopt::EvaP</fixed> (file <fixed>Getopt-EvaP-2.3.1.tar.gz</fixed>)
+
+This module uses a table-driven option handler that provides most of
+the features of <fixed>Getopt::Long</fixed> but also includes first level help
+messages.
+
+<fixed>Getopt::Tabular</fixed> (file <fixed>Getopt-Tabular-0.2.tar.gz</fixed>)
+
+Another table-driven option handler loosely inspired by Tcl/Tk.
+Powerful, but very complex to set up.
+
+
+<bold>__END__</bold>
+
+
+Johan Vromans <<jvromans@squirrel.nl> has been engaged in software
+engineering since 1975. He has been a Perl user since version 2 and
+participated actively in the development of Perl. Besides being the
+author of <fixed>Getopt::Long</fixed>, he wrote the `Perl5 Desktop Reference' and
+co-authored `The Webmasters Handbook'.
+
+
+;;Local Variables:
+;;eval: (ispell-change-dictionary "english")
+;;eval: (modify-face 'fixed  nil    nil nil nil nil t   nil)
+;;eval: (modify-face 'italic "blue" nil nil nil nil nil nil)
+;;End:
