@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Jul  9 14:47:45 2010
-# Update Count    : 1618
+# Last Modified On: Fri Jan  7 12:49:54 2011
+# Update Count    : 1619
 # Status          : Released
 
 ################ Module Preamble ################
@@ -249,7 +249,7 @@ use constant PAT_FLOAT => "[-+]?[0-9._]+(\.[0-9_]+)?([eE][-+]?[0-9_]+)?";
 sub GetOptions(@) {
     # Shift in default array.
     unshift(@_, \@ARGV);
-    # Try to keep caller() and Carp consitent.
+    # Try to keep caller() and Carp consistent.
     goto &GetOptionsFromArray;
 }
 

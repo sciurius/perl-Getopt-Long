@@ -99,7 +99,7 @@ Changes in version 2.35
 
   prefix_pattern has now been complemented by a new configuration
   option 'long_prefix_pattern' that allows the user to specify what
-  prefix patterns should have long option style sematics applied.
+  prefix patterns should have long option style semantics applied.
   This will enable people to do things like
 
     foo.pl /option=value
@@ -287,7 +287,7 @@ Changes in version 2.27
   generated. E.g., GetOptions('foo', 'foo').
   Thanks to Wolfgang Laun.
 
-* Lots of internal restructoring to make room for extensions.
+* Lots of internal restructuring to make room for extensions.
 
 * Redesigned the regression tests.
 
