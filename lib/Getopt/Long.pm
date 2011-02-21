@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Jan  7 12:49:54 2011
-# Update Count    : 1619
+# Last Modified On: Mon Feb 21 11:18:19 2011
+# Update Count    : 1621
 # Status          : Released
 
 ################ Module Preamble ################
@@ -1765,7 +1765,7 @@ will call the subroutine with two or three arguments. The first
 argument is the name of the option. (Actually, it is an object that
 stringifies to the name of the option.) For a scalar or array destination,
 the second argument is the value to be stored. For a hash destination,
-the second arguments is the key to the hash, and the third argument
+the second argument is the key to the hash, and the third argument
 the value to be stored. It is up to the subroutine to store the value,
 or do whatever it thinks is appropriate.
 
@@ -1794,6 +1794,15 @@ changed from string to object. This was done to make room for
 extensions and more detailed control. The object stringifies to the
 option name so this change should not introduce compatibility
 problems.
+
+Here is an example of how to access the option name and value from within
+a subroutine:
+
+    GetOptions ('opt=i' => \&handler);
+    sub handler {
+        my ($opt_name, $opt_value) = @_;
+        print("Option name is $opt_name and value is $opt_value\n");
+    }
 
 =head2 Options with multiple names
 
@@ -2325,9 +2334,9 @@ especially when mixing long options and bundles. Caveat emptor.
 
 =item ignore_case  (default: enabled)
 
-If enabled, case is ignored when matching long option names. If,
-however, bundling is enabled as well, single character options will be
-treated case-sensitive.
+If enabled, case is ignored when matching option names. If, however,
+bundling is enabled as well, single character options will be treated
+case-sensitive.
 
 With C<ignore_case>, option specifications for options that only
 differ in case, e.g., C<"foo"> and C<"Foo">, will be flagged as
