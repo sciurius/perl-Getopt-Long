@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Feb 21 11:18:19 2011
-# Update Count    : 1621
+# Last Modified On: Thu Mar 31 12:00:07 2011
+# Update Count    : 1622
 # Status          : Released
 
 ################ Module Preamble ################
@@ -1609,8 +1609,8 @@ can contain more than just the option name. The reference to the
 variable is called the option I<destination>.
 
 GetOptions() will return a true value if the command line could be
-processed successfully. Otherwise, it will write error messages to
-STDERR, and return a false result.
+processed successfully. Otherwise, it will write error messages using
+die() and warn(), and return a false result.
 
 =head2 A little bit less simple options
 
