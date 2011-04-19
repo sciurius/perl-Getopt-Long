@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Jul  9 14:25:49 2010
-# Update Count    : 501
+# Last Modified On: Tue Apr 19 20:49:40 2011
+# Update Count    : 504
 # Status          : In progress
 
 ################ No args ################
@@ -2210,3 +2210,18 @@ T: #24941: Autoabbrev with + incorrect
 P: v1:s
 A: +
 W: Missing option after +
+
+T: #67577 Parsing of type 'o' not correct for multiple values
+P: opt=o@{,} \\@a1
+A: --opt 1 2 0x3
+   @a1 1 2 3
+
+T: #67577 Parsing of type 'o' not correct for multiple values
+P: opt=o@{,} \\@a1
+A: --opt 0x1 2 0x3
+   @a1 1 2 3
+
+T: #67577 Parsing of type 'o' not correct for multiple values
+P: opt=o@{,} \\@a1
+A: --opt 0x1 0x2 0x3
+   @a1 1 2 3

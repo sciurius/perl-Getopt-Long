@@ -23,6 +23,8 @@ Changes in version 2.39
 
 * Several other minor documentation fixes and enhancements.
 
+* Fix bug  #67577 Parsing of type 'o' not correct for multiple values
+
 Changes in version 2.38
 -----------------------
 

@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Mar 31 12:00:07 2011
-# Update Count    : 1622
+# Last Modified On: Tue Apr 19 20:48:03 2011
+# Update Count    : 1623
 # Status          : Released
 
 ################ Module Preamble ################
@@ -17,10 +17,10 @@ use 5.004;
 use strict;
 
 use vars qw($VERSION);
-$VERSION        =  2.3802;
+$VERSION        =  2.3803;
 # For testing versions only.
 use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.38_02";
+$VERSION_STRING = "2.38_03";
 
 use Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
@@ -661,7 +661,12 @@ sub GetOptionsFromArray(@) {
 		    if ( @$argv ) {
 			if ( ValidValue($ctl, $argv->[0], 1, $argend, $prefix) ) {
 			    $arg = shift(@$argv);
-			    $arg =~ tr/_//d if $ctl->[CTL_TYPE] =~ /^[iIo]$/;
+			    if ( $ctl->[CTL_TYPE] =~ /^[iIo]$/ ) {
+				$arg =~ tr/_//d;
+				$arg = $ctl->[CTL_TYPE] eq 'o' && $arg =~ /^0/
+				  ? oct($arg)
+				  : 0+$arg
+			    }
 			    ($key,$arg) = $arg =~ /^([^=]+)=(.*)/
 			      if $ctl->[CTL_DEST] == CTL_DEST_HASH;
 			    next;
@@ -678,7 +683,12 @@ sub GetOptionsFromArray(@) {
 		# Any more args?
 		if ( @$argv && ValidValue($ctl, $argv->[0], 0, $argend, $prefix) ) {
 		    $arg = shift(@$argv);
-		    $arg =~ tr/_//d if $ctl->[CTL_TYPE] =~ /^[iIo]$/;
+		    if ( $ctl->[CTL_TYPE] =~ /^[iIo]$/ ) {
+			$arg =~ tr/_//d;
+			$arg = $ctl->[CTL_TYPE] eq 'o' && $arg =~ /^0/
+			  ? oct($arg)
+			  : 0+$arg
+		    }
 		    ($key,$arg) = $arg =~ /^([^=]+)=(.*)/
 		      if $ctl->[CTL_DEST] == CTL_DEST_HASH;
 		    next;
