@@ -32,3 +32,24 @@ tardist :
 .PHONY : install
 install :
 	$(MAKE) -f Makefile install
+
+MODIR := locale
+LOCALES := nl
+xxlocales :
+	for locale in $(LOCALES); \
+	do \
+	  test -d $(MODIR)/$$locale || mkdir -p $(MODIR)/$$locale; \
+	  ( cd locale; \
+	    sh make_locales_$$locale; \
+	  ); \
+	done
+
+PODIR := locale
+locales :
+	for locale in $(LOCALES); \
+	do \
+	  test -d $(MODIR)/$$locale/LC_MESSAGES || mkdir -p $(MODIR)/$$locale/LC_MESSAGES; \
+	done
+	msgfmt -c -v -o $(MODIR)/en/LC_MESSAGES/ebcore.mo    $(PODIR)/ebcore-en.po
+	msgfmt -c -v -o $(MODIR)/nl/LC_MESSAGES/ebwxshell.mo $(PODIR)/ebwxshell-nl.po
+

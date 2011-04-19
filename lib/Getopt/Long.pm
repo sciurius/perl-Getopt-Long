@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Apr 19 20:48:03 2011
-# Update Count    : 1623
+# Last Modified On: Tue Apr 19 21:00:01 2011
+# Update Count    : 1642
 # Status          : Released
 
 ################ Module Preamble ################
@@ -38,6 +38,7 @@ BEGIN {
     # Init immediately so their contents can be used in the 'use vars' below.
     @EXPORT    = qw(&GetOptions $REQUIRE_ORDER $PERMUTE $RETURN_IN_ORDER);
     @EXPORT_OK = qw(&HelpMessage &VersionMessage &Configure
+		    &SetLocalizer &SetLocaliser
 		    &GetOptionsFromArray &GetOptionsFromString);
 }
 
@@ -94,6 +95,13 @@ sub ConfigDefaults() {
     $longprefix = "(--)";       # what does a long prefix look like
 }
 
+sub SetLocalizer {
+    no warnings 'redefine';
+    *_T = shift;
+}
+
+sub SetLocaliser { goto &SetLocalizer }
+
 # Override import.
 sub import {
     my $pkg = shift;		# package
@@ -123,6 +131,21 @@ sub import {
 ($major_version, $minor_version) = $VERSION =~ /^(\d+)\.(\d+)/;
 
 ConfigDefaults();
+
+# Prepare for translations. Caller is responsible for setting up
+# the translation environment and Getopt::Long::_T subroutine.
+unless ( __PACKAGE__->can("_T") ) {
+    *_T = sub { $_[0] };
+}
+unless ( __PACKAGE__->can("__x") ) {
+    *__x = sub {
+	my ($t, %args) = @_;
+	$t = _T($t);
+	my $re = join('|', map { quotemeta($_) } keys(%args));
+	$t =~ s/\{($re)\}/defined($args{$1}) ? $args{$1} : "{$1}"/ge;
+	$t;
+    };
+}
 
 ################ OO Interface ################
 
@@ -156,8 +179,9 @@ sub new {
     }
 
     if ( %atts ) {		# Oops
-	die(__PACKAGE__.": unhandled attributes: ".
-	    join(" ", sort(keys(%atts)))."\n");
+	die( Getopt::Long::__x("{pkg}: unhandled attributes: {atts}".
+			       pkg => __PACKAGE__,
+			       atts => join(" ", sort(keys(%atts)))) . "\n" );
     }
 
     $self;
@@ -262,7 +286,8 @@ sub GetOptionsFromString(@) {
     return ( $ret, $args ) if wantarray;
     if ( @$args ) {
 	$ret = 0;
-	warn("GetOptionsFromString: Excess data \"@$args\" in string \"$string\"\n");
+	warn( __x("GetOptionsFromString: Excess data \"{args}\" in string \"{string}\"",
+		  args => "@$args", string => $string) . "\n");
     }
     $ret;
 }
@@ -335,7 +360,7 @@ sub GetOptionsFromArray(@) {
 	my $opt = shift (@optionlist);
 
 	unless ( defined($opt) ) {
-	    $error .= "Undefined argument in option spec\n";
+	    $error .= _T("Undefined argument in option spec")."\n";
 	    next;
 	}
 
@@ -351,7 +376,7 @@ sub GetOptionsFromArray(@) {
 	    }
 	    unless ( @optionlist > 0
 		    && ref($optionlist[0]) && ref($optionlist[0]) eq 'CODE' ) {
-		$error .= "Option spec <> requires a reference to a subroutine\n";
+		$error .= _T("Option spec <> requires a reference to a subroutine")."\n";
 		# Kill the linkage (to avoid another error).
 		shift (@optionlist)
 		  if @optionlist && ref($optionlist[0]);
@@ -417,7 +442,8 @@ sub GetOptionsFromArray(@) {
 		# Ok.
 	    }
 	    else {
-		$error .= "Invalid option linkage for \"$opt\"\n";
+		$error .= __x("Invalid option linkage for \"{opt}\"",
+			      opt => $opt) . "\n";
 	    }
 	}
 	else {
@@ -446,7 +472,8 @@ sub GetOptionsFromArray(@) {
 	     && ( $opctl{$name}[CTL_DEST] == CTL_DEST_ARRAY
 		  || $opctl{$name}[CTL_DEST] == CTL_DEST_HASH )
 	   ) {
-	    $error .= "Invalid option linkage for \"$opt\"\n";
+	    $error .= __x("Invalid option linkage for \"{opt}\"",
+			  opt => $opt) . "\n";
 	}
 
     }
@@ -605,9 +632,8 @@ sub GetOptionsFromArray(@) {
 			}
 		    }
 		    else {
-			print STDERR ("Invalid REF type \"", ref($linkage{$opt}),
-				      "\" in linkage\n");
-			die("Getopt::Long -- internal error!\n");
+			print STDERR ( __x("Invalid REF type \"{type}\" in linkage", type => ref($linkage{$opt})) . "\n");
+			die( _T("Getopt::Long -- internal error!")."\n" );
 		    }
 		}
 		# No entry in linkage means entry in userlinkage.
@@ -671,11 +697,13 @@ sub GetOptionsFromArray(@) {
 			      if $ctl->[CTL_DEST] == CTL_DEST_HASH;
 			    next;
 			}
-			warn("Value \"$$argv[0]\" invalid for option $opt\n");
+			warn( __x("Value \"{val}\" invalid for option {opt}",
+				  val => $$argv[0], opt => $opt) . "\n" );
 			$error++;
 		    }
 		    else {
-			warn("Insufficient arguments for option $opt\n");
+			warn( __x("Insufficient arguments for option {opt}",
+				  opt => $opt) . "\n" );
 			$error++;
 		    }
 		}
@@ -992,8 +1020,8 @@ sub FindOption ($$$$$) {
 	    # Now see if it really is ambiguous.
 	    unless ( keys(%hit) == 1 ) {
 		return (0) if $passthrough;
-		warn ("Option ", $opt, " is ambiguous (",
-		      join(", ", @hits), ")\n");
+		warn( __x("Option {opt} is ambiguous ({hits})",
+			  opt => $opt, hits => join(", ", @hits)) , "\n" );
 		$error++;
 		return (1, undef);
 	    }
@@ -1024,10 +1052,12 @@ sub FindOption ($$$$$) {
             unshift (@$argv, $starter.$rest) if defined $rest;
 	}
 	if ( $opt eq "" ) {
-	    warn ("Missing option after ", $starter, "\n");
+	    warn( __x("Missing option after {starter}",
+		      starter => $starter) . "\n" );
 	}
 	else {
-	    warn ("Unknown option: ", $opt, "\n");
+	    warn( __x("Unknown option: {opt}",
+		      opt => $opt) . "\n" );
 	}
 	$error++;
 	return (1, undef);
@@ -1046,7 +1076,8 @@ sub FindOption ($$$$$) {
     if ( $type eq '' || $type eq '!' || $type eq '+' ) {
 	if ( defined $optarg ) {
 	    return (0) if $passthrough;
-	    warn ("Option ", $opt, " does not take an argument\n");
+	    warn( __x("Option {opt} does not take an argument",
+		      opt => $opt) . "\n" );
 	    $error++;
 	    undef $opt;
 	}
@@ -1079,7 +1110,8 @@ sub FindOption ($$$$$) {
 #	if ( $mand && !($type eq 's' ? defined($optarg) : 0) ) {
 	if ( $mand ) {
 	    return (0) if $passthrough;
-	    warn ("Option ", $opt, " requires an argument\n");
+	    warn( __x("Option {opt} requires an argument",
+		      opt => $opt) . "\n" );
 	    $error++;
 	    return (1, undef);
 	}
@@ -1105,7 +1137,8 @@ sub FindOption ($$$$$) {
 	  : ($arg, defined($ctl->[CTL_DEFAULT]) ? $ctl->[CTL_DEFAULT] :
 	     ($mand ? undef : ($type eq 's' ? "" : 1)));
 	if (! defined $arg) {
-	    warn ("Option $opt, key \"$key\", requires a value\n");
+	    warn( __x("Option {opt}, key \"{key}\", requires a value",
+		     opt => $opt, key => $key) . "\n" );
 	    $error++;
 	    # Push back.
 	    unshift (@$argv, $starter.$rest) if defined $rest;
@@ -1164,10 +1197,13 @@ sub FindOption ($$$$$) {
 		      unless defined $optarg;
 		    return (0);
 		}
-		warn ("Value \"", $arg, "\" invalid for option ",
-		      $opt, " (",
-		      $type eq 'o' ? "extended " : '',
-		      "number expected)\n");
+		$type eq 'o'
+		? warn( __x("Value \"{arg}\" invalid for option {opt}".
+			    " (extended number expected)",
+			    arg => $arg, opt => $opt) . "\n" )
+		: warn( __x("Value \"{arg}\" invalid for option {opt}".
+			    " (number expected)",
+			    arg => $arg, opt => $opt) . "\n" );
 		$error++;
 		# Push back.
 		unshift (@$argv, $starter.$rest) if defined $rest;
@@ -1210,8 +1246,9 @@ sub FindOption ($$$$$) {
 		      unless defined $optarg;
 		    return (0);
 		}
-		warn ("Value \"", $arg, "\" invalid for option ",
-		      $opt, " (real number expected)\n");
+		warn( __x("Value \"{arg}\" invalid for option {opt}".
+			  " (real number expected)",
+			  arg => $arg, opt => $opt) . "\n" );
 		$error++;
 		# Push back.
 		unshift (@$argv, $starter.$rest) if defined $rest;
@@ -1226,7 +1263,7 @@ sub FindOption ($$$$$) {
 	}
     }
     else {
-	die("Getopt::Long internal error (Can't happen)\n");
+	die( _T("Getopt::Long internal error (Can't happen)")."\n");
     }
     return (1, $opt, $ctl, $arg, $key);
 }
@@ -1267,7 +1304,7 @@ sub ValidValue ($$$$$) {
 	my $o_valid = PAT_FLOAT;
 	return $arg =~ /^$o_valid$/;
     }
-    die("ValidValue: Cannot happen\n");
+    die(_T("ValidValue: Cannot happen")."\n");
 }
 
 # Getopt::Long Configuration.
@@ -1354,7 +1391,8 @@ sub Configure (@) {
 	    # Turn into regexp. Needs to be parenthesized!
 	    $genprefix = "(" . quotemeta($genprefix) . ")";
 	    eval { '' =~ /$genprefix/; };
-	    die("Getopt::Long: invalid pattern \"$genprefix\"") if $@;
+	    die( __x("Getopt::Long: invalid pattern \"{pat}\"",
+		     pat => $genprefix) ) if $@;
 	}
 	elsif ( $try =~ /^prefix_pattern=(.+)$/ && $action ) {
 	    $genprefix = $1;
@@ -1362,7 +1400,8 @@ sub Configure (@) {
 	    $genprefix = "(" . $genprefix . ")"
 	      unless $genprefix =~ /^\(.*\)$/;
 	    eval { '' =~ m"$genprefix"; };
-	    die("Getopt::Long: invalid pattern \"$genprefix\"") if $@;
+	    die( __x("Getopt::Long: invalid pattern \"{pat}\"",
+		     pat => $genprefix) ) if $@;
 	}
 	elsif ( $try =~ /^long_prefix_pattern=(.+)$/ && $action ) {
 	    $longprefix = $1;
@@ -1370,13 +1409,15 @@ sub Configure (@) {
 	    $longprefix = "(" . $longprefix . ")"
 	      unless $longprefix =~ /^\(.*\)$/;
 	    eval { '' =~ m"$longprefix"; };
-	    die("Getopt::Long: invalid long prefix pattern \"$longprefix\"") if $@;
+	    die( __x("Getopt::Long: invalid long prefix pattern \"{pat}\"",
+		     pat => $longprefix) ) if $@;
 	}
 	elsif ( $try eq 'debug' ) {
 	    $debug = $action;
 	}
 	else {
-	    die("Getopt::Long: unknown config parameter \"$opt\"")
+	    die( __x("Getopt::Long: unknown config parameter \"{cfg}\"",
+		     cfg => $opt) );
 	}
     }
     $prevconfig;
@@ -1429,7 +1470,7 @@ sub HelpMessage(@) {
 	require Pod::Usage;
 	import Pod::Usage;
 	1;
-    } || die("Cannot provide help: cannot load Pod::Usage\n");
+    } || die( _T("Cannot provide help: cannot load Pod::Usage") . "\n" );
 
     # Note that pod2usage will issue a warning if -exitval => NOEXIT.
     pod2usage(setup_pa_args("help", @_));

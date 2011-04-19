@@ -5,22 +5,23 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 15 15:59:04 1992
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Jul  9 14:28:48 2010
-# Update Count    : 43
+# Last Modified On: Sun Oct  3 22:23:06 2010
+# Update Count    : 47
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
 
 use strict;
+use warnings;
 
 # Package or program libraries, if appropriate.
 # $LIBDIR = $ENV{'LIBDIR'} || '/usr/local/lib/sample';
 # use lib qw($LIBDIR);
 # require 'common.pl';
 
-# Package name.
+# Package name. Customize, please.
 my $my_package = 'Sciurix';
-# Program name and version.
+# Program name and version. Customize, please.
 my ($my_name, $my_version) = qw( MyProg 0.01 );
 
 ################ Command line parameters ################
@@ -30,7 +31,7 @@ use Getopt::Long 2.13;
 # Command line options.
 my $verbose = 0;		# verbose processing
 
-# Development options (not shown with -help).
+# Development options (not shown with --help).
 my $debug = 0;			# debugging
 my $trace = 0;			# trace (show process)
 my $test = 0;			# test mode.
@@ -60,11 +61,11 @@ sub app_options {
     return unless @ARGV > 0;
 
     if ( !GetOptions(
-		     'ident'	=> \$ident,
-		     'verbose'	=> \$verbose,
-		     'trace'	=> \$trace,
-		     'help|?'	=> \$help,
-		     'debug'	=> \$debug,
+		     'ident'		=> \$ident,
+		     'verbose'		=> \$verbose,
+		     'trace'		=> \$trace,
+		     'help|?'		=> \$help,
+		     'debug'		=> \$debug,
 		    ) or $help )
     {
 	app_usage(2);
@@ -81,9 +82,9 @@ sub app_usage {
     app_ident();
     print STDERR <<EndOfUsage;
 Usage: $0 [options] [file ...]
-    -help		this message
-    -ident		show identification
-    -verbose		verbose information
+    --help		this message
+    --ident		show identification
+    --verbose		verbose information
 EndOfUsage
     exit $exit if defined $exit && $exit != 0;
 }
