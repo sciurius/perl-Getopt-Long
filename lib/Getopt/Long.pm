@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Apr 19 20:48:03 2011
-# Update Count    : 1623
+# Last Modified On: Sat Aug 20 21:32:30 2011
+# Update Count    : 1625
 # Status          : Released
 
 ################ Module Preamble ################
@@ -2649,6 +2649,11 @@ version 2.13.
 
     use Getopt::Long;
     GetOptions ("help|?");    # -help and -? will both set $opt_help
+
+As of version 2.32 Getopt::Long provides auto-help, a quick and easy way
+to add the options --help and -? to your program, and handle them.
+
+See C<auto_help> in section L<Configuring Getopt::Long>.
 
 =head1 AUTHOR
 
