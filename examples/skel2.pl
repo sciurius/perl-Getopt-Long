@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Sun Sep 15 18:39:01 1996
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Jul  9 14:29:41 2010
-# Update Count    : 20
+# Last Modified On: Sun Sep  4 20:08:49 2011
+# Update Count    : 21
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -89,28 +89,28 @@ sample - skeleton for GetOpt::Long and Pod::Usage
 sample [options] [file ...]
 
  Options:
-   -ident		show identification
-   -help		brief help message
-   -man                 full documentation
-   -verbose		verbose information
+   --ident		show identification
+   --help		brief help message
+   --man                full documentation
+   --verbose		verbose information
 
 =head1 OPTIONS
 
 =over 8
 
-=item B<-help>
+=item B<--help>
 
 Print a brief help message and exits.
 
-=item B<-man>
+=item B<--man>
 
 Prints the manual page and exits.
 
-=item B<-ident>
+=item B<--ident>
 
 Prints program identification.
 
-=item B<-verbose>
+=item B<--verbose>
 
 More verbose information.
 

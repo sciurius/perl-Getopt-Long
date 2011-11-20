@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Aug 20 21:32:30 2011
-# Update Count    : 1625
+# Last Modified On: Tue Sep 27 21:05:28 2011
+# Update Count    : 1627
 # Status          : Released
 
 ################ Module Preamble ################
@@ -1354,7 +1354,7 @@ sub Configure (@) {
 	    # Turn into regexp. Needs to be parenthesized!
 	    $genprefix = "(" . quotemeta($genprefix) . ")";
 	    eval { '' =~ /$genprefix/; };
-	    die("Getopt::Long: invalid pattern \"$genprefix\"") if $@;
+	    die("Getopt::Long: invalid pattern \"$genprefix\"\n") if $@;
 	}
 	elsif ( $try =~ /^prefix_pattern=(.+)$/ && $action ) {
 	    $genprefix = $1;
@@ -1362,7 +1362,7 @@ sub Configure (@) {
 	    $genprefix = "(" . $genprefix . ")"
 	      unless $genprefix =~ /^\(.*\)$/;
 	    eval { '' =~ m"$genprefix"; };
-	    die("Getopt::Long: invalid pattern \"$genprefix\"") if $@;
+	    die("Getopt::Long: invalid pattern \"$genprefix\"\n") if $@;
 	}
 	elsif ( $try =~ /^long_prefix_pattern=(.+)$/ && $action ) {
 	    $longprefix = $1;
@@ -1370,13 +1370,13 @@ sub Configure (@) {
 	    $longprefix = "(" . $longprefix . ")"
 	      unless $longprefix =~ /^\(.*\)$/;
 	    eval { '' =~ m"$longprefix"; };
-	    die("Getopt::Long: invalid long prefix pattern \"$longprefix\"") if $@;
+	    die("Getopt::Long: invalid long prefix pattern \"$longprefix\"\n") if $@;
 	}
 	elsif ( $try eq 'debug' ) {
 	    $debug = $action;
 	}
 	else {
-	    die("Getopt::Long: unknown config parameter \"$opt\"")
+	    die("Getopt::Long: unknown or erroneous config parameter \"$opt\"\n")
 	}
     }
     $prevconfig;
