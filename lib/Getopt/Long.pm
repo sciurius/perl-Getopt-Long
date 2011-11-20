@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Sep 27 21:05:28 2011
-# Update Count    : 1627
+# Last Modified On: Sun Nov 20 16:15:36 2011
+# Update Count    : 1628
 # Status          : Released
 
 ################ Module Preamble ################
@@ -176,6 +176,12 @@ sub configure {
 sub getoptions {
     my ($self) = shift;
 
+    return $self->getoptionsfromarray(\@ARGV, @_);
+}
+
+sub getoptionsfromarray {
+    my ($self) = shift;
+
     # Restore config settings.
     my $save = Getopt::Long::Configure ($self->{settings});
 
@@ -188,7 +194,7 @@ sub getoptions {
 	# be called implicitly here, and again explicitly when we try
 	# to deliver the messages.
 	local ($SIG{__DIE__}) = 'DEFAULT';
-	$ret = Getopt::Long::GetOptions (@_);
+	$ret = Getopt::Long::GetOptionsFromArray (@_);
     };
 
     # Restore saved settings.
@@ -1958,6 +1964,7 @@ Getopt::Long can be used in an object oriented way as well:
     $p = Getopt::Long::Parser->new;
     $p->configure(...configuration options...);
     if ($p->getoptions(...options descriptions...)) ...
+    if ($p->getoptionsfromarray( \@array, ...options descriptions...)) ...
 
 Configuration options can be passed to the constructor:
 
