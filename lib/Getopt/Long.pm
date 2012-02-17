@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Nov 20 16:15:36 2011
-# Update Count    : 1628
+# Last Modified On: Thu Nov 24 20:29:33 2011
+# Update Count    : 1631
 # Status          : Released
 
 ################ Module Preamble ################
@@ -789,6 +789,8 @@ sub ParseOptionSpec ($$) {
 		     (?: \w+[-\w]* )
 		     # Alias names, or "?"
 		     (?: \| (?: \? | \w[-\w]* ) )*
+		     # Aliases
+		     (?: \| (?: [^-|!+=:][^|!+=:]* )? )*
 		   )?
 		   (
 		     # Either modifiers ...
@@ -1525,7 +1527,10 @@ Getopt::Long - Extended processing of command line options
 =head1 DESCRIPTION
 
 The Getopt::Long module implements an extended getopt function called
-GetOptions(). This function adheres to the POSIX syntax for command
+GetOptions(). It parses the command line from C<@ARGV>, recognizing
+and removing specified options and their possible values.
+
+This function adheres to the POSIX syntax for command
 line options, with GNU extensions. In general, this means that options
 have long names instead of single letters, and are introduced with a
 double dash "--". Support for bundling of command line options, as was
@@ -1579,11 +1584,7 @@ Getopt::Long is the Perl5 successor of C<newgetopt.pl>. This was the
 first Perl module that provided support for handling the new style of
 command line options, in particular long option names, hence the Perl5
 name Getopt::Long. This module also supports single-character options
-and bundling. Single character options may be any alphabetic
-character, a question mark, and a dash. Long options may consist of a
-series of letters, digits, and dashes. Although this is currently not
-enforced by Getopt::Long, multiple consecutive dashes are not allowed,
-and the option name must not end with a dash.
+and bundling.
 
 To use Getopt::Long from a Perl program, you must include the
 following line in your Perl program:
@@ -2038,7 +2039,8 @@ used to parse options from an arbitrary array.
     use Getopt::Long qw(GetOptionsFromArray);
     $ret = GetOptionsFromArray(\@myopts, ...);
 
-When used like this, the global C<@ARGV> is not touched at all.
+When used like this, options and their possible values are removed
+from C<@myopts>, the global C<@ARGV> is not touched at all.
 
 The following two calls behave identically:
 
@@ -2656,6 +2658,9 @@ version 2.13.
 
     use Getopt::Long;
     GetOptions ("help|?");    # -help and -? will both set $opt_help
+
+Other characters that can't appear in Perl identifiers are also supported
+as aliases with Getopt::Long of at least version 2.39.
 
 As of version 2.32 Getopt::Long provides auto-help, a quick and easy way
 to add the options --help and -? to your program, and handle them.
