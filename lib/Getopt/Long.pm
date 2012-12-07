@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Nov 24 20:29:33 2011
-# Update Count    : 1631
+# Last Modified On: Fri Dec  7 17:07:31 2012
+# Update Count    : 1636
 # Status          : Released
 
 ################ Module Preamble ################
@@ -1717,7 +1717,7 @@ destination:
     GetOptions ("library=s@" => \$libfiles);
 
 Used with the example above, C<@libfiles> (or C<@$libfiles>) would
-contain two strings upon completion: C<"lib/srdlib"> and
+contain two strings upon completion: C<"lib/stdlib"> and
 C<"lib/extlib">, in that order. It is also possible to specify that
 only integer or floating point numbers are acceptable values.
 
