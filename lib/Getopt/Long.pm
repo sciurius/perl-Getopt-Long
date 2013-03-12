@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Dec  7 17:08:08 2012
-# Update Count    : 1637
+# Last Modified On: Tue Mar 12 14:42:25 2013
+# Update Count    : 1638
 # Status          : Released
 
 ################ Module Preamble ################
@@ -17,10 +17,10 @@ use 5.004;
 use strict;
 
 use vars qw($VERSION);
-$VERSION        =  2.3803;
+$VERSION        =  2.39;
 # For testing versions only.
 use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.38_03";
+$VERSION_STRING = "2.39";
 
 use Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
