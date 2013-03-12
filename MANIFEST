@@ -1,4 +1,3 @@
-Announce              Getopt::Long Announcement
 MANIFEST              List of files in this kit
 README                Introductionary text
 INSTALL               Installation information
@@ -19,4 +18,3 @@ examples/skel3.pl     Skeleton program to use Getopt::Long
 examples/skel4.pl     Skeleton program to use Getopt::Long
 examples/parsetime.pl Sample user handler for options
 perl-Getopt-Long.spec RPM spec file for (some) RedHat based systems
-META.yml              Meta information
