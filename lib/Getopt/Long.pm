@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Dec  7 17:07:31 2012
-# Update Count    : 1636
+# Last Modified On: Fri Dec  7 17:08:08 2012
+# Update Count    : 1637
 # Status          : Released
 
 ################ Module Preamble ################
@@ -110,6 +110,7 @@ sub import {
     # Hide one level and call super.
     local $Exporter::ExportLevel = 1;
     push(@syms, qw(&GetOptions)) if @syms; # always export GetOptions
+    $requested_version = 0;
     $pkg->SUPER::import(@syms);
     # And configure.
     Configure(@config) if @config;
