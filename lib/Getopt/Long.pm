@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Mar 12 14:42:25 2013
-# Update Count    : 1638
+# Last Modified On: Fri May 17 08:23:10 2013
+# Update Count    : 1639
 # Status          : Released
 
 ################ Module Preamble ################
@@ -2546,7 +2546,7 @@ briefly some of these 'features'.
 
 When no destination is specified for an option, GetOptions will store
 the resultant value in a global variable named C<opt_>I<XXX>, where
-I<XXX> is the primary name of this option. When a progam executes
+I<XXX> is the primary name of this option. When a program executes
 under C<use strict> (recommended), these variables must be
 pre-declared with our() or C<use vars>.
 
