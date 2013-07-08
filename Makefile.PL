@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Sat Mar 16 11:43:21 1996
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Jul  9 14:23:45 2010
-# Update Count    : 112
+# Last Modified On: Mon Jul  8 08:14:42 2013
+# Update Count    : 113
 # Status          : Unknown, Use with caution!
 
 use Config;
@@ -88,7 +88,7 @@ WriteMakefile(
         ABSTRACT => 'Module to handle parsing command line options',
         ),
 
-	INSTALLDIRS => 'perl',
+	INSTALLDIRS => ($] < 5.011 ? 'perl' : 'site'),
 	PM 	  => { "lib/newgetopt.pl"  => '$(INST_LIB)/newgetopt.pl',
 		       "lib/Getopt/Long.pm" => '$(INST_LIB)/Getopt/Long.pm',
 		     },
