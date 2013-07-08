@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 15 15:59:04 1992
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Jul  9 14:31:06 2010
-# Update Count    : 83
+# Last Modified On: Thu Jul  4 14:43:40 2013
+# Update Count    : 84
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -93,25 +93,23 @@ sub app_setup {
 	  'debug',
 	 ) )
     {
-	# GNU convention: message to STDERR upon failure.
-	app_usage(\*STDERR, 2);
+	app_usage(2);
     }
-    # GNU convention: message to STDOUT upon request.
-    app_usage(\*STDOUT, 0) if $help;
-    app_ident(\*STDOUT) if $ident;
+    app_usage(0) if $help;
+    app_ident() if $ident;
 
     $options;
 }
 
 sub app_ident {
-    my ($fh) = @_;
-    print {$fh} ("This is $my_package [$my_name $my_version]\n");
+    print ("This is $my_package [$my_name $my_version]\n");
 }
 
 sub app_usage {
-    my ($fh, $exit) = @_;
-    app_ident($fh);
-    print ${fh} <<EndOfUsage;
+    my ($exit) = @_;
+    select \*STDERR if $exit;
+    app_ident();
+    print <<EndOfUsage;
 Usage: $0 [options] [file ...]
     ### ADD OPTIONS HERE ###
     --config=CFG	load options from config file
