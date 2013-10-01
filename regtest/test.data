@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Jun 13 08:28:14 2013
-# Update Count    : 509
+# Last Modified On: Mon Sep 16 14:56:55 2013
+# Update Count    : 518
 # Status          : In progress
 
 ################ No args ################
@@ -1951,11 +1951,27 @@ A: --foo 1 -2 aa bb
    @a1 1 -2
    @ARGV aa bb
 
-T: Repeat args (float)
+#### Changed due to bugfix #88707
+
+R: < 2.4101
+
+T: Repeat args (float) (pre 2.42)
 P: foo=f{2,3} \\@a1 bar+ \\$v1
 A: --foo 1.1 -2.2 .3 aa bb
    @a1 1.1 -2.2 .3
    @ARGV aa bb
+
+R: 2.4101
+
+T: Repeat args (float) (2.42 and later)
+P: foo=f{2,3} \\@a1 bar+ \\$v1
+A: --foo 1.1 -2.2 .3 aa bb
+   @a1 1.1 -2.2
+   @ARGV .3 aa bb
+
+R:
+
+#### End
 
 T: Repeat args (int)
 P: foo=i{2,3} \\@a1 bar+ \\$v1
@@ -2235,3 +2251,8 @@ T: #86095 Possible problem with aliases
 P: emchk|emcheck! \\$v1
 A: --noemch
    $v1 0
+
+T: #88707 name=f accepts 1.2.3
+P: name=f \\$v1
+A: --name=1.2.3
+W: Value "1.2.3" invalid for option name (real number expected)
