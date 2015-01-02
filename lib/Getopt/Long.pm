@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Oct  1 08:25:52 2013
-# Update Count    : 1651
+# Last Modified On: Fri Jan  2 22:07:33 2015
+# Update Count    : 1660
 # Status          : Released
 
 ################ Module Preamble ################
@@ -17,10 +17,10 @@ use 5.004;
 use strict;
 
 use vars qw($VERSION);
-$VERSION        =  2.42;
+$VERSION        =  2.42_01;
 # For testing versions only.
 use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.42";
+$VERSION_STRING = "2.42_01";
 
 use Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
@@ -365,6 +365,9 @@ sub GetOptionsFromArray(@) {
 		next;
 	    }
 	    $linkage{'<>'} = shift (@optionlist);
+	    if ( $passthrough ) {
+		$error .= "Option spec <> cannot be used with pass_through\n";
+	    }
 	    next;
 	}
 
@@ -707,7 +710,7 @@ sub GetOptionsFromArray(@) {
 	elsif ( $order == $PERMUTE ) {
 	    # Try non-options call-back.
 	    my $cb;
-	    if ( (defined ($cb = $linkage{'<>'})) ) {
+	    if ( !$passthrough && (defined ($cb = $linkage{'<>'})) ) {
 		print STDERR ("=> &L{$tryopt}(\"$tryopt\")\n")
 		  if $debug;
 		my $eval_error = do {
@@ -2399,8 +2402,8 @@ C<require> statement.
 
 =item pass_through (default: disabled)
 
-Options that are unknown, ambiguous or supplied with an invalid option
-value are passed through in C<@ARGV> instead of being flagged as
+Anything that is unknown, ambiguous or supplied with an invalid option
+value is passed through in C<@ARGV> instead of being flagged as
 errors. This makes it possible to write wrapper scripts that process
 only part of the user supplied command line arguments, and pass the
 remaining options to some other program.
@@ -2411,6 +2414,9 @@ However, if C<permute> is enabled instead, results can become confusing.
 
 Note that the options terminator (default C<-->), if present, will
 also be passed through in C<@ARGV>.
+
+For obvious reasons, B<pass_through> cannot be used with the
+non-option catchall C<< <> >>.
 
 =item prefix
 
