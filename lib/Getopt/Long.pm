@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Jan  8 14:08:16 2015
-# Update Count    : 1672
+# Last Modified On: Wed Jan 14 14:59:43 2015
+# Update Count    : 1678
 # Status          : Released
 
 ################ Module Preamble ################
@@ -300,7 +300,10 @@ sub GetOptionsFromArray(@) {
 	  ("Getopt::Long $Getopt::Long::VERSION ",
 	   "called from package \"$pkg\".",
 	   "\n  ",
-	   "argv: (@$argv)",
+	   "argv: ",
+	   defined($argv)
+	   ? UNIVERSAL::isa( $argv, 'ARRAY' ) ? "(@$argv)" : $argv
+	   : "<undef>",
 	   "\n  ",
 	   "autoabbrev=$autoabbrev,".
 	   "bundling=$bundling,",
@@ -465,6 +468,9 @@ sub GetOptionsFromArray(@) {
 	}
 
     }
+
+    $error .= "GetOptionsFromArray: 1st parameter is not an array reference\n"
+      unless $argv && UNIVERSAL::isa( $argv, 'ARRAY' );
 
     # Bail out if errors found.
     die ($error) if $error;
