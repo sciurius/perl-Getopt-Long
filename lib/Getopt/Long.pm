@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Jan 14 14:59:43 2015
-# Update Count    : 1678
+# Last Modified On: Wed Jan 14 15:03:41 2015
+# Update Count    : 1680
 # Status          : Released
 
 ################ Module Preamble ################
@@ -17,10 +17,10 @@ use 5.004;
 use strict;
 
 use vars qw($VERSION);
-$VERSION        =  2.42_01;
+$VERSION        =  2.43;
 # For testing versions only.
 use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.42_01";
+$VERSION_STRING = "2.43";
 
 use Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
@@ -2726,7 +2726,7 @@ Johan Vromans <jvromans@squirrel.nl>
 
 =head1 COPYRIGHT AND DISCLAIMER
 
-This program is Copyright 1990,2013 by Johan Vromans.
+This program is Copyright 1990,2015 by Johan Vromans.
 This program is free software; you can redistribute it and/or
 modify it under the terms of the Perl Artistic License or the
 GNU General Public License as published by the Free Software
