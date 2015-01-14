@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Jan  2 22:07:33 2015
-# Update Count    : 1660
+# Last Modified On: Thu Jan  8 14:08:16 2015
+# Update Count    : 1672
 # Status          : Released
 
 ################ Module Preamble ################
@@ -50,6 +50,9 @@ use vars qw($autoabbrev $getopt_compat $ignorecase $bundling $order
 # Official invisible variables.
 use vars qw($genprefix $caller $gnu_compat $auto_help $auto_version $longprefix);
 
+# Really invisible variables.
+my $bundling_values;
+
 # Public subroutines.
 sub config(@);			# deprecated name
 
@@ -92,6 +95,7 @@ sub ConfigDefaults() {
     $passthrough = 0;		# leave unrecognized options alone
     $gnu_compat = 0;		# require --opt=val if value is optional
     $longprefix = "(--)";       # what does a long prefix look like
+    $bundling_values = 0;	# no bundling of values
 }
 
 # Override import.
@@ -300,6 +304,7 @@ sub GetOptionsFromArray(@) {
 	   "\n  ",
 	   "autoabbrev=$autoabbrev,".
 	   "bundling=$bundling,",
+	   "bundling_values=$bundling_values,",
 	   "getopt_compat=$getopt_compat,",
 	   "gnu_compat=$gnu_compat,",
 	   "order=$order,",
@@ -945,7 +950,7 @@ sub FindOption ($$$$$) {
 
     my $tryopt = $opt;		# option to try
 
-    if ( $bundling && $starter eq '-' ) {
+    if ( ( $bundling || $bundling_values ) && $starter eq '-' ) {
 
 	# To try overrides, obey case ignore.
 	$tryopt = $ignorecase ? lc($opt) : $opt;
@@ -956,6 +961,23 @@ sub FindOption ($$$$$) {
 	    print STDERR ("=> $starter$tryopt overrides unbundling\n")
 	      if $debug;
 	}
+
+	# If bundling_values, option may be followed by the value.
+	elsif ( $bundling_values ) {
+	    $tryopt = $opt;
+	    # Unbundle single letter option.
+	    $rest = length ($tryopt) > 0 ? substr ($tryopt, 1) : '';
+	    $tryopt = substr ($tryopt, 0, 1);
+	    $tryopt = lc ($tryopt) if $ignorecase > 1;
+	    print STDERR ("=> $starter$tryopt unbundled from ",
+			  "$starter$tryopt$rest\n") if $debug;
+	    # Whatever remains may not be considered an option.
+	    $optarg = $rest eq '' ? undef : $rest;
+	    $rest = undef;
+	}
+
+	# Split off a single letter and leave the rest for
+	# further processing.
 	else {
 	    $tryopt = $opt;
 	    # Unbundle single letter option.
@@ -1061,6 +1083,7 @@ sub FindOption ($$$$$) {
 	    warn ("Option ", $opt, " does not take an argument\n");
 	    $error++;
 	    undef $opt;
+	    undef $optarg if $bundling_values;
 	}
 	elsif ( $type eq '' || $type eq '+' ) {
 	    # Supply explicit value.
@@ -1289,13 +1312,13 @@ sub Configure (@) {
       [ $error, $debug, $major_version, $minor_version,
 	$autoabbrev, $getopt_compat, $ignorecase, $bundling, $order,
 	$gnu_compat, $passthrough, $genprefix, $auto_version, $auto_help,
-	$longprefix ];
+	$longprefix, $bundling_values ];
 
     if ( ref($options[0]) eq 'ARRAY' ) {
 	( $error, $debug, $major_version, $minor_version,
 	  $autoabbrev, $getopt_compat, $ignorecase, $bundling, $order,
 	  $gnu_compat, $passthrough, $genprefix, $auto_version, $auto_help,
-	  $longprefix ) = @{shift(@options)};
+	  $longprefix, $bundling_values ) = @{shift(@options)};
     }
 
     my $opt;
@@ -1328,6 +1351,7 @@ sub Configure (@) {
 		$getopt_compat = 0;
                 $genprefix = "(--|-)";
 		$order = $PERMUTE;
+		$bundling_values = 0;
 	    }
 	}
 	elsif ( $try eq 'gnu_compat' ) {
@@ -1347,9 +1371,15 @@ sub Configure (@) {
 	}
 	elsif ( $try eq 'bundling' ) {
 	    $bundling = $action;
+	    $bundling_values = 0 if $action;
 	}
 	elsif ( $try eq 'bundling_override' ) {
 	    $bundling = $action ? 2 : 0;
+	    $bundling_values = 0 if $action;
+	}
+	elsif ( $try eq 'bundling_values' ) {
+	    $bundling_values = $action;
+	    $bundling = 0 if $action;
 	}
 	elsif ( $try eq 'require_order' ) {
 	    $order = $action ? $REQUIRE_ORDER : $PERMUTE;
@@ -2137,12 +2167,12 @@ at once. For example if C<a>, C<v> and C<x> are all valid options,
 
     -vax
 
-would set all three.
+will set all three.
 
-Getopt::Long supports two levels of bundling. To enable bundling, a
+Getopt::Long supports three styles of bundling. To enable bundling, a
 call to Getopt::Long::Configure is required.
 
-The first level of bundling can be enabled with:
+The simplest style of bundling can be enabled with:
 
     Getopt::Long::Configure ("bundling");
 
@@ -2153,27 +2183,38 @@ options,
 
     -vax
 
-would set C<a>, C<v> and C<x>, but
+will set C<a>, C<v> and C<x>, but
 
     --vax
 
-would set C<vax>.
+will set C<vax>.
 
-The second level of bundling lifts this restriction. It can be enabled
+The second style of bundling lifts this restriction. It can be enabled
 with:
 
     Getopt::Long::Configure ("bundling_override");
 
-Now, C<-vax> would set the option C<vax>.
+Now, C<-vax> will set the option C<vax>.
 
-When any level of bundling is enabled, option values may be inserted
-in the bundle. For example:
+In all of the above cases, option values may be inserted in the
+bundle. For example:
 
     -h24w80
 
 is equivalent to
 
     -h 24 -w 80
+
+A third style of bundling allows only values to be bundled with
+options. It can be enabled with:
+
+    Getopt::Long::Configure ("bundling_values");
+
+Now, C<-h24> will set the option C<h> to C<24>, but option bundles
+like C<-vxa> and C<-h24w80> are flagged as errors.
+
+Enabling C<bundling_values> will disable the other two styles of
+bundling.
 
 When configured for bundling, single-character options are matched
 case sensitive while long options are matched case insensitive. To
