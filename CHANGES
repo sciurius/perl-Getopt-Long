@@ -4,7 +4,7 @@ Changes in version 2.43
 * Fix bug https://rt.cpan.org/Ticket/Display.html?id=92462
 
 * Implement enhancement
-  https://rt.cpan.org/Public/Bug/Display.html?id=101537
+  https://rt.cpan.org/Public/Bug/Display.html?id=101237
 
 * Fix the Getopt::Long part of bug
   https://rt.cpan.org/Ticket/Display.html?id=100335
