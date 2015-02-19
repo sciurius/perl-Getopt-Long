@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Jan  2 21:55:14 2015
-# Update Count    : 521
+# Last Modified On: Thu Feb 19 09:26:34 2015
+# Update Count    : 526
 # Status          : In progress
 
 ################ No args ################
@@ -2257,9 +2257,20 @@ P: name=f \\$v1
 A: --name=1.2.3
 W: Value "1.2.3" invalid for option name (real number expected)
 
+# This error was introduced in 2.43 and changed to a warning in 2.44.
 T: #92462: Options to Non-Option Handler when pass_through is Enabled
 O: pass_through
+R: == 2.43
 P: <> \\&warn foo=i
 A: --foo 5 --bar 2 test
 E: Option spec <> cannot be used with pass_through
+   @ARGV --bar 2 test
+
+# This error was introduced in 2.43 and changed to a warning in 2.44.
+T: #102207: Option spec <> cannot be used with pass_through error
+O: pass_through
+R: 2.44
+P: <> \\&warn foo=i
+A: --foo 5 --bar 2 test
+W: Option spec <> cannot be used with pass_through. FIX IT!
    @ARGV --bar 2 test

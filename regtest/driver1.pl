@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Mon Aug  6 11:53:07 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Jul  9 14:37:49 2010
-# Update Count    : 453
+# Last Modified On: Thu Feb 19 09:24:05 2015
+# Update Count    : 454
 # Status          : Unknown, Use with caution!
 
 package MyTest;			# not main
@@ -335,7 +335,7 @@ sub gather {
 
     # R: version
     # Require a specific version
-    elsif ( /^R:(\s+((<=?)?\s*\d\.\d\d(\d\d)?)|$)/i ) {
+    elsif ( /^R:(\s+(([<=]=?)?\s*\d\.\d\d(\d\d)?)|$)/i ) {
 	if ( $t->{done} < 0 ) {
 	    $sticky_version = $2 || "";
 	}
@@ -390,6 +390,7 @@ sub do_test {
 	my $v = $t->{version};
 	my $vv = $v;
 	if ( ($v =~ /^<=\s*(.*)/) ? ($Getopt::Long::VERSION gt ($vv = $1)) :
+	     ($v =~ /^==\s*(.*)/) ? ($Getopt::Long::VERSION ne ($vv = $1)) :
 	     ($v =~ /^<\s*(.*)/)  ? ($Getopt::Long::VERSION ge ($vv = $1)) :
 	                            ($Getopt::Long::VERSION lt $v) ) {
 	    $skipped += 4;

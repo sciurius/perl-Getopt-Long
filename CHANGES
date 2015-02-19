@@ -1,3 +1,9 @@
+Changes in version 2.44
+-----------------------
+
+* Be gentle to the user community and turn fix 92462 into a warning.
+  This may be changed back to error in some future release.
+
 Changes in version 2.43
 -----------------------
 
