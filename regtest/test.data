@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Feb 19 09:26:34 2015
-# Update Count    : 526
+# Last Modified On: Mon Feb 23 20:32:06 2015
+# Update Count    : 536
 # Status          : In progress
 
 ################ No args ################
@@ -2269,8 +2269,38 @@ E: Option spec <> cannot be used with pass_through
 # This error was introduced in 2.43 and changed to a warning in 2.44.
 T: #102207: Option spec <> cannot be used with pass_through error
 O: pass_through
-R: 2.44
+R: == 2.44
 P: <> \\&warn foo=i
 A: --foo 5 --bar 2 test
 W: Option spec <> cannot be used with pass_through. FIX IT!
    @ARGV --bar 2 test
+
+T: Callbacks w/ pass_through; up to 2.42.
+R: <= 2.42
+O: pass_through
+P: <> \\&ok
+A: xx foo 
+   $v1 x
+
+T: Callbacks w/ pass_through; 2.43 only.
+R: == 2.43
+O: pass_through
+P: <> \\&ok
+A: xx foo 
+E: Option spec <> cannot be used with pass_through
+   $v1 x
+
+T: Callbacks w/ pass_through; 2.44 only.
+R: == 2.44
+O: pass_through
+P: <> \\&ok
+A: xx foo 
+W: Option spec <> cannot be used with pass_through. FIX IT!
+   @ARGV xx foo
+
+T: Callbacks w/ pass_through; as of 2.45 only. Reverted to <= 2.42.
+R: 2.45
+O: pass_through
+P: <> \\&ok
+A: xx foo 
+   $v1 x

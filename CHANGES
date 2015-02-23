@@ -1,3 +1,15 @@
+Changes in version 2.45
+-----------------------
+
+* Revert behaviour of the combination of <> and pass_through to what
+  is was in 2.42.
+
+  Thanks to Wilson Snyder to provide enhancements to the documentation
+  to clarify why <> and pass_through generally is a bad idea.
+
+  It is, however, very unfortunate to hear from users that their
+  programs *depend* on the undocumented pre-2.43 behaviour.
+
 Changes in version 2.44
 -----------------------
 
