@@ -1,3 +1,12 @@
+Changes in version 2.46
+-----------------------
+
+* Fix bug https://rt.cpan.org/Ticket/Display.html?id=104842
+
+  Kudo's to EDAVIS for finding this very obscure bug.
+
+* Some small changes/additions to the test suite and examples.
+
 Changes in version 2.45
 -----------------------
 

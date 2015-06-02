@@ -4,13 +4,14 @@
 # Author          : Johan Vromans
 # Created On      : Sun Sep 15 18:39:01 1996
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Sep  4 20:08:49 2011
-# Update Count    : 21
+# Last Modified On: Tue Jun  2 10:40:04 2015
+# Update Count    : 23
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
 
 use strict;
+use warnings;
 
 # Package name.
 my $my_package = 'Sciurix';
@@ -89,10 +90,10 @@ sample - skeleton for GetOpt::Long and Pod::Usage
 sample [options] [file ...]
 
  Options:
-   --ident		show identification
-   --help		brief help message
-   --man                full documentation
-   --verbose		verbose information
+   --ident		shows identification
+   --help		shows a brief help message and exits
+   --man                shows full documentation and exits
+   --verbose		provides more verbose information
 
 =head1 OPTIONS
 
@@ -100,7 +101,7 @@ sample [options] [file ...]
 
 =item B<--help>
 
-Print a brief help message and exits.
+Prints a brief help message and exits.
 
 =item B<--man>
 
@@ -112,11 +113,11 @@ Prints program identification.
 
 =item B<--verbose>
 
-More verbose information.
+Provides more verbose information.
 
 =item I<file>
 
-Input file(s).
+The input file(s) to process, if any.
 
 =back
 
