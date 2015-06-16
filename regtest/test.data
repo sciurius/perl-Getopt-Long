@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Feb 23 20:32:06 2015
-# Update Count    : 536
+# Last Modified On: Wed Jun 10 12:01:41 2015
+# Update Count    : 548
 # Status          : In progress
 
 ################ No args ################
@@ -733,12 +733,14 @@ A: -v3 -6.4e-1 foo
    $opt_v3 == -0.64
    @ARGV foo
 
-R: 2.3502
+R: <2.4601
 
 T: Float opt (mandatory)
 A: -v3 -_6 foo
    $opt_v3 == -6
    @ARGV foo
+
+R: 2.3502
 
 T: Float opt (mandatory)
 A: -v3 -6._4 foo
@@ -1961,7 +1963,17 @@ A: --foo 1.1 -2.2 .3 aa bb
    @a1 1.1 -2.2 .3
    @ARGV aa bb
 
-R: 2.4101
+#### Changed back due to bugfix #89513
+
+R: 2.4601
+
+T: Repeat args (float) (pre 2.42)
+P: foo=f{2,3} \\@a1 bar+ \\$v1
+A: --foo 1.1 -2.2 .3 aa bb
+   @a1 1.1 -2.2 .3
+   @ARGV aa bb
+
+R: == 2.4101
 
 T: Repeat args (float) (2.42 and later)
 P: foo=f{2,3} \\@a1 bar+ \\$v1
@@ -2304,3 +2316,8 @@ O: pass_through
 P: <> \\&ok
 A: xx foo 
    $v1 x
+
+T: #89513 name=f does not accept .1
+P: v1=f \\$v1
+A: --v1=.1
+   $v1 .1

@@ -1,3 +1,21 @@
+Changes in version 2.47
+-----------------------
+
+* Fix bug https://rt.cpan.org/Ticket/Display.html?id=89513.
+
+  Should have done that earlier :)
+
+  This changes the format for accepted float numbers:
+
+  <optional sign>
+  <optional mantissa>
+  <optional dec.point and fraction>
+  <optional "e" and exponent>
+
+  Mantissa and decimal fraction may not both be omitted.
+
+  Underscores are permissible virtually anywhere in numbers for clarity.
+
 Changes in version 2.46
 -----------------------
 
