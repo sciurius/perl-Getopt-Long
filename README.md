@@ -6,6 +6,8 @@ GNUmakefile (for development).
 
 Relevant targets of the GNUmakefile are
 
-test : runs the standard tests
-regtest : runs the extended regression tests
-tardist : creates a new tar.gz distribution
+* test : runs the standard tests
+
+* regtest : runs the extended regression tests
+
+* tardist : creates a new tar.gz distribution
