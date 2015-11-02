@@ -11,3 +11,7 @@ Relevant targets of the GNUmakefile are
 * regtest : runs the extended regression tests
 
 * tardist : creates a new tar.gz distribution
+
+Note that a Github release is a snapshot of this repository. An
+official CPAN release should be made with the 'tardist' target of the
+GNUmakefile.
