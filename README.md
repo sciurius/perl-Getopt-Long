@@ -15,3 +15,6 @@ Relevant targets of the GNUmakefile are
 Note that a Github release is a snapshot of this repository. An
 official CPAN release should be made with the 'tardist' target of the
 GNUmakefile.
+
+Please file issues with rt.cpan.org:
+https://rt.cpan.org/Ticket/Create.html?Queue=Getopt-Long
