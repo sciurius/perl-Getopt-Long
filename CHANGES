@@ -1,3 +1,10 @@
+Changes in version 2.48
+-----------------------
+
+* Fix bug https://rt.cpan.org/Ticket/Display.html?id=39052.
+
+  Thanks to Roy Ivy III for digging this out and providing patches.
+  
 Changes in version 2.47
 -----------------------
 

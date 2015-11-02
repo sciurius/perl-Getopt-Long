@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Jun 10 12:01:41 2015
-# Update Count    : 548
+# Last Modified On: Thu Oct  8 14:55:20 2015
+# Update Count    : 550
 # Status          : In progress
 
 ################ No args ################
@@ -711,11 +711,11 @@ A: -v3 +3.18e2 foo
    @ARGV foo
 
 T: Float opt (mandatory)
-A: -v3 3.18e2 
+A: -v3 3.18e2
    $opt_v3 == 318
 
 T: Float opt (mandatory)
-A: -v3 +3.18e2 
+A: -v3 +3.18e2
    $opt_v3 == 318
 
 T: Float opt (mandatory)
@@ -767,7 +767,7 @@ A: -v3 -- foo
 W: Value "--" invalid for option v3 (real number expected)
 
 T: Float opt (mandatory)
-A: -v3 
+A: -v3
 W: Option v3 requires an argument
 
 T: Float opt (mandatory, multiple)
@@ -1326,7 +1326,7 @@ A: -a -c-b foo
    @ARGV foo
 
 T: Bundling
-P: a f=i 
+P: a f=i
 A: -fa
 W: Value "a" invalid for option f (number expected)
 
@@ -1549,7 +1549,7 @@ A: -HeLp foo
    @ARGV foo
 
 # Bug report by Seth Robertson <seth@systemdetection.com>, 2.28:
-# Options not recognized when ignorecase and autoabbrev are both off. 
+# Options not recognized when ignorecase and autoabbrev are both off.
 T: Option character case
 O: no_auto_abbrev no_ignore_case
 P: foo
@@ -1572,7 +1572,7 @@ A: -I foo -d aa=bb bar
 P: xx=s@ \\$v1
 
 T: Auto-vivification of Arrays
-A: 
+A:
 
 T: Auto-vivification of Arrays
 A: -xx aa
@@ -1677,7 +1677,7 @@ A: -gsx foo bar
 P: xx=s% \\$v1
 
 T: Auto-vivification of ref to hash ref
-A: 
+A:
 
 T: Auto-vivification of ref to hash ref
 A: -xx x1=aa
@@ -1791,37 +1791,37 @@ A: xx foo
 
 T: Callbacks (using warn (obsolete))
 P: xx \\&warn yy \\&warn
-A: -xx -yy foo 
+A: -xx -yy foo
 W: Callback warning for "xx"
 W: Callback warning for "yy"
 
 T: Callbacks (using die)
 P: xx \\&die yy \\&die
-A: -xx -yy foo 
+A: -xx -yy foo
 W: Callback died for "xx"
 W: Callback died for "yy"
 
 T: Callbacks (using !FINISH)
 P: xx \\&finish yy \\&finish
-A: -xx -yy foo 
+A: -xx -yy foo
    $v1 1
    @ARGV -yy foo
 
 T: Callbacks (using !FINISH)
 P: xx \\&ok <> \\&finish
-A: -xx yy foo 
+A: -xx yy foo
    $v1 x
    @ARGV foo
 
 T: Callbacks (using !FINISH)
 P: xx=s \\&ok <> \\&finish
-A: -xx yy foo 
+A: -xx yy foo
    $v1 x
 
 T: Callbacks (using !FINISH, Merijn Brand special)
 O: bundling
 P: x \\$v2 y \\&finish z \\$v3
-A: -xyzzy -yy foo 
+A: -xyzzy -yy foo
    $v1 1
    $v2 1
    @ARGV -zzy -yy foo
@@ -2013,7 +2013,7 @@ A: --foo xx=aa yy=bb zz=cc qqq
 
 # From: Ryan <uncle_george@hotmail.com>
 # Subject: new range feature. CTL_AMAX, argcnt checking against -1
-# 
+#
 # I love the new range functionality.  I found a bug when using the
 # undefined max range like in the example.  I even found a fix. : )
 
@@ -2032,21 +2032,21 @@ A: --foo one two three four five
 
 T: Repeat args
 P: foo=s{,2} \\@a1
-A: --foo one two 
+A: --foo one two
    @a1 one two
 
 T: Repeat args
 P: foo=s{,2} \\@a1
-A: --foo one 
-   @a1 one 
+A: --foo one
+   @a1 one
 
 T: Repeat args
 P: foo:s{,2} \\@a1
-A: --foo 
+A: --foo
 
 T: Repeat args
 P: foo=s{,2} \\@a1
-A: --foo 
+A: --foo
 W: Option foo requires an argument
 
 R: 2.3502
@@ -2102,17 +2102,17 @@ A:
 # From: Haakon Riiser <haakon.riiser@fys.uio.no>
 # Subject: Getopt::Long error messages with :config bundling
 # Date: Tue, 24 Feb 2004 16:45:32 +0100
-# 
+#
 # I'll get right to the point. :-)
-# 
+#
 #   ----- begin test.pl -----
 #   use Getopt::Long qw(:config bundling);
 #   GetOptions("help");
 #   ----- end test.pl -----
-# 
+#
 #   $ perl test.pl --invalid
 #   Unknown option: i
-# 
+#
 # Is this error message intentional?
 
 T: Error messages with :config bundling
@@ -2142,7 +2142,7 @@ A: +foo bar
 # Date: Tue, 23 May 2006 08:33:39 -0400 (EDT)
 # When using an option with an optional hash value, values (not keys)
 # starting with a dash trigger an unexpected error:
-# 
+#
 # perl -MGetopt::Long -we "GetOptions('replace:s%');" -- --replace a=-b
 # Unknown option: b
 
@@ -2213,25 +2213,24 @@ A: --v1= xxx
 T: Null required arguments
 P: v1:s
 A: --v1 "" xxx
-   $opt_v1 ""
-   @ARGV xxx
+   @ARGV "" xxx
 
 O:
 
-# <MARKOV@cpan.org> 
+# <MARKOV@cpan.org>
 # Simpelest program: "run"
-# 
+#
 # #!/usr/bin/perl
 # use Getopt::Long;
 # GetOptions('a', 'b') or die;
-# 
+#
 # then execute:
 # ./run +
-# 
+#
 # results in:
 # Option is ambiguous (a, b)
 # Died at ./run line 6.
-# 
+#
 # It should be an error.
 
 T: #24941: Autoabbrev with + incorrect
@@ -2291,14 +2290,14 @@ T: Callbacks w/ pass_through; up to 2.42.
 R: <= 2.42
 O: pass_through
 P: <> \\&ok
-A: xx foo 
+A: xx foo
    $v1 x
 
 T: Callbacks w/ pass_through; 2.43 only.
 R: == 2.43
 O: pass_through
 P: <> \\&ok
-A: xx foo 
+A: xx foo
 E: Option spec <> cannot be used with pass_through
    $v1 x
 
@@ -2306,7 +2305,7 @@ T: Callbacks w/ pass_through; 2.44 only.
 R: == 2.44
 O: pass_through
 P: <> \\&ok
-A: xx foo 
+A: xx foo
 W: Option spec <> cannot be used with pass_through. FIX IT!
    @ARGV xx foo
 
@@ -2314,10 +2313,86 @@ T: Callbacks w/ pass_through; as of 2.45 only. Reverted to <= 2.42.
 R: 2.45
 O: pass_through
 P: <> \\&ok
-A: xx foo 
+A: xx foo
    $v1 x
 
 T: #89513 name=f does not accept .1
 P: v1=f \\$v1
 A: --v1=.1
    $v1 .1
+
+T: #39052: gnu_getopt option not 100% identical to GNU getopt
+# If the option has an optional argument, it must be written directly
+# after the long option name, separated by '=', if present".
+P: foo:s \\$v1
+O: gnu_compat
+A: --foo=bar
+   $v1 bar
+
+T: #39052: gnu_getopt option not 100% identical to GNU getopt
+# If the option has an optional argument, it must be written directly
+# after the long option name, separated by '=', if present".
+P: foo:s \\$v1
+O: gnu_compat
+A: --foo bar
+   @ARGV bar
+
+T: #39052: gnu_getopt option not 100% identical to GNU getopt
+# Seems to break single character options with optional arguments. For
+# example, using the config 'f:s', `-fx` consumes 'x' but doesn't set
+# 'f'.
+# ... does it?
+P: f:s \\$v1
+O: gnu_compat
+A: -fx y
+##W: Unknown option: fx
+##   @ARGV y
+   $v1 x
+   @ARGV y
+
+T: #39052: gnu_getopt option not 100% identical to GNU getopt
+P: f:s \\$v1
+O: gnu_compat
+A: -f x y
+   @ARGV x y
+
+T: #39052: gnu_getopt option not 100% identical to GNU getopt
+P: f=s \\$v1
+O: gnu_compat
+A: -fx y
+   $v1 x
+   @ARGV y
+
+T: #39052: gnu_getopt option not 100% identical to GNU getopt
+P: f=s \\$v1
+O: gnu_compat
+A: -f x y
+   $v1 x
+   @ARGV y
+
+T: #39052: gnu_getopt option not 100% identical to GNU getopt
+P: foo:s \\$v1
+O: gnu_compat
+A: --foo=x y
+   $v1 x
+   @ARGV y
+
+T: #39052: gnu_getopt option not 100% identical to GNU getopt
+P: foo:s \\$v1
+O: gnu_compat
+A: --foo x y
+   @ARGV x y
+
+T: #39052: gnu_getopt option not 100% identical to GNU getopt
+P: foo=s \\$v1
+O: gnu_compat
+A: --foo=x y
+   $v1 x
+   @ARGV y
+
+T: #39052: gnu_getopt option not 100% identical to GNU getopt
+P: foo=s \\$v1
+O: gnu_compat
+A: --foo x y
+   $v1 x
+   @ARGV y
