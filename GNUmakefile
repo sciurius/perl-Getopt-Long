@@ -25,6 +25,10 @@ cleanup :
 	    $(MAKE) -f Makefile clean; \
 	fi
 
+.PHONY : dist
+dist :
+	$(MAKE) -f Makefile dist
+
 .PHONY : tardist
 tardist :
 	$(MAKE) -f Makefile tardist

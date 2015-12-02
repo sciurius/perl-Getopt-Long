@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Sat Mar 16 11:43:21 1996
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Jul  8 08:14:42 2013
-# Update Count    : 113
+# Last Modified On: Wed Dec  2 20:57:13 2015
+# Update Count    : 114
 # Status          : Unknown, Use with caution!
 
 use Config;
@@ -78,7 +78,6 @@ EOD
 
 print STDERR ("\n");
 
-my $x =
 WriteMakefile(
 	NAME      => "Getopt::Long",
 	VERSION   => $version,
@@ -97,23 +96,3 @@ WriteMakefile(
 	PREREQ_PM => { "Pod::Usage" => 1.14 },
  );
 
-# Write .spec file.
-# Note that $x->{...} is not supported in older Perls.
-WriteSpecfile($x->{DISTNAME}, $x->{VERSION}) if $] >= 5.008;
-
-sub WriteSpecfile {
-    my $name    = shift;
-    my $version = shift;
-
-    if ( open (FH, "rpm/$name.spec.in") ) {
-	print "Writing RPM spec file...\n";
-	open (NEWFH, ">perl-$name.spec");
-	while ( <FH> ) {
-	    s/%define modname [\w---]+/%define modname $name/;
-	    s/%define modversion \d+\.\d+/%define modversion $version/;
-	    print NEWFH $_;
-	}
-	close(NEWFH);
-	close(FH);
-    }
-}
