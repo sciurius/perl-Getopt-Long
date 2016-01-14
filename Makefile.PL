@@ -13,6 +13,13 @@ use lib "./lib";
 use Getopt::Long;
 my $version = $Getopt::Long::VERSION_STRING || $Getopt::Long::VERSION;
 
+my $mm_version = $ExtUtils::MakeMaker::VERSION;
+if ($mm_version =~ /_/) {
+    # developer release
+    $mm_version = eval $mm_version;
+    die $@ if $@;
+}
+
 sub MY::postamble {
     my $ret = "";
     my $mandir = $Config{installman3dir};
@@ -94,5 +101,20 @@ WriteMakefile(
 	dist      => { COMPRESS => 'gzip', SUFFIX => 'gz',
 		     },
 	PREREQ_PM => { "Pod::Usage" => 1.14 },
+
+        ($mm_version <= 6.45) ? () : (
+            META_MERGE => {
+                'meta-spec' => { version => 2 },
+                resources => {
+                    repository => {
+                        type => 'git',
+                        web  => 'https://github.com/sciurius/perl-Getopt-Long',
+                        url  => 'https://github.com/sciurius/perl-Getopt-Long.git',
+                    },
+                },
+            },
+        ),
+  
+
  );
 
