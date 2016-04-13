@@ -1,3 +1,10 @@
+Changes in version 2.xx
+-----------------------
+
+* Fix bug https://rt.cpan.org/Ticket/Display.html?id=113748
+
+  Thanks Tom Wyant for finding and fixing this.
+
 Changes in version 2.48
 -----------------------
 

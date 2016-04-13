@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Oct  8 14:57:49 2015
-# Update Count    : 1697
+# Last Modified On: Wed Apr 13 20:34:15 2016
+# Update Count    : 1698
 # Status          : Released
 
 ################ Module Preamble ################
@@ -17,10 +17,10 @@ use 5.004;
 use strict;
 
 use vars qw($VERSION);
-$VERSION        =  2.48;
+$VERSION        =  2.48_01;
 # For testing versions only.
 use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.48";
+$VERSION_STRING = "2.48_01";
 
 use Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
@@ -1451,7 +1451,7 @@ sub VersionMessage(@) {
 
     my $v = $main::VERSION;
     my $fh = $pa->{-output} ||
-      ($pa->{-exitval} eq "NOEXIT" || $pa->{-exitval} < 2) ? \*STDOUT : \*STDERR;
+      ( ($pa->{-exitval} eq "NOEXIT" || $pa->{-exitval} < 2) ? \*STDOUT : \*STDERR );
 
     print $fh (defined($pa->{-message}) ? $pa->{-message} : (),
 	       $0, defined $v ? " version $v" : (),
