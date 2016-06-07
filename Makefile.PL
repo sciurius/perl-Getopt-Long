@@ -26,7 +26,7 @@ sub MY::postamble {
     # regtest
     $ret .= <<EOD;
 regtest .SILENT : all
-	cd regtest && \$(MAKE) \$(PASTHRU) tests
+	cd regtest && \$(MAKE) \$(PASTHRU) test
 
 EOD
 
