@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Oct  8 14:55:20 2015
-# Update Count    : 550
+# Last Modified On: Tue Jun  7 10:00:32 2016
+# Update Count    : 551
 # Status          : In progress
 
 ################ No args ################
@@ -2396,3 +2396,10 @@ O: gnu_compat
 A: --foo x y
    $v1 x
    @ARGV y
+
+T: #114999: ":number" broken in 2.48
+P: c:20 \\$v1
+O: gnu_getopt
+A: -c
+   $v1 20
+
