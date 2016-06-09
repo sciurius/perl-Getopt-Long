@@ -1,5 +1,9 @@
-Changes in version 2.xx
+Changes in version 2.49
 -----------------------
+
+* Fix bug https://rt.cpan.org/Ticket/Display.html?id=114999
+
+  Thanks Roy Ivy III for finding and fixing this.
 
 * Fix bug https://rt.cpan.org/Ticket/Display.html?id=113748
 
