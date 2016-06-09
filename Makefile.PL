@@ -22,6 +22,14 @@ if ($mm_version =~ /_/) {
 
 sub MY::postamble {
     my $ret = "";
+
+    # regtest
+    $ret .= <<EOD;
+regtest .SILENT : all
+	cd regtest && \$(MAKE) \$(PASTHRU) test
+
+EOD
+
     my $mandir = $Config{installman3dir};
     my $obsolete = "$mandir/Getopt::GetoptLong.3";
     if ( -e $obsolete ) {
@@ -114,7 +122,7 @@ WriteMakefile(
                 },
             },
         ),
-  
+
 
  );
 
