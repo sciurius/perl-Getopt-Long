@@ -1112,7 +1112,7 @@ sub FindOption ($$$$$) {
     if ( $gnu_compat ) {
 	my $optargtype = 0; # 0 = none, 1 = empty, 2 = nonempty
 	$optargtype = ( !defined($optarg) ? 0 : ( (length($optarg) == 0) ? 1 : 2 ) );
-	return (1, $opt, $ctl, undef)
+    return (1, $opt, $ctl, defined($ctl->[CTL_DEFAULT]) ? $ctl->[CTL_DEFAULT] : undef)
 	  if (($optargtype == 0) && !$mand);
 	return (1, $opt, $ctl, $type eq 's' ? '' : 0)
 	  if $optargtype == 1;  # --foo=  -> return nothing
