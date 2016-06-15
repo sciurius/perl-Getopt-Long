@@ -20,14 +20,22 @@ if ($mm_version =~ /_/) {
     die $@ if $@;
 }
 
-sub MY::postamble {
+package MY;
+sub postamble {
+	my $self = shift;
     my $ret = "";
 
-    # regtest
+    # regtest (dmake/make + nmake compatible)
+    $makefile_arg = "";
+    $make_type = lc $self->make;
+    if ($make_type eq 'nmake') {
+        $makefile_arg = '/f Makefile.nmake'
+    }
     $ret .= <<EOD;
-regtest .SILENT : all
-	cd regtest && \$(MAKE) \$(PASTHRU) test
-
+.PHONY  : regtest
+regtest : all
+	\$(NOECHO) cd regtest && \$(MAKE) $makefile_arg \$(PASTHRU) test
+\
 EOD
 
     my $mandir = $Config{installman3dir};
@@ -69,6 +77,7 @@ EOD
     }
     $ret;
 }
+package main;
 
 if ( $version =~ /_/ ) {
     print STDERR <<EOD;

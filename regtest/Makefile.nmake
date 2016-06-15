@@ -1,0 +1,20 @@
+# Makefile -- Makefile for regression testst
+# Author : Johan Vromans
+
+## * nmake (MSWindows-only) compatible
+
+DOLLAR = $$
+
+##
+
+## * ref: http://stackoverflow.com/questions/4509033/nmake-phony-analogue/32783804#32783804 @@ https://archive.is/BrYS8
+PHONY = _PHONY_NONEXISTANT_TARGET_FILE_FOR_NMAKE
+
+##
+
+!INCLUDE "Makefile.targets"
+
+##
+
+_PHONY_NONEXISTANT_TARGET_FILE_FOR_NMAKE:
+	@

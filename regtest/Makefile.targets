@@ -1,0 +1,28 @@
+# Makefile -- Makefile for regression tests
+# Author : Johan Vromans
+
+## macros
+
+PERL = perl -w -Mblib
+OPT	 = --verbose test.data
+
+## targets
+
+all : test test_aux $(PHONY)
+
+test : $(PHONY)
+	@$(PERL) -w driver1.pl $(OPT)
+
+test_aux : $(PHONY)
+	@$(PERL) -E "use English; @files = glob(q/aux*.pl/); for (@files) { print qx[ $(DOLLAR)EXECUTABLE_NAME $(DOLLAR)_ && echo 'SUCCESS: $(DOLLAR)_' || echo 'FAILED: $(DOLLAR)_'] }"
+	@perl -T -Mlib=../blib/lib taint01.pl -opt1 value1 -opt2=value2 && echo 'SUCCESS: taint01.pl' || echo 'FAILED: taint01.pl'
+
+####
+
+_info : $(PHONY)
+	@echo "OS_detected = '$(OS_detected)'"
+	@echo "DOLLAR = '$(DOLLAR)'"
+
+#
+
+.PHONY: all test test_aux _info
