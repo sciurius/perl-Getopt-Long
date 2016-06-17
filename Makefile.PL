@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Sat Mar 16 11:43:21 1996
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Jun  9 14:49:04 2016
-# Update Count    : 115
+# Last Modified On: Fri Jun 17 16:34:16 2016
+# Update Count    : 117
 # Status          : Unknown, Use with caution!
 
 use Config;
@@ -11,7 +11,7 @@ use ExtUtils::MakeMaker 5.0;
 
 use lib "./lib";
 use Getopt::Long;
-my $version = $Getopt::Long::VERSION_STRING || $Getopt::Long::VERSION;
+my $version = "2.49.1";
 
 my $mm_version = $ExtUtils::MakeMaker::VERSION;
 if ($mm_version =~ /_/) {
@@ -22,14 +22,6 @@ if ($mm_version =~ /_/) {
 
 sub MY::postamble {
     my $ret = "";
-
-    # regtest
-    $ret .= <<EOD;
-regtest .SILENT : all
-	cd regtest && \$(MAKE) \$(PASTHRU) test
-
-EOD
-
     my $mandir = $Config{installman3dir};
     my $obsolete = "$mandir/Getopt::GetoptLong.3";
     if ( -e $obsolete ) {
