@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Sat Mar 16 11:43:21 1996
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Jun  9 14:49:04 2016
-# Update Count    : 115
+# Last Modified On: Wed Jul 27 17:49:00 2016
+# Update Count    : 116
 # Status          : Unknown, Use with caution!
 
 use Config;
@@ -20,24 +20,8 @@ if ($mm_version =~ /_/) {
     die $@ if $@;
 }
 
-package MY;
-sub postamble {
-	my $self = shift;
+sub MY::postamble {
     my $ret = "";
-
-    # regtest (dmake/make + nmake compatible)
-    $makefile_arg = "";
-    $make_type = lc $self->make;
-    if ($make_type eq 'nmake') {
-        $makefile_arg = '/f Makefile.nmake'
-    }
-    $ret .= <<EOD;
-.PHONY  : regtest
-regtest : all
-	\$(NOECHO) cd regtest && \$(MAKE) $makefile_arg \$(PASTHRU) test
-\
-EOD
-
     my $mandir = $Config{installman3dir};
     my $obsolete = "$mandir/Getopt::GetoptLong.3";
     if ( -e $obsolete ) {
@@ -77,7 +61,6 @@ EOD
     }
     $ret;
 }
-package main;
 
 if ( $version =~ /_/ ) {
     print STDERR <<EOD;
