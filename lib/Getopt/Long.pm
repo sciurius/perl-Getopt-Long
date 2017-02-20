@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Jun  9 14:50:37 2016
-# Update Count    : 1699
+# Last Modified On: Tue Feb 14 13:55:26 2017
+# Update Count    : 1702
 # Status          : Released
 
 ################ Module Preamble ################
@@ -1045,7 +1045,8 @@ sub FindOption ($$$$$) {
 	# Complete the option name, if appropriate.
 	if ( @hits == 1 && $hits[0] ne $opt ) {
 	    $tryopt = $hits[0];
-	    $tryopt = lc ($tryopt) if $ignorecase;
+	    $tryopt = lc ($tryopt)
+	      if $ignorecase > (($bundling && length($tryopt) == 1) ? 1 : 0);
 	    print STDERR ("=> option \"$opt\" -> \"$tryopt\"\n")
 		if $debug;
 	}
@@ -1753,12 +1754,12 @@ destination for the option:
     GetOptions ("library=s" => \@libfiles);
 
 Alternatively, you can specify that the option can have multiple
-values by adding a "@", and pass a scalar reference as the
+values by adding a "@", and pass a reference to a scalar as the
 destination:
 
     GetOptions ("library=s@" => \$libfiles);
 
-Used with the example above, C<@libfiles> (or C<@$libfiles>) would
+Used with the example above, C<@libfiles> c.q. C<@$libfiles> would
 contain two strings upon completion: C<"lib/stdlib"> and
 C<"lib/extlib">, in that order. It is also possible to specify that
 only integer or floating point numbers are acceptable values.
