@@ -3,6 +3,12 @@ Changes in version 2.xx
 
 * Fix bug https://rt.cpan.org/Ticket/Display.html?id=120231.
 
+* Fix bug https://rt.cpan.org/Ticket/Display.html?id=120300.
+  Unfortunately, this withdraws a small part of fix 114999.
+  GNU getopt_long() does not accept the (optional)
+  argument to be passed to the option without = sign.
+  We do, since not doing so breaks existing scripts.
+
 Changes in version 2.49.1
 -------------------------
 
