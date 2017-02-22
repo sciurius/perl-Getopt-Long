@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Feb 14 13:55:20 2017
-# Update Count    : 555
+# Last Modified On: Wed Feb 22 12:06:19 2017
+# Update Count    : 565
 # Status          : In progress
 
 ################ No args ################
@@ -2213,7 +2213,8 @@ A: --v1= xxx
 T: Null required arguments
 P: v1:s
 A: --v1 "" xxx
-   @ARGV "" xxx
+   $opt_v1 ""
+   @ARGV xxx
 
 O:
 
@@ -2332,10 +2333,11 @@ A: --foo=bar
 T: #39052: gnu_getopt option not 100% identical to GNU getopt
 # If the option has an optional argument, it must be written directly
 # after the long option name, separated by '=', if present".
+# THIS BREAKS SCRIPTS. WITHDRAWN in 2.50.
 P: foo:s \\$v1
 O: gnu_compat
 A: --foo bar
-   @ARGV bar
+   $v1 bar
 
 T: #39052: gnu_getopt option not 100% identical to GNU getopt
 # Seems to break single character options with optional arguments. For
@@ -2350,11 +2352,13 @@ A: -fx y
    $v1 x
    @ARGV y
 
+# THIS BREAKS SCRIPTS. WITHDRAWN in 2.50.
 T: #39052: gnu_getopt option not 100% identical to GNU getopt
 P: f:s \\$v1
 O: gnu_compat
 A: -f x y
-   @ARGV x y
+   $v1 x
+   @ARGV y
 
 T: #39052: gnu_getopt option not 100% identical to GNU getopt
 P: f=s \\$v1
@@ -2377,11 +2381,13 @@ A: --foo=x y
    $v1 x
    @ARGV y
 
+# THIS BREAKS SCRIPTS. WITHDRAWN in 2.50.
 T: #39052: gnu_getopt option not 100% identical to GNU getopt
 P: foo:s \\$v1
 O: gnu_compat
 A: --foo x y
-   @ARGV x y
+   $v1 x
+   @ARGV y
 
 T: #39052: gnu_getopt option not 100% identical to GNU getopt
 P: foo=s \\$v1
@@ -2413,3 +2419,11 @@ O: bundling ignore_case
 A: --pid
    $v1 1
 
+# Regression in 2.48
+T: #120300: optional option value broken with gnu_compat
+P: a:s \\$v1 b \\$v2
+O: gnu_compat
+A: -a avalue -b extra1 extra2
+   @ARGV extra1 extra2
+   $v1 avalue
+   $v2 1
