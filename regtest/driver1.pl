@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Mon Aug  6 11:53:07 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Feb 19 09:24:05 2015
-# Update Count    : 454
+# Last Modified On: Wed Feb 22 10:21:20 2017
+# Update Count    : 459
 # Status          : Unknown, Use with caution!
 
 package MyTest;			# not main
@@ -31,6 +31,7 @@ my $line = 0;			# only the test at this line
 
 my $only;			# run only one test set
 my $only_style;			# in this style
+my $quick;			# quick(er) testing
 
 # Development options (not shown with -help).
 my $debug = 0;			# debugging
@@ -49,6 +50,7 @@ if ( $line ) {
     }
     $only = -1;
 }
+$only_style = 0 if $quick;
 
 ################ Presets ################
 
@@ -686,6 +688,7 @@ sub app_options {
 		     'trace'	=> \$trace,
 		     'line=s'	=> \$line,
 		     'fatal'	=> \$fatal,
+		     'quick'	=> \$quick,
 		     'help|?'	=> \$help,
 		     'debug'	=> \$debug,
 		    ) or $help )
@@ -705,7 +708,8 @@ sub app_usage {
     print STDERR <<EndOfUsage;
 Usage: $0 [options] [file ...] [test[\@variant]]
     -fatal		stop after first error
-    -line NN[\@variant] only one test after this line
+    -line NN[\@variant]	only the test at this line, with debug
+    -quick		quick, just one variant
     -help		this message
     -ident		show identification
     -verbose		verbose information
