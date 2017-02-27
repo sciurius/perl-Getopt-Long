@@ -25,7 +25,7 @@ sub parse_opts
 eval {
     parse_opts();
 };
-exit -1 unless $@ =~ /^MY ERROR/;
+die ("Fail ", __FILE__, "\n") unless $@ =~ /^MY ERROR/;
 
 __END__
 From: Diab Jerius <dj@head-cfa.harvard.edu>
