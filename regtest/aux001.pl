@@ -25,7 +25,7 @@ sub parse_opts
 eval {
     parse_opts();
 };
-print STDERR ("Fail ", __FILE__, "\n") unless $@ =~ /^MY ERROR/;
+die ("Fail ", __FILE__, "\n") unless $@ =~ /^MY ERROR/;
 
 __END__
 From: Diab Jerius <dj@head-cfa.harvard.edu>
@@ -40,7 +40,7 @@ I often wrap calls to GetOpt::Long with code like this:
 =============
 
   eval
-  { 
+  {
     local $SIG{ __WARN__ } = sub { die $_[0] };
 
     GetOptions( ... );
@@ -66,7 +66,7 @@ sub parse_opts
   my %param;
 
   eval
-  { 
+  {
     local $SIG{ __WARN__ } = sub { die $_[0] };
 
     GetOptions( 'require=s', \&require_file );
@@ -135,9 +135,9 @@ Commenting out the local $@ line causes the error propagation to work.
 
 =============
 
-eval { 
+eval {
   local $SIG{ __WARN__ } = sub { die $_[0]; };
-  
+
   local $@;
   eval { die ("My Error") };
   warn $@ if $@ ne '';

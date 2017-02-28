@@ -1,23 +1,16 @@
 # Makefile -- Makefile for regression testst
 # Author : Johan Vromans
 
-## * dmake/make compatible
+## * nmake (MSWindows-only) compatible
 
-## OS dependency
+DOLLAR = $$
 
-ifeq ($(OS),Windows_NT)
-    OS_detected := MSWindows
-else
-    OS_detected := $(shell uname -s)
-endif
+##
 
-ifeq ($(OS_detected),MSWindows)
-	DOLLAR := $$
-else
-	DOLLAR := \$$
-endif
+## * ref: http://stackoverflow.com/questions/4509033/nmake-phony-analogue/32783804#32783804 @@ https://archive.is/BrYS8
+PHONY = _PHONY_NONEXISTANT_TARGET_FILE_FOR_NMAKE
 
-####
+##
 
 ## macros
 
@@ -44,3 +37,8 @@ _info : $(PHONY)
 #
 
 .PHONY: all test test_aux _info
+
+##
+
+_PHONY_NONEXISTANT_TARGET_FILE_FOR_NMAKE:
+	@
