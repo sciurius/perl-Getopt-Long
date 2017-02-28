@@ -1,7 +1,7 @@
-# Makefile -- Makefile for regression testst
-# Author : Johan Vromans
+# Makefile.nmake -- nmake (MSWindows-only) Makefile for regression tests
+# Author : Roy Ivy III, based on the original Makefile for Linux.
 
-## * nmake (MSWindows-only) compatible
+## *  compatible
 
 DOLLAR = $$
 
@@ -19,9 +19,9 @@ OPT	 = --verbose test.data
 
 ## targets
 
-all : test test_aux $(PHONY)
+all : test_basic test_aux $(PHONY)
 
-test : $(PHONY)
+test_basic : $(PHONY)
 	@$(PERL) -w driver1.pl $(OPT)
 
 test_aux : $(PHONY)
@@ -36,7 +36,7 @@ _info : $(PHONY)
 
 #
 
-.PHONY: all test test_aux _info
+.PHONY: all test_basic test_aux _info
 
 ##
 

@@ -1,46 +1,22 @@
-# Makefile -- Makefile for regression testst
-# Author : Johan Vromans
+# Makefile -- Makefile for regression tests
+# Author          : Johan Vromans
+# Created On      : Fri May 12 11:13:53 2000
+# Last Modified By: Johan Vromans
+# Last Modified On: Tue Feb 28 10:50:17 2017
+# Update Count    : 25
+# Status          : Unknown, Use with caution!
 
-## * dmake/make compatible
+PERL	= perl -w -Mblib
+OPT	= --verbose test.data
 
-## OS dependency
+all :	test_basic test_aux
 
-ifeq ($(OS),Windows_NT)
-    OS_detected := MSWindows
-else
-    OS_detected := $(shell uname -s)
-endif
+test_basic :
+	$(PERL) -w driver1.pl $(OPT)
 
-ifeq ($(OS_detected),MSWindows)
-	DOLLAR := $$
-else
-	DOLLAR := \$$
-endif
+test_aux :
+	for test in aux*.pl; do \
+	  $(PERL) $$test || echo "FAILED: $$test"; \
+	done
+	perl -T -Mblib taint01.pl -opt1 value1 -opt2=value2 || echo "FAILED: taint01.pl"
 
-####
-
-## macros
-
-PERL = perl -w -Mblib
-OPT	 = --verbose test.data
-
-## targets
-
-all : test test_aux $(PHONY)
-
-test : $(PHONY)
-	@$(PERL) -w driver1.pl $(OPT)
-
-test_aux : $(PHONY)
-	@$(PERL) -E "use English; @files = glob(q/aux*.pl/); for (@files) { print qx[ $(DOLLAR)EXECUTABLE_NAME $(DOLLAR)_ && echo 'SUCCESS: $(DOLLAR)_' || echo 'FAILED: $(DOLLAR)_'] }"
-	@perl -T -Mlib=../blib/lib taint01.pl -opt1 value1 -opt2=value2 && echo 'SUCCESS: taint01.pl' || echo 'FAILED: taint01.pl'
-
-####
-
-_info : $(PHONY)
-	@echo "OS_detected = '$(OS_detected)'"
-	@echo "DOLLAR = '$(DOLLAR)'"
-
-#
-
-.PHONY: all test test_aux _info
