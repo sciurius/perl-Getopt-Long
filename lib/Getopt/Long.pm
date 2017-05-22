@@ -1122,8 +1122,13 @@ sub FindOption ($$$$$) {
 	    # We do, since not doing so breaks existing scripts.
 	    $optargtype = 3;
 	}
-	return (1, $opt, $ctl, $ctl->[CTL_DEFAULT])
-	  if (($optargtype == 0) && !$mand);
+	if(($optargtype == 0) && !$mand) {
+	    my $val
+	      = defined($ctl->[CTL_DEFAULT]) ? $ctl->[CTL_DEFAULT]
+	      : $type eq 's'                 ? ''
+	      :                                0;
+	    return (1, $opt, $ctl, $val);
+	}
 	return (1, $opt, $ctl, $type eq 's' ? '' : 0)
 	  if $optargtype == 1;  # --foo=  -> return nothing
     }

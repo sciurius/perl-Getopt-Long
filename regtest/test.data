@@ -2427,3 +2427,9 @@ A: -a avalue -b extra1 extra2
    @ARGV extra1 extra2
    $v1 avalue
    $v2 1
+
+T: PR#7: Provide a default value for optional arguments (gnu_compat)
+P: foo:s \\&ok
+O: gnu_compat
+A: --foo
+   $v1 ''
