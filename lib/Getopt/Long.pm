@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Feb 22 12:09:29 2017
-# Update Count    : 1714
+# Last Modified On: Sat May 27 12:11:39 2017
+# Update Count    : 1715
 # Status          : Released
 
 ################ Module Preamble ################
@@ -18,10 +18,10 @@ use warnings;
 package Getopt::Long;
 
 use vars qw($VERSION);
-$VERSION        =  2.49;
+$VERSION        =  2.50;
 # For testing versions only.
 use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.49";
+$VERSION_STRING = "2.50";
 
 use Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
