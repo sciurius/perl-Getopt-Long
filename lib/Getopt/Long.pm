@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat May 27 12:11:39 2017
-# Update Count    : 1715
+# Last Modified On: Tue Jun 13 13:20:51 2017
+# Update Count    : 1719
 # Status          : Released
 
 ################ Module Preamble ################
@@ -1123,6 +1123,12 @@ sub FindOption ($$$$$) {
 	    $optargtype = 3;
 	}
 	if(($optargtype == 0) && !$mand) {
+	    if ( $type eq 'I' ) {
+		# Fake incremental type.
+		my @c = @$ctl;
+		$c[CTL_TYPE] = '+';
+		return (1, $opt, \@c, 1);
+	    }
 	    my $val
 	      = defined($ctl->[CTL_DEFAULT]) ? $ctl->[CTL_DEFAULT]
 	      : $type eq 's'                 ? ''

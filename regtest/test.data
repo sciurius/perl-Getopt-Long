@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Feb 22 12:06:19 2017
-# Update Count    : 565
+# Last Modified On: Tue Jun 13 13:20:56 2017
+# Update Count    : 581
 # Status          : In progress
 
 ################ No args ################
@@ -2433,3 +2433,11 @@ P: foo:s \\&ok
 O: gnu_compat
 A: --foo
    $v1 ''
+
+T: #122068: Incremental option processing broken.
+O: gnu_getopt
+P: verbose|v:+ \\$v1
+A: -vvvv
+   $v1 4
+
+
