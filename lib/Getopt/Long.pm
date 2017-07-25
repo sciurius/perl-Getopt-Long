@@ -1547,7 +1547,7 @@ sub setup_pa_args($@) {
 
 # Sneak way to know what version the user requested.
 sub VERSION {
-    $requested_version = $_[1];
+    $requested_version = $_[1] if @_ > 1;
     shift->SUPER::VERSION(@_);
 }
 
