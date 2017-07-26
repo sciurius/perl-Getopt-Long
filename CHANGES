@@ -3,6 +3,9 @@ Changes in version 2.51
 
 * Fix bug https://rt.cpan.org/Ticket/Display.html?id=122068.
 
+* Fix warnings when getting options after calling Getopt::Long->VERSION.
+  Thanks to Dan Book.
+
 Changes in version 2.50
 -----------------------
 
