@@ -20,4 +20,4 @@ official CPAN release must be made with the 'dist' target of the
 GNUmakefile.
 
 Please file issues with rt.cpan.org:
-https://rt.cpan.org/Ticket/Create.html?Queue=Getopt-Long
+https://rt.cpan.org/Public/Bug/Report.html?Queue=Getopt-Long
