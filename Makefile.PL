@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Sat Mar 16 11:43:21 1996
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat May 27 12:13:51 2017
-# Update Count    : 118
+# Last Modified On: Fri Oct 27 08:41:31 2017
+# Update Count    : 119
 # Status          : Unknown, Use with caution!
 
 use Config;
@@ -106,11 +106,7 @@ WriteMakefile(
             META_MERGE => {
                 'meta-spec' => { version => 2 },
                 resources => {
-                    repository => {
-                        type => 'git',
-                        web  => 'https://github.com/sciurius/perl-Getopt-Long',
-                        url  => 'https://github.com/sciurius/perl-Getopt-Long.git',
-                    },
+		  repository => "https://github.com/sciurius/perl-Getopt-Long",
                 },
             },
         ),
