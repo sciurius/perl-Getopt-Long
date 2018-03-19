@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Jun 13 13:20:51 2017
-# Update Count    : 1719
+# Last Modified On: Mon Mar 19 09:34:17 2018
+# Update Count    : 1720
 # Status          : Released
 
 ################ Module Preamble ################
@@ -2275,8 +2275,7 @@ it will set variable C<$stdio>.
 A special option 'name' C<< <> >> can be used to designate a subroutine
 to handle non-option arguments. When GetOptions() encounters an
 argument that does not look like an option, it will immediately call this
-subroutine and passes it one parameter: the argument name. Well, actually
-it is an object that stringifies to the argument name.
+subroutine and passes it one parameter: the argument name.
 
 For example:
 
