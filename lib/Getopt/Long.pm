@@ -115,7 +115,6 @@ sub import {
     # Hide one level and call super.
     local $Exporter::ExportLevel = 1;
     push(@syms, qw(&GetOptions)) if @syms; # always export GetOptions
-    $requested_version = 0;
     $pkg->SUPER::import(@syms);
     # And configure.
     Configure(@config) if @config;
