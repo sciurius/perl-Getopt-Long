@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Mar 19 09:34:17 2018
-# Update Count    : 1720
+# Last Modified On: Tue May 22 14:07:42 2018
+# Update Count    : 1724
 # Status          : Released
 
 ################ Module Preamble ################
@@ -805,10 +805,8 @@ sub ParseOptionSpec ($$) {
 		   (
 		     # Option name
 		     (?: \w+[-\w]* )
-		     # Alias names, or "?"
-		     (?: \| (?: \? | \w[-\w]* ) )*
 		     # Aliases
-		     (?: \| (?: [^-|!+=:][^|!+=:]* )? )*
+		     (?: \| (?: . [^|!+=:]* )? )*
 		   )?
 		   (
 		     # Either modifiers ...
@@ -2738,8 +2736,10 @@ version 2.13.
     use Getopt::Long;
     GetOptions ("help|?");    # -help and -? will both set $opt_help
 
-Other characters that can't appear in Perl identifiers are also supported
-as aliases with Getopt::Long of at least version 2.39.
+Other characters that can't appear in Perl identifiers are also
+supported in aliases with Getopt::Long of at version 2.39. Note that
+the characters C<!>, C<|>, C<+>, C<=>, and C<:> can only appear as the
+first (or only) character of an alias.
 
 As of version 2.32 Getopt::Long provides auto-help, a quick and easy way
 to add the options --help and -? to your program, and handle them.

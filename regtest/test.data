@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Jun 13 13:20:56 2017
-# Update Count    : 581
+# Last Modified On: Tue May 22 13:55:15 2018
+# Update Count    : 584
 # Status          : In progress
 
 ################ No args ################
@@ -2440,4 +2440,8 @@ P: verbose|v:+ \\$v1
 A: -vvvv
    $v1 4
 
-
+T: #125370: Impossible to have option "-=" 
+O: bundling
+P: user-option|=:s \\$v1
+A: -=foo
+   $v1 'foo'
