@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue May 22 14:07:42 2018
-# Update Count    : 1724
+# Last Modified On: Mon Aug 12 17:05:46 2019
+# Update Count    : 1728
 # Status          : Released
 
 ################ Module Preamble ################
@@ -18,10 +18,10 @@ use warnings;
 package Getopt::Long;
 
 use vars qw($VERSION);
-$VERSION        =  2.50;
+$VERSION        =  2.51;
 # For testing versions only.
 use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.50";
+$VERSION_STRING = "2.51";
 
 use Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
@@ -303,7 +303,7 @@ sub GetOptionsFromArray(@) {
 	# Avoid some warnings if debugging.
 	local ($^W) = 0;
 	print STDERR
-	  ("Getopt::Long $Getopt::Long::VERSION ",
+	  ("Getopt::Long $Getopt::Long::VERSION_STRING ",
 	   "called from package \"$pkg\".",
 	   "\n  ",
 	   "argv: ",
@@ -769,7 +769,7 @@ sub GetOptionsFromArray(@) {
     }
 
     # Finish.
-    if ( @ret && $order == $PERMUTE ) {
+    if ( @ret && ( $order == $PERMUTE || $passthrough ) ) {
 	#  Push back accumulated arguments
 	print STDERR ("=> restoring \"", join('" "', @ret), "\"\n")
 	    if $debug;

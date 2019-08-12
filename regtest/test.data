@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue May 22 13:55:15 2018
-# Update Count    : 584
+# Last Modified On: Mon Aug 12 16:51:51 2019
+# Update Count    : 585
 # Status          : In progress
 
 ################ No args ################
@@ -2445,3 +2445,19 @@ O: bundling
 P: user-option|=:s \\$v1
 A: -=foo
    $v1 'foo'
+
+# Actually it is require_order that causes the problem.
+T: #134352 Getopt::Long wrongly removes '--' with pass_through
+O: pass_through require_order
+P: a \\$v1
+A: -a -b -- -noarg
+   @ARGV -b -- -noarg
+   $v1 1
+
+T: #134352 Getopt::Long wrongly removes '--' with pass_through
+O: pass_through require_order
+P: a \\$v1
+A: -a -- -noarg
+   @ARGV -- -noarg
+   $v1 1
+
