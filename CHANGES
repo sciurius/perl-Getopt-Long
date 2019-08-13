@@ -5,6 +5,8 @@ Changes in version 2.52
   This is the case when an option has :s% and nothing was passed. This
   currently gives a perl warning, issue a real error message instead.
 
+* Added some tests, see https://rt.cpan.org/Ticket/Display.html?id=87581
+
 Changes in version 2.51
 -----------------------
 
