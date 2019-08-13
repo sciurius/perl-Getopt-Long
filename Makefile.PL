@@ -106,7 +106,11 @@ WriteMakefile(
             META_MERGE => {
                 'meta-spec' => { version => 2 },
                 resources => {
-		  repository => "https://github.com/sciurius/perl-Getopt-Long",
+                    repository => {
+                        type => "git",
+                        url => "https://github.com/sciurius/perl-Getopt-Long.git",
+                        web => "https://github.com/sciurius/perl-Getopt-Long",
+                    },
                 },
             },
         ),
