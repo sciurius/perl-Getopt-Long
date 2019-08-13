@@ -1,3 +1,10 @@
+Changes in version 2.52
+-----------------------
+
+* Fix bug https://rt.cpan.org/Ticket/History.html?id=127584.
+  This is the case when an option has :s% and nothing was passed. This
+  currently gives a perl warning, issue a real error message instead.
+
 Changes in version 2.51
 -----------------------
 

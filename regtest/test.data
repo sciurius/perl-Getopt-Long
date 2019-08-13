@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Aug 12 16:51:51 2019
-# Update Count    : 585
+# Last Modified On: Tue Aug 13 19:12:57 2019
+# Update Count    : 587
 # Status          : In progress
 
 ################ No args ################
@@ -2460,4 +2460,9 @@ P: a \\$v1
 A: -a -- -noarg
    @ARGV -- -noarg
    $v1 1
+
+T: #127584 Optional hash-valued option warns when key is missing, even though the key is not required
+P: v:s% \\%h1
+A: -v
+W: Option v requires an argument
 

@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Aug 12 17:05:46 2019
-# Update Count    : 1728
+# Last Modified On: Tue Aug 13 10:13:00 2019
+# Update Count    : 1732
 # Status          : Released
 
 ################ Module Preamble ################
@@ -1143,7 +1143,7 @@ sub FindOption ($$$$$) {
 	 : !(defined $rest || @$argv > 0) ) {
 	# Complain if this option needs an argument.
 #	if ( $mand && !($type eq 's' ? defined($optarg) : 0) ) {
-	if ( $mand ) {
+	if ( $mand || $ctl->[CTL_DEST] == CTL_DEST_HASH ) {
 	    return (0) if $passthrough;
 	    warn ("Option ", $opt, " requires an argument\n");
 	    $error++;
