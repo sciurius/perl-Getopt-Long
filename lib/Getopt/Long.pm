@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Aug 18 14:08:48 2020
-# Update Count    : 1737
+# Last Modified On: Tue Aug 18 14:17:12 2020
+# Update Count    : 1738
 # Status          : Released
 
 ################ Module Preamble ################
@@ -2162,7 +2162,7 @@ list context, a message will be given and C<GetOptionsFromString> will
 return failure.
 
 As with GetOptionsFromArray, a first argument hash reference now
-becomes the second argument.
+becomes the second argument. See the next section.
 
 =head2 Storing options values in a hash
 
