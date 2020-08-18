@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Aug 18 08:19:38 2020
-# Update Count    : 1736
+# Last Modified On: Tue Aug 18 14:08:48 2020
+# Update Count    : 1737
 # Status          : Released
 
 ################ Module Preamble ################
@@ -2229,9 +2229,9 @@ The simplest style of bundling can be enabled with:
     Getopt::Long::Configure ("bundling");
 
 Configured this way, single-character options can be bundled but long
-options B<must> always start with a double dash C<--> to avoid
-ambiguity. For example, when C<vax>, C<a>, C<v> and C<x> are all valid
-options,
+options (and any of their auto-abbreviated shortened forms) B<must>
+always start with a double dash C<--> to avoid ambiguity. For example,
+when C<vax>, C<a>, C<v> and C<x> are all valid options,
 
     -vax
 
@@ -2423,7 +2423,8 @@ first.
 
 Enabling this option will allow single-character options to be
 bundled. To distinguish bundles from long option names, long options
-I<must> be introduced with C<--> and bundles with C<->.
+(and any of their auto-abbreviated shortened forms) I<must> be
+introduced with C<--> and bundles with C<->.
 
 Note that, if you have options C<a>, C<l> and C<all>, and
 auto_abbrev enabled, possible arguments and option settings are:
