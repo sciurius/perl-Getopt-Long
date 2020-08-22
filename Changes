@@ -1,3 +1,9 @@
+Changes in version 2.53
+-----------------------
+
+* Improve parsing of float numbers.
+  https://rt.cpan.org/Ticket/Display.html?id=133216
+
 Changes in version 2.52
 -----------------------
 

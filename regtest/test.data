@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Aug 13 19:12:57 2019
-# Update Count    : 587
+# Last Modified On: Sat Aug 22 20:57:40 2020
+# Update Count    : 589
 # Status          : In progress
 
 ################ No args ################
@@ -726,6 +726,26 @@ A: -v3 -6 foo
 T: Float opt (mandatory)
 A: -v3 -6.4 foo
    $opt_v3 == -6.4
+   @ARGV foo
+
+T: Float opt (mandatory)
+A: -v3 .4 foo
+   $opt_v3 == 0.4
+   @ARGV foo
+
+T: Float opt (mandatory)
+A: -v3 -.4e1 foo
+   $opt_v3 == -4
+   @ARGV foo
+
+T: Float opt (mandatory)
+A: -v3 4. foo
+   $opt_v3 == 4
+   @ARGV foo
+
+T: Float opt (mandatory)
+A: -v3 -4.e1 foo
+   $opt_v3 == -40
    @ARGV foo
 
 T: Float opt (mandatory)

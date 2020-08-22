@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Aug 18 14:48:05 2020
-# Update Count    : 1739
+# Last Modified On: Sat Aug 22 21:00:09 2020
+# Update Count    : 1750
 # Status          : Released
 
 ################ Module Preamble ################
@@ -21,7 +21,7 @@ use vars qw($VERSION);
 $VERSION        =  2.52;
 # For testing versions only.
 use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.52";
+$VERSION_STRING = "2.52_1";
 
 use Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
@@ -258,9 +258,9 @@ use constant PAT_XINT  =>
   ")";
 use constant PAT_FLOAT =>
   "[-+]?".			# optional sign
-  "(?=[0-9.])".			# must start with digit or dec.point
+  "(?=\\.?[0-9])".		# must start with digit or dec.point
   "[0-9_]*".			# digits before the dec.point
-  "(\.[0-9_]+)?".		# optional fraction
+  "(\\.[0-9_]*)?".		# optional fraction
   "([eE][-+]?[0-9_]+)?";	# optional exponent
 
 sub GetOptions(@) {
