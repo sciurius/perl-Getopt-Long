@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Sun Sep 15 18:39:01 1996
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Jul 16 10:00:31 2019
-# Update Count    : 25
+# Last Modified On: Tue Oct 13 18:49:04 2020
+# Update Count    : 26
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -60,13 +60,13 @@ sub app_options {
 
     # Process options.
     if ( @ARGV > 0 ) {
-	GetOptions('ident'	=> \$ident,
-		   'verbose+'	=> \$verbose,
-		   'quiet'	=> sub { $verbose = 0 },
-		   'trace'	=> \$trace,
-		   'help|?'	=> \$help,
-		   'man'	=> \$man,
-		   'debug'	=> \$debug)
+	GetOptions( 'ident'	=> \$ident,
+		    'verbose+'	=> \$verbose,
+		    'quiet'	=> sub { $verbose = 0 },
+		    'trace'	=> \$trace,
+		    'help|?'	=> \$help,
+		    'man'	=> \$man,
+		    'debug'	=> \$debug )
 	  or $pod2usage->(2);
     }
     if ( $ident or $help or $man ) {
