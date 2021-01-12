@@ -1713,8 +1713,8 @@ disable C<$verbose> by setting its value to C<0>. Using a suitable
 default value, the program can find out whether C<$verbose> is false
 by default, or disabled by using C<--noverbose>.
 
-(If both C<--verbose> and C<--noverbose> are given, the later option
-takes precedence.)
+(If both C<--verbose> and C<--noverbose> are given, whichever is given
+last takes precedence.)
 
 An incremental option is specified with a plus C<+> after the
 option name:
