@@ -1713,6 +1713,9 @@ disable C<$verbose> by setting its value to C<0>. Using a suitable
 default value, the program can find out whether C<$verbose> is false
 by default, or disabled by using C<--noverbose>.
 
+(If both C<--verbose> and C<--noverbose> are given, whichever is given
+last takes precedence.)
+
 An incremental option is specified with a plus C<+> after the
 option name:
 
@@ -1764,6 +1767,10 @@ values, and C<f> for floating point values. Using a colon C<:> instead
 of the equals sign indicates that the option value is optional. In
 this case, if no suitable value is supplied, string valued options get
 an empty string C<''> assigned, while numeric options are set to C<0>.
+
+(If the same option appears more than once on the command line, the
+last given value is used.  If you want to take all the values, see
+below.)
 
 =head2 Options with multiple values
 
