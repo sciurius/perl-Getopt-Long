@@ -18,10 +18,10 @@ use warnings;
 package Getopt::Long;
 
 use vars qw($VERSION);
-$VERSION        =  2.52_001;
+$VERSION        =  2.52_002;
 # For testing versions only.
 use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.52_1";
+$VERSION_STRING = "2.52_2";
 
 use Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
@@ -2030,15 +2030,14 @@ option will be incremented.
 Getopt::Long can be used in an object oriented way as well:
 
     use Getopt::Long;
-    $p = Getopt::Long::Parser->new;
+    my $p = Getopt::Long::Parser->new;
     $p->configure(...configuration options...);
     if ($p->getoptions(...options descriptions...)) ...
     if ($p->getoptionsfromarray( \@array, ...options descriptions...)) ...
 
 Configuration options can be passed to the constructor:
 
-    $p = new Getopt::Long::Parser
-             config => [...configuration options...];
+    my $p = Getopt::Long::Parser->new(config => [...configuration options...]);
 
 =head2 Callback object
 
