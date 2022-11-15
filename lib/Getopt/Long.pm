@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Aug 19 17:35:14 2022
-# Update Count    : 1756
+# Last Modified On: Tue Nov 15 14:16:18 2022
+# Update Count    : 1776
 # Status          : Released
 
 ################ Module Preamble ################
@@ -18,10 +18,10 @@ use warnings;
 package Getopt::Long;
 
 use vars qw($VERSION);
-$VERSION        =  2.52_002;
+$VERSION        =  2.53;
 # For testing versions only.
 use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.52_2";
+$VERSION_STRING = "2.53";
 
 use Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
@@ -820,7 +820,7 @@ sub ParseOptionSpec ($$) {
 		     [=:] [ionfs] [@%]? (?: \{\d*,?\d*\} )?
 		     |
 		     # ... or an optional-with-default spec
-		     : (?: -?\d+ | \+ ) [@%]?
+		     : (?: 0[0-7]+ | 0[xX][0-9a-fA-F]+ | 0[bB][01]+ | -?\d+ | \+ ) [@%]?
 		   )?
 		   $;x ) {
 	return (undef, "Error in option spec: \"$opt\"\n");
@@ -853,10 +853,23 @@ sub ParseOptionSpec ($$) {
 	# Fields are hard-wired here.
 	$entry = [$spec,$orig,undef,CTL_DEST_SCALAR,0,0];
     }
-    elsif ( $spec =~ /^:(-?\d+|\+)([@%])?$/ ) {
+    elsif ( $spec =~ /^:(0[0-7]+|0x[0-9a-f]+|0b[01]+|-?\d+|\+)([@%])?$/i ) {
 	my $def = $1;
 	my $dest = $2;
-	my $type = $def eq '+' ? 'I' : 'i';
+	my $type = 'i';		# assume integer
+	if ( $def eq '+' ) {
+	    # Increment.
+	    $type = 'I';
+	}
+	elsif ( $def =~ /^(0[0-7]+|0[xX][0-9a-fA-F]+|0[bB][01]+)$/ ) {
+	    # Octal, binary or hex.
+	    $type = 'o';
+	    $def = oct($def);
+	}
+	elsif ( $def =~ /^-?\d+$/ ) {
+	    # Integer.
+	    $def = 0 + $def;
+	}
 	$dest ||= '$';
 	$dest = $dest eq '@' ? CTL_DEST_ARRAY
 	  : $dest eq '%' ? CTL_DEST_HASH : CTL_DEST_SCALAR;
@@ -2017,6 +2030,8 @@ considered an option on itself.
 =item : I<number> [ I<desttype> ]
 
 Like C<:i>, but if the value is omitted, the I<number> will be assigned.
+
+If the I<number> is octal, hexadecimal or binary, behaves like C<:o>.
 
 =item : + [ I<desttype> ]
 
