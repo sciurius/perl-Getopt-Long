@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Dec 28 10:12:34 2020
-# Update Count    : 1753
+# Last Modified On: Fri Aug 19 17:35:14 2022
+# Update Count    : 1756
 # Status          : Released
 
 ################ Module Preamble ################
@@ -18,10 +18,10 @@ use warnings;
 package Getopt::Long;
 
 use vars qw($VERSION);
-$VERSION        =  2.52_001;
+$VERSION        =  2.52_002;
 # For testing versions only.
 use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.52_1";
+$VERSION_STRING = "2.52_2";
 
 use Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
@@ -525,8 +525,9 @@ sub GetOptionsFromArray(@) {
 	my $key;		# key (if hash type)
 	my $arg;		# option argument
 	my $ctl;		# the opctl entry
+	my $starter;		# the actual starter character(s)
 
-	($found, $opt, $ctl, $arg, $key) =
+	($found, $opt, $ctl, $starter, $arg, $key) =
 	  FindOption ($argv, $prefix, $argend, $opt, \%opctl);
 
 	if ( $found ) {
@@ -606,12 +607,13 @@ sub GetOptionsFromArray(@) {
 			    eval {
 				&{$linkage{$opt}}
 				  (Getopt::Long::CallBack->new
-				   (name    => $opt,
-				    given   => $given,
-				    ctl     => $ctl,
-				    opctl   => \%opctl,
-				    linkage => \%linkage,
-				    prefix  => $prefix,
+				   (name     => $opt,
+				    given    => $given,
+				    ctl      => $ctl,
+				    opctl    => \%opctl,
+				    linkage  => \%linkage,
+				    prefix   => $prefix,
+				    starter  => $starter,
 				   ),
 				   $ctl->[CTL_DEST] == CTL_DEST_HASH ? ($key) : (),
 				   $arg);
@@ -923,7 +925,7 @@ sub ParseOptionSpec ($$) {
 # Option lookup.
 sub FindOption ($$$$$) {
 
-    # returns (1, $opt, $ctl, $arg, $key) if okay,
+    # returns (1, $opt, $ctl, $starter, $arg, $key) if okay,
     # returns (1, undef) if option in error,
     # returns (0) otherwise.
 
@@ -1104,7 +1106,7 @@ sub FindOption ($$$$$) {
 	    $arg = 0;		# supply explicit value
 	}
 	unshift (@$argv, $starter.$rest) if defined $rest;
-	return (1, $opt, $ctl, $arg);
+	return (1, $opt, $ctl, $starter, $arg);
     }
 
     # Get mandatory status and type info.
@@ -1127,15 +1129,15 @@ sub FindOption ($$$$$) {
 		# Fake incremental type.
 		my @c = @$ctl;
 		$c[CTL_TYPE] = '+';
-		return (1, $opt, \@c, 1);
+		return (1, $opt, \@c, $starter, 1);
 	    }
 	    my $val
 	      = defined($ctl->[CTL_DEFAULT]) ? $ctl->[CTL_DEFAULT]
 	      : $type eq 's'                 ? ''
 	      :                                0;
-	    return (1, $opt, $ctl, $val);
+	    return (1, $opt, $ctl, $starter, $val);
 	}
-	return (1, $opt, $ctl, $type eq 's' ? '' : 0)
+	return (1, $opt, $ctl, $starter, $type eq 's' ? '' : 0)
 	  if $optargtype == 1;  # --foo=  -> return nothing
     }
 
@@ -1155,9 +1157,9 @@ sub FindOption ($$$$$) {
 	    # Fake incremental type.
 	    my @c = @$ctl;
 	    $c[CTL_TYPE] = '+';
-	    return (1, $opt, \@c, 1);
+	    return (1, $opt, \@c, $starter, 1);
 	}
-	return (1, $opt, $ctl,
+	return (1, $opt, $ctl, $starter,
 		defined($ctl->[CTL_DEFAULT]) ? $ctl->[CTL_DEFAULT] :
 		$type eq 's' ? '' : 0);
     }
@@ -1187,16 +1189,16 @@ sub FindOption ($$$$$) {
 
     if ( $type eq 's' ) {	# string
 	# A mandatory string takes anything.
-	return (1, $opt, $ctl, $arg, $key) if $mand;
+	return (1, $opt, $ctl, $starter, $arg, $key) if $mand;
 
 	# Same for optional string as a hash value
-	return (1, $opt, $ctl, $arg, $key)
+	return (1, $opt, $ctl, $starter, $arg, $key)
 	  if $ctl->[CTL_DEST] == CTL_DEST_HASH;
 
 	# An optional string takes almost anything.
-	return (1, $opt, $ctl, $arg, $key)
+	return (1, $opt, $ctl, $starter, $arg, $key)
 	  if defined $optarg || defined $rest;
-	return (1, $opt, $ctl, $arg, $key) if $arg eq "-"; # ??
+	return (1, $opt, $ctl, $starter, $arg, $key) if $arg eq "-"; # ??
 
 	# Check for option or option list terminator.
 	if ($arg eq $argend ||
@@ -1248,7 +1250,7 @@ sub FindOption ($$$$$) {
 		    # Fake incremental type.
 		    my @c = @$ctl;
 		    $c[CTL_TYPE] = '+';
-		    return (1, $opt, \@c, 1);
+		    return (1, $opt, \@c, $starter, 1);
 		}
 		# Supply default value.
 		$arg = defined($ctl->[CTL_DEFAULT]) ? $ctl->[CTL_DEFAULT] : 0;
@@ -1293,7 +1295,7 @@ sub FindOption ($$$$$) {
     else {
 	die("Getopt::Long internal error (Can't happen)\n");
     }
-    return (1, $opt, $ctl, $arg, $key);
+    return (1, $opt, $ctl, $starter, $arg, $key);
 }
 
 sub ValidValue ($$$$$) {
