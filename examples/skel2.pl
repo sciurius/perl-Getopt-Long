@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Sun Sep 15 18:39:01 1996
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Oct 13 18:49:04 2020
-# Update Count    : 26
+# Last Modified On: Fri Apr 29 14:19:33 2022
+# Update Count    : 27
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -67,14 +67,13 @@ sub app_options {
 		    'help|?'	=> \$help,
 		    'man'	=> \$man,
 		    'debug'	=> \$debug )
-	  or $pod2usage->(2);
+	  or $pod2usage->( -exitval => 2, -verbose => 0 );
     }
     if ( $ident or $help or $man ) {
 	print STDERR ("This is $my_package [$my_name $my_version]\n");
     }
     if ( $man or $help ) {
-	$pod2usage->(1) if $help;
-	$pod2usage->(VERBOSE => 2) if $man;
+	$pod2usage->( -exitval => 0, -verbose => $man ? 2 : 0 );
     }
 }
 
