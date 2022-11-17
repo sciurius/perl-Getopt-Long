@@ -1544,7 +1544,9 @@ sub setup_pa_args($@) {
 
     if ( UNIVERSAL::isa($pa, 'HASH') ) {
 	# Get rid of -msg vs. -message ambiguity.
-	$pa->{-message} //= delete($pa->{-msg});
+	if (!defined $pa->{-message}) {
+	    $pa->{-message} = delete($pa->{-msg});
+	}
     }
     elsif ( $pa =~ /^-?\d+$/ ) {
 	$pa = { -exitval => $pa };
