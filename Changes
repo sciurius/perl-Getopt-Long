@@ -1,3 +1,8 @@
+Changes in version 2.54
+-----------------------
+
+* Fix compatibility with Perl 5.8.
+
 Changes in version 2.53
 -----------------------
 
@@ -6,6 +11,13 @@ Changes in version 2.53
 
 * Fix Version/HelpMessage -message argument.
   https://rt.cpan.org/Ticket/Display.html?id=133963
+
+* Added 'starter' method to the callback object. This method returns the
+  starter (e.g. '--' or '-') of the option as used by the user.
+
+* Fix problem with Pod::Usage argument in examples/skel2.pl.
+
+* Enhanced option:default spec to octal, hex and binary.
 
 Changes in version 2.52
 -----------------------
@@ -19,11 +31,13 @@ Changes in version 2.52
 
 * Added some tests, see https://rt.cpan.org/Ticket/Display.html?id=87581
 
-* Change README to README.md and update it.
+* Fix doc issue 36380.
 
 * Change CHANGES to Changes.
 
 * Some small doc fixes.
+
+* Update links in README.
 
 Changes in version 2.51
 -----------------------
