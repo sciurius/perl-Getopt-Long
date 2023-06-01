@@ -1,7 +1,15 @@
+Changes in version 2.55
+-----------------------
+
+* Fix long standing bug that duplicate options were not detected when
+  the options differ in case while ignore_case is in effect.
+  This will now yield a warning and become a fatal error in a future
+  release.
+
 Changes in version 2.54
 -----------------------
 
-* Fix compatibility with Perl 5.8.
+* Small fix for 5.8 compatibility. Thanks to Graham Knop.
 
 Changes in version 2.53
 -----------------------

@@ -3,9 +3,9 @@
 # Getopt::Long.pm -- Universal options parsing
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
-# Last Modified By: Johan Vromans
-# Last Modified On: Thu Nov 17 17:45:27 2022
-# Update Count    : 1777
+# Last Modified By: 
+# Last Modified On: Thu Jun  1 21:33:39 2023
+# Update Count    : 1778
 # Status          : Released
 
 ################ Module Preamble ################
@@ -929,7 +929,8 @@ sub ParseOptionSpec ($$) {
 	}
     }
 
-    if ( $dups && $^W ) {
+    if ( $dups ) {
+	# Warn now. Will become fatal in a future release.
 	foreach ( split(/\n+/, $dups) ) {
 	    warn($_."\n");
 	}

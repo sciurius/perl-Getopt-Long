@@ -1,9 +1,9 @@
 # test.data -- regression tests for Getopt::Long
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
-# Last Modified By: Johan Vromans
-# Last Modified On: Tue Nov 15 13:54:33 2022
-# Update Count    : 597
+# Last Modified By: 
+# Last Modified On: Thu Jun  1 21:39:16 2023
+# Update Count    : 604
 # Status          : In progress
 
 ################ No args ################
@@ -2521,3 +2521,16 @@ P: v:s% \\%h1
 A: -v
 W: Option v requires an argument
 
+T: Detect duplicate options when ignore_case is in effect
+O: ignore_case
+P: v=i \\$v1 V=i \\$v2
+A: -v 1 -V 2
+   $v2 2
+W: Duplicate specification "V=i" for option "v"
+
+T: Detect duplicate options when ignore_case is in effect
+O: no_ignore_case
+P: v=i \\$v1 V=i \\$v2
+A: -v 1 -V 2
+   $v1 1
+   $v2 2
