@@ -1,9 +1,9 @@
 # Makefile.PL -- Makefile generator for Getopt::Long
 # Author          : Johan Vromans
 # Created On      : Sat Mar 16 11:43:21 1996
-# Last Modified By: Johan Vromans
-# Last Modified On: Thu Nov 17 17:45:51 2022
-# Update Count    : 124
+# Last Modified By: 
+# Last Modified On: Thu Jun 15 13:37:58 2023
+# Update Count    : 126
 # Status          : Unknown, Use with caution!
 
 use Config;
@@ -95,7 +95,7 @@ WriteMakefile(
         ),
 
 	INSTALLDIRS => ($] < 5.011 ? 'perl' : 'site'),
-	PM 	  => { "lib/newgetopt.pl"  => '$(INST_LIB)/newgetopt.pl',
+	PM 	  => { "lib/newgetopt.pl"   => '$(INST_LIB)/newgetopt.pl',
 		       "lib/Getopt/Long.pm" => '$(INST_LIB)/Getopt/Long.pm',
 		     },
 	dist      => { COMPRESS => 'gzip', SUFFIX => 'gz',
@@ -110,6 +110,9 @@ WriteMakefile(
                         type => "git",
                         url => "https://github.com/sciurius/perl-Getopt-Long.git",
                         web => "https://github.com/sciurius/perl-Getopt-Long",
+                    },
+                    bugtracker => {
+                        web => "https://github.com/sciurius/perl-Getopt-Long/issues",
                     },
                 },
             },
