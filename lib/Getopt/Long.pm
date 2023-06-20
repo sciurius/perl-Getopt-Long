@@ -48,7 +48,7 @@ BEGIN {
 use vars @EXPORT, @EXPORT_OK;
 use vars qw($error $debug $major_version $minor_version);
 # Deprecated visible variables.
-use vars qw($autoabbrev $getopt_compat $ignorecase $bundling $order
+use vars qw($autoabbrev $getopt_compat $gnu_equals $ignorecase $bundling $order
 	    $passthrough);
 # Official invisible variables.
 use vars qw($genprefix $caller $gnu_compat $auto_help $auto_version $longprefix);
@@ -97,6 +97,7 @@ sub ConfigDefaults() {
     $ignorecase = 1;		# ignore case when matching options
     $passthrough = 0;		# leave unrecognized options alone
     $gnu_compat = 0;		# require --opt=val if value is optional
+    $gnu_equals = 0;		# require '=' (break '--opt val' compatibility)
     $longprefix = "(--)";       # what does a long prefix look like
     $bundling_values = 0;	# no bundling of values
 }
@@ -318,6 +319,7 @@ sub GetOptionsFromArray(@) {
 	   "bundling_values=$bundling_values,",
 	   "getopt_compat=$getopt_compat,",
 	   "gnu_compat=$gnu_compat,",
+	   "gnu_equals=$gnu_equals,",
 	   "order=$order,",
 	   "\n  ",
 	   "ignorecase=$ignorecase,",
@@ -963,14 +965,16 @@ sub FindOption ($$$$$) {
 
     # If it is a long option, it may include the value.
     # With getopt_compat, only if not bundling.
-    if ( ($starter=~/^$longprefix$/
-	  || ($getopt_compat && ($bundling == 0 || $bundling == 2)))
-	 && (my $oppos = index($opt, '=', 1)) > 0) {
+    if ((my $oppos = index($opt, '=', 1)) > 0) {
+      if ( $starter=~/^$longprefix$/
+	   || ($getopt_compat && ($bundling == 0 || $bundling == 2))
+	   || ($gnu_equals && $oppos == 1) ) {
 	my $optorg = $opt;
 	$opt = substr($optorg, 0, $oppos);
 	$optarg = substr($optorg, $oppos + 1); # retain tainedness
 	print STDERR ("=> option \"", $opt,
 		      "\", optarg = \"$optarg\"\n") if $debug;
+      }
     }
 
     #### Look it up ###
@@ -1181,8 +1185,12 @@ sub FindOption ($$$$$) {
     }
 
     # Get (possibly optional) argument.
-    $arg = (defined $rest ? $rest
-	    : (defined $optarg ? $optarg : shift (@$argv)));
+    $arg = (! $gnu_equals && defined $rest ? $rest
+	    : (defined $optarg ? $optarg
+	       : ! $gnu_equals ? shift (@$argv)
+	       : (defined $ctl->[CTL_DEFAULT]) ? $ctl->[CTL_DEFAULT]
+	          : $type eq 's'               ? ''
+	          :                              0));
 
     # Get key if this is a "name=value" pair for a hash option.
     my $key;
@@ -1202,6 +1210,10 @@ sub FindOption ($$$$$) {
     #### Check if the argument is valid for this option ####
 
     my $key_valid = $ctl->[CTL_DEST] == CTL_DEST_HASH ? "[^=]+=" : "";
+
+    ### '$gnu_equals' doesn't take its argument from $rest; push it back
+    do { unshift (@$argv, $starter.$rest); undef $rest }
+      if defined $rest && $gnu_equals;
 
     if ( $type eq 's' ) {	# string
 	# A mandatory string takes anything.
@@ -1358,13 +1370,13 @@ sub Configure (@) {
       [ $error, $debug, $major_version, $minor_version, $caller,
 	$autoabbrev, $getopt_compat, $ignorecase, $bundling, $order,
 	$gnu_compat, $passthrough, $genprefix, $auto_version, $auto_help,
-	$longprefix, $bundling_values ];
+	$gnu_equals, $longprefix, $bundling_values ];
 
     if ( ref($options[0]) eq 'ARRAY' ) {
 	( $error, $debug, $major_version, $minor_version, $caller,
 	  $autoabbrev, $getopt_compat, $ignorecase, $bundling, $order,
 	  $gnu_compat, $passthrough, $genprefix, $auto_version, $auto_help,
-	  $longprefix, $bundling_values ) = @{shift(@options)};
+	  $gnu_equals, $longprefix, $bundling_values ) = @{shift(@options)};
     }
 
     my $opt;
@@ -1404,6 +1416,9 @@ sub Configure (@) {
 	    $gnu_compat = $action;
 	    $bundling = 0;
 	    $bundling_values = 1;
+	}
+	elsif ( $try eq 'gnu_equals' ) {
+	    $gnu_equals = $action;
 	}
 	elsif ( $try =~ /^(auto_?)?version$/ ) {
 	    $auto_version = $action;
@@ -2393,14 +2408,20 @@ do. Without C<gnu_compat>, C<--opt=> gives an error. With C<gnu_compat>,
 C<--opt=> will give option C<opt> and empty value.
 This is the way GNU getopt_long() does it.
 
-Note that C<--opt value> is still accepted, even though GNU
-getopt_long() doesn't.
+Note that unless C<gnu_equals> is in effect, C<--opt value> is still
+accepted, even though GNU getopt_long() doesn't.
 
 =item gnu_getopt
 
 This is a short way of setting C<gnu_compat> C<bundling> C<permute>
 C<no_getopt_compat>. With C<gnu_getopt>, command line handling should be
 reasonably compatible with GNU getopt_long().
+
+=item gnu_equals
+
+This requires optional values to be specified using an C<=>, e.g. either
+C<-o=val> or C<--opt=val>; i.e., it "breaks" existing scripts that use
+C<--opt val> to pass optional parameters.
 
 =item require_order
 
