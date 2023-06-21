@@ -556,7 +556,7 @@ sub GetOptionsFromArray(@) {
 			    print STDERR ("=> \$\$L{$opt} += \"$arg\"\n")
 			      if $debug;
 			    if ( defined ${$linkage{$opt}} ) {
-			        ${$linkage{$opt}} += $arg;
+			        ( ${$linkage{$opt}} ||= 0 ) += $arg;
 			    }
 		            else {
 			        ${$linkage{$opt}} = $arg;
@@ -670,7 +670,7 @@ sub GetOptionsFromArray(@) {
 			print STDERR ("=> \$L{$opt} += \"$arg\"\n")
 			  if $debug;
 			if ( defined $userlinkage->{$opt} ) {
-			    $userlinkage->{$opt} += $arg;
+			    ( $userlinkage->{$opt} ||= 0 ) += $arg;
 			}
 			else {
 			    $userlinkage->{$opt} = $arg;
