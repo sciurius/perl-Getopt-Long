@@ -1185,9 +1185,9 @@ sub FindOption ($$$$$) {
     }
 
     # Get (possibly optional) argument.
-    $arg = (! $gnu_equals && defined $rest ? $rest
+    $arg = ( ( ! $gnu_equals || $mand ) && defined $rest ? $rest
 	    : (defined $optarg ? $optarg
-	       : ! $gnu_equals ? shift (@$argv)
+	       : ( ! $gnu_equals || $mand ) ? shift (@$argv)
 	       : (defined $ctl->[CTL_DEFAULT]) ? $ctl->[CTL_DEFAULT]
 	          : $type eq 's'               ? ''
 	          :                              0));
@@ -1213,7 +1213,7 @@ sub FindOption ($$$$$) {
 
     ### '$gnu_equals' doesn't take its argument from $rest; push it back
     do { unshift (@$argv, $starter.$rest); undef $rest }
-      if defined $rest && $gnu_equals;
+      if defined $rest && $gnu_equals && !$mand;
 
     if ( $type eq 's' ) {	# string
 	# A mandatory string takes anything.
@@ -1256,7 +1256,7 @@ sub FindOption ($$$$$) {
 	    $arg = ($type eq 'o' && $arg =~ /^0/) ? oct($arg) : 0+$arg;
 	}
 	else {
-	    if ( defined $optarg || $mand ) {
+	    if ( defined $optarg || ( $mand && ! $gnu_equals ) ) {
 		if ( $passthrough ) {
 		    unshift (@$argv, defined $rest ? $starter.$rest : $arg)
 		      unless defined $optarg;
@@ -1273,7 +1273,7 @@ sub FindOption ($$$$$) {
 	    }
 	    else {
 		# Push back.
-		unshift (@$argv, defined $rest ? $starter.$rest : $arg);
+		unshift (@$argv, defined $rest ? $starter.$rest : $arg) unless $gnu_equals;
 		if ( $type eq 'I' ) {
 		    # Fake incremental type.
 		    my @c = @$ctl;
@@ -1323,6 +1323,11 @@ sub FindOption ($$$$$) {
     else {
 	die("Getopt::Long internal error (Can't happen)\n");
     }
+
+    ### '$gnu_equals' doesn't take its argument from $rest; push it back
+    do { unshift (@$argv, $starter.$rest); undef $rest }
+      if defined $rest && $gnu_equals;
+
     return (1, $opt, $ctl, $starter, $arg, $key);
 }
 
