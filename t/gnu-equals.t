@@ -12,7 +12,7 @@ BEGIN {
 
 use Getopt::Long;
 
-print "1..92\n";
+print "1..106\n";
 
 ##############################################################################
 ###  NOTE: This and `t/gnu-getopt.t` are meant to be a "Before and After"  ###
@@ -42,12 +42,12 @@ print "1..92\n";
   Getopt::Long::Configure ("default", "pass_through", "gnu_getopt", "gnu_equals");
   print +(GetOptions (
         'debug|d:s'   => \$DEBUG,
-        'force|f=s'   => \$FORCE,    # FORCE is Required
+        'force|f=s'   => \$FORCE,    # FORCE is a Required String
         'verbose|v:s' => \$VERBOSE,
   ) ? "" : "not ", "ok 7 (START=@START)\n");
 
-  print (($FORCE eq "")        ? "" : "not ", "ok 8 (FORCE=$FORCE)\n");
-  print (($VERBOSE eq "2")     ? "" : "not ", "ok 9 (VERBOSE=$VERBOSE)\n");
+  print (($FORCE eq "v=2")     ? "" : "not ", "ok 8 (FORCE=$FORCE)\n");
+  print (($VERBOSE eq "")      ? "" : "not ", "ok 9 (VERBOSE=$VERBOSE)\n");
   print (($DEBUG eq "")        ? "" : "not ", "ok 10 (DEBUG=$DEBUG)\n");
   print ((@ARGV == 0)          ? "" : "not ", "ok 11 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
   print ((!defined $ARGV[0])   ? "" : "not ", "ok 12\n");
@@ -123,6 +123,25 @@ print "1..92\n";
   print "ok 38\n";
 }
 
+{ ### -f24v=2 ==> -f="24" -v="2"
+  my $DEBUG = my $FORCE = my $VERBOSE = "";
+  my @START = @ARGV = qw(-f24v=2);
+  Getopt::Long::Configure ("default", "pass_through", "gnu_getopt", "gnu_equals");
+  print +(GetOptions (
+        'debug|d:s'   => \$DEBUG,
+        'force|f=i'   => \$FORCE,    # FORCE is a Required Integer
+        'verbose|v=i' => \$VERBOSE,  # VERBOSE is a Required Integer, Too
+  ) ? "" : "not ", "ok 39 (START=@START)\n");
+
+  print (($FORCE eq "24")      ? "" : "not ", "ok 40 (FORCE=$FORCE)\n");
+  print (($VERBOSE eq "2")     ? "" : "not ", "ok 41 (VERBOSE=$VERBOSE)\n");
+  print (($DEBUG eq "")        ? "" : "not ", "ok 42 (DEBUG=$DEBUG)\n");
+  print ((@ARGV == 0)          ? "" : "not ", "ok 43 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
+  print ((!defined $ARGV[0])   ? "" : "not ", "ok 44\n");
+  print "ok 45\n";
+  print "ok 46\n";
+}
+
 { ### -fv=2 ==> -f="0" -v="2"
   my $DEBUG = my $FORCE = my $VERBOSE = "";
   my @START = @ARGV = qw(-fv=2);
@@ -131,13 +150,13 @@ print "1..92\n";
         'debug|d:s'   => \$DEBUG,
         'force|f:i'   => \$FORCE,    # FORCE is an Optional Integer
         'verbose|v:s' => \$VERBOSE,
-  ) ? "" : "not ", "ok 39 (START=@START)\n");
+  ) ? "" : "not ", "ok 47 (START=@START)\n");
 
-  print (($FORCE eq "0")       ? "" : "not ", "ok 40 (FORCE=$FORCE)\n");
-  print (($VERBOSE eq "2")     ? "" : "not ", "ok 41 (VERBOSE=$VERBOSE)\n");
-  print (($DEBUG eq "")        ? "" : "not ", "ok 42 (DEBUG=$DEBUG)\n");
-  print ((@ARGV == 0)          ? "" : "not ", "ok 43 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
-  print ((!defined $ARGV[0])   ? "" : "not ", "ok 44\n");
+  print (($FORCE eq "0")       ? "" : "not ", "ok 48 (FORCE=$FORCE)\n");
+  print (($VERBOSE eq "2")     ? "" : "not ", "ok 49 (VERBOSE=$VERBOSE)\n");
+  print (($DEBUG eq "")        ? "" : "not ", "ok 50 (DEBUG=$DEBUG)\n");
+  print ((@ARGV == 0)          ? "" : "not ", "ok 51 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
+  print ((!defined $ARGV[0])   ? "" : "not ", "ok 52\n");
 }
 
 { ### -fv=2 ==> -f="0" -v="2"
@@ -148,13 +167,13 @@ print "1..92\n";
         'debug|d:s'   => \$DEBUG,
         'force|f:i'   => \$FORCE,    # FORCE is an Optional Integer
         'verbose|v:i' => \$VERBOSE,  # VERBOSE is an Optional Integer, Too
-  ) ? "" : "not ", "ok 45 (START=@START)\n");
+  ) ? "" : "not ", "ok 53 (START=@START)\n");
 
-  print (($FORCE eq "0")       ? "" : "not ", "ok 46 (FORCE=$FORCE)\n");
-  print (($VERBOSE eq "2")     ? "" : "not ", "ok 47 (VERBOSE=$VERBOSE)\n");
-  print (($DEBUG eq "")        ? "" : "not ", "ok 48 (DEBUG=$DEBUG)\n");
-  print ((@ARGV == 0)          ? "" : "not ", "ok 49 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
-  print ((!defined $ARGV[0])   ? "" : "not ", "ok 50\n");
+  print (($FORCE eq "0")       ? "" : "not ", "ok 54 (FORCE=$FORCE)\n");
+  print (($VERBOSE eq "2")     ? "" : "not ", "ok 55 (VERBOSE=$VERBOSE)\n");
+  print (($DEBUG eq "")        ? "" : "not ", "ok 56 (DEBUG=$DEBUG)\n");
+  print ((@ARGV == 0)          ? "" : "not ", "ok 57 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
+  print ((!defined $ARGV[0])   ? "" : "not ", "ok 58\n");
 }
 
 { ### -fv 2 ==> -f="" -v="" -- "2"
@@ -165,13 +184,13 @@ print "1..92\n";
         'debug|d:s'   => \$DEBUG,
         'force|f:s'   => \$FORCE,
         'verbose|v:s' => \$VERBOSE,
-  ) ? "" : "not ", "ok 51 (START=@START)\n");
+  ) ? "" : "not ", "ok 59 (START=@START)\n");
 
-  print (($FORCE eq "")        ? "" : "not ", "ok 52 (FORCE=$FORCE)\n");
-  print (($VERBOSE eq "")      ? "" : "not ", "ok 53 (VERBOSE=$VERBOSE)\n");
-  print (($DEBUG eq "")        ? "" : "not ", "ok 54 (DEBUG=$DEBUG)\n");
-  print ((@ARGV == 1)          ? "" : "not ", "ok 55 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
-  print (($ARGV[0] eq "2")     ? "" : "not ", "ok 56\n");
+  print (($FORCE eq "")        ? "" : "not ", "ok 60 (FORCE=$FORCE)\n");
+  print (($VERBOSE eq "")      ? "" : "not ", "ok 61 (VERBOSE=$VERBOSE)\n");
+  print (($DEBUG eq "")        ? "" : "not ", "ok 62 (DEBUG=$DEBUG)\n");
+  print ((@ARGV == 1)          ? "" : "not ", "ok 63 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
+  print (($ARGV[0] eq "2")     ? "" : "not ", "ok 64\n");
 }
 
 { ### -fv=-1 ==> -f="" -v="-1"
@@ -182,13 +201,13 @@ print "1..92\n";
         'debug|d:s'   => \$DEBUG,
         'force|f:s'   => \$FORCE,
         'verbose|v:s' => \$VERBOSE,
-  ) ? "" : "not ", "ok 57 (START=@START)\n");
+  ) ? "" : "not ", "ok 65 (START=@START)\n");
 
-  print (($FORCE eq "")        ? "" : "not ", "ok 58 (FORCE=$FORCE)\n");
-  print (($VERBOSE eq "-1")    ? "" : "not ", "ok 59 (VERBOSE=$VERBOSE)\n");
-  print (($DEBUG eq "")        ? "" : "not ", "ok 60 (DEBUG=$DEBUG)\n");
-  print ((@ARGV == 0)          ? "" : "not ", "ok 61 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
-  print ((!defined $ARGV[0])   ? "" : "not ", "ok 62\n");
+  print (($FORCE eq "")        ? "" : "not ", "ok 66 (FORCE=$FORCE)\n");
+  print (($VERBOSE eq "-1")    ? "" : "not ", "ok 67 (VERBOSE=$VERBOSE)\n");
+  print (($DEBUG eq "")        ? "" : "not ", "ok 68 (DEBUG=$DEBUG)\n");
+  print ((@ARGV == 0)          ? "" : "not ", "ok 69 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
+  print ((!defined $ARGV[0])   ? "" : "not ", "ok 70\n");
 }
 
 { ### -fv -1 ==> -f="" -v="" -- "-1"
@@ -199,13 +218,13 @@ print "1..92\n";
         'debug|d:s'   => \$DEBUG,
         'force|f:s'   => \$FORCE,
         'verbose|v:s' => \$VERBOSE,
-  ) ? "" : "not ", "ok 63 (START=@START)\n");
+  ) ? "" : "not ", "ok 71 (START=@START)\n");
 
-  print (($FORCE eq "")        ? "" : "not ", "ok 64 (FORCE=$FORCE)\n");
-  print (($VERBOSE eq "")      ? "" : "not ", "ok 65 (VERBOSE=$VERBOSE)\n");
-  print (($DEBUG eq "")        ? "" : "not ", "ok 66 (DEBUG=$DEBUG)\n");
-  print ((@ARGV == 1)          ? "" : "not ", "ok 67 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
-  print (($ARGV[0] eq "-1")    ? "" : "not ", "ok 68\n");
+  print (($FORCE eq "")        ? "" : "not ", "ok 72 (FORCE=$FORCE)\n");
+  print (($VERBOSE eq "")      ? "" : "not ", "ok 73 (VERBOSE=$VERBOSE)\n");
+  print (($DEBUG eq "")        ? "" : "not ", "ok 74 (DEBUG=$DEBUG)\n");
+  print ((@ARGV == 1)          ? "" : "not ", "ok 75 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
+  print (($ARGV[0] eq "-1")    ? "" : "not ", "ok 76\n");
 }
 
 { ### -v=+3 ==> -v="+3"
@@ -216,13 +235,13 @@ print "1..92\n";
         'debug|d:s'   => \$DEBUG,
         'force|f:s'   => \$FORCE,
         'verbose|v:s' => \$VERBOSE,
-  ) ? "" : "not ", "ok 69 (START=@START)\n");
+  ) ? "" : "not ", "ok 77 (START=@START)\n");
 
-  print (($FORCE eq "")        ? "" : "not ", "ok 70 (FORCE=$FORCE)\n");
-  print (($VERBOSE eq "+3")    ? "" : "not ", "ok 71 (VERBOSE=$VERBOSE)\n");
-  print (($DEBUG eq "")        ? "" : "not ", "ok 72 (DEBUG=$DEBUG)\n");
-  print ((@ARGV == 0)          ? "" : "not ", "ok 73 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
-  print ((!defined $ARGV[0])   ? "" : "not ", "ok 74\n");
+  print (($FORCE eq "")        ? "" : "not ", "ok 78 (FORCE=$FORCE)\n");
+  print (($VERBOSE eq "+3")    ? "" : "not ", "ok 79 (VERBOSE=$VERBOSE)\n");
+  print (($DEBUG eq "")        ? "" : "not ", "ok 80 (DEBUG=$DEBUG)\n");
+  print ((@ARGV == 0)          ? "" : "not ", "ok 81 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
+  print ((!defined $ARGV[0])   ? "" : "not ", "ok 82\n");
 }
 
 { ### -v +3 ==> -v -- "+3"
@@ -233,13 +252,13 @@ print "1..92\n";
         'debug|d:s'   => \$DEBUG,
         'force|f:s'   => \$FORCE,
         'verbose|v:s' => \$VERBOSE,
-  ) ? "" : "not ", "ok 75 (START=@START)\n");
+  ) ? "" : "not ", "ok 83 (START=@START)\n");
 
-  print (($FORCE eq "")        ? "" : "not ", "ok 76 (FORCE=$FORCE)\n");
-  print (($VERBOSE eq "")      ? "" : "not ", "ok 77 (VERBOSE=$VERBOSE)\n");
-  print (($DEBUG eq "")        ? "" : "not ", "ok 78 (DEBUG=$DEBUG)\n");
-  print ((@ARGV == 1)          ? "" : "not ", "ok 79 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
-  print (($ARGV[0] eq "+3")    ? "" : "not ", "ok 80\n");
+  print (($FORCE eq "")        ? "" : "not ", "ok 84 (FORCE=$FORCE)\n");
+  print (($VERBOSE eq "")      ? "" : "not ", "ok 85 (VERBOSE=$VERBOSE)\n");
+  print (($DEBUG eq "")        ? "" : "not ", "ok 86 (DEBUG=$DEBUG)\n");
+  print ((@ARGV == 1)          ? "" : "not ", "ok 87 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
+  print (($ARGV[0] eq "+3")    ? "" : "not ", "ok 88\n");
 }
 
 ### Increment/Decrement Flags
@@ -260,13 +279,13 @@ print "1..92\n";
         'debug|d:s'   => sub { $DEBUG   = ! length $_[1] ? ( $DEBUG   || 0 ) + 1 : $_[1] =~ /^\+(.+)/ ? ( $DEBUG   || 0 ) + $1 : $_[1] },
         'force|f:s'   => sub { $FORCE   = ! length $_[1] ? ( $FORCE   || 0 ) + 1 : $_[1] =~ /^\+(.+)/ ? ( $FORCE   || 0 ) + $1 : $_[1] },
         'verbose|v:s' => sub { $VERBOSE = ! length $_[1] ? ( $VERBOSE || 0 ) + 1 : $_[1] =~ /^\+(.+)/ ? ( $VERBOSE || 0 ) + $1 : $_[1] },
-  ) ? "" : "not ", "ok 81 (START=@START)\n");
+  ) ? "" : "not ", "ok 89 (START=@START)\n");
 
-  print (($FORCE eq "")        ? "" : "not ", "ok 82 (FORCE=$FORCE)\n");
-  print (($VERBOSE eq "6")     ? "" : "not ", "ok 83 (VERBOSE=$VERBOSE)\n");
-  print (($DEBUG eq "")        ? "" : "not ", "ok 84 (DEBUG=$DEBUG)\n");
-  print ((@ARGV == 0)          ? "" : "not ", "ok 85 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
-  print ((!defined $ARGV[0])   ? "" : "not ", "ok 86\n");
+  print (($FORCE eq "")        ? "" : "not ", "ok 90 (FORCE=$FORCE)\n");
+  print (($VERBOSE eq "6")     ? "" : "not ", "ok 91 (VERBOSE=$VERBOSE)\n");
+  print (($DEBUG eq "")        ? "" : "not ", "ok 92 (DEBUG=$DEBUG)\n");
+  print ((@ARGV == 0)          ? "" : "not ", "ok 93 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
+  print ((!defined $ARGV[0])   ? "" : "not ", "ok 94\n");
 }
 
 { ### -v=-2 -v -v=+-3 ==> -v="-4"  ( -2   + 1   - 3 )
@@ -277,11 +296,28 @@ print "1..92\n";
         'debug|d:s'   => sub { $DEBUG   = ! length $_[1] ? ( $DEBUG   || 0 ) + 1 : $_[1] =~ /^\+(.+)/ ? ( $DEBUG   || 0 ) + $1 : $_[1] },
         'force|f:s'   => sub { $FORCE   = ! length $_[1] ? ( $FORCE   || 0 ) + 1 : $_[1] =~ /^\+(.+)/ ? ( $FORCE   || 0 ) + $1 : $_[1] },
         'verbose|v:s' => sub { $VERBOSE = ! length $_[1] ? ( $VERBOSE || 0 ) + 1 : $_[1] =~ /^\+(.+)/ ? ( $VERBOSE || 0 ) + $1 : $_[1] },
-  ) ? "" : "not ", "ok 87 (START=@START)\n");
+  ) ? "" : "not ", "ok 95 (START=@START)\n");
 
-  print (($FORCE eq "")        ? "" : "not ", "ok 88 (FORCE=$FORCE)\n");
-  print (($VERBOSE eq "-4")    ? "" : "not ", "ok 89 (VERBOSE=$VERBOSE)\n");
-  print (($DEBUG eq "")        ? "" : "not ", "ok 90 (DEBUG=$DEBUG)\n");
-  print ((@ARGV == 0)          ? "" : "not ", "ok 91 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
-  print ((!defined $ARGV[0])   ? "" : "not ", "ok 92\n");
+  print (($FORCE eq "")        ? "" : "not ", "ok 96 (FORCE=$FORCE)\n");
+  print (($VERBOSE eq "-4")    ? "" : "not ", "ok 97 (VERBOSE=$VERBOSE)\n");
+  print (($DEBUG eq "")        ? "" : "not ", "ok 98 (DEBUG=$DEBUG)\n");
+  print ((@ARGV == 0)          ? "" : "not ", "ok 99 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
+  print ((!defined $ARGV[0])   ? "" : "not ", "ok 100\n");
+}
+
+{ ### -fv=2 ==> -f="" -v="2"
+  my $DEBUG = my $FORCE = my $VERBOSE = "";
+  my @START = @ARGV = qw(-fv=2);
+  Getopt::Long::Configure ("default", "pass_through", "gnu_getopt", "gnu_equals");
+  print +(GetOptions (
+        'debug|d'   => \$DEBUG,
+        'force|f'   => \$FORCE,
+        'verbose|v' => \$VERBOSE,
+  ) ? "" : "not ", "ok 101 (START=@START)\n");
+
+  print (($FORCE eq "1")       ? "" : "not ", "ok 102 (FORCE=$FORCE)\n");
+  print (($VERBOSE eq "")      ? "" : "not ", "ok 103 (VERBOSE=$VERBOSE)\n");
+  print (($DEBUG eq "")        ? "" : "not ", "ok 104 (DEBUG=$DEBUG)\n");
+  print ((@ARGV == 1)          ? "" : "not ", "ok 105 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
+  print (($ARGV[0] eq "-v=2")  ? "" : "not ", "ok 106\n");
 }
