@@ -32,7 +32,7 @@ print "1..92\n";
   print (($FORCE eq "")        ? "" : "not ", "ok 2 (FORCE=$FORCE)\n");
   print (($VERBOSE eq "2")     ? "" : "not ", "ok 3 (VERBOSE=$VERBOSE)\n");
   print (($DEBUG eq "")        ? "" : "not ", "ok 4 (DEBUG=$DEBUG)\n");
-  print ((@ARGV == 0)          ? "" : "not ", "ok 5 (ARGV=@ARGV)\n");
+  print ((@ARGV == 0)          ? "" : "not ", "ok 5 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
   print ((!defined $ARGV[0])   ? "" : "not ", "ok 6\n");
 }
 
@@ -49,7 +49,7 @@ print "1..92\n";
   print (($FORCE eq "")        ? "" : "not ", "ok 8 (FORCE=$FORCE)\n");
   print (($VERBOSE eq "2")     ? "" : "not ", "ok 9 (VERBOSE=$VERBOSE)\n");
   print (($DEBUG eq "")        ? "" : "not ", "ok 10 (DEBUG=$DEBUG)\n");
-  print ((@ARGV == 0)          ? "" : "not ", "ok 11 (ARGV=@ARGV)\n");
+  print ((@ARGV == 0)          ? "" : "not ", "ok 11 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
   print ((!defined $ARGV[0])   ? "" : "not ", "ok 12\n");
 }
 
@@ -66,7 +66,7 @@ print "1..92\n";
   print (($FORCE eq "1")       ? "" : "not ", "ok 14 (FORCE=$FORCE)\n");
   print (($VERBOSE eq "2")     ? "" : "not ", "ok 15 (VERBOSE=$VERBOSE)\n");
   print (($DEBUG eq "")        ? "" : "not ", "ok 16 (DEBUG=$DEBUG)\n");
-  print ((@ARGV == 0)          ? "" : "not ", "ok 17 (ARGV=@ARGV)\n");
+  print ((@ARGV == 0)          ? "" : "not ", "ok 17 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
   print ((!defined $ARGV[0])   ? "" : "not ", "ok 18\n");
 }
 
@@ -83,7 +83,7 @@ print "1..92\n";
   print (($FORCE eq "1")       ? "" : "not ", "ok 20 (FORCE=$FORCE)\n");
   print (($VERBOSE eq "")      ? "" : "not ", "ok 21 (VERBOSE=$VERBOSE)\n");
   print (($DEBUG eq "")        ? "" : "not ", "ok 22 (DEBUG=$DEBUG)\n");
-  print ((@ARGV == 1)          ? "" : "not ", "ok 23 (ARGV=@ARGV)\n");
+  print ((@ARGV == 1)          ? "" : "not ", "ok 23 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
   print (($ARGV[0] eq "-v=2")  ? "" : "not ", "ok 24\n");
 }
 
@@ -100,7 +100,7 @@ print "1..92\n";
   print (($FORCE eq "0")       ? "" : "not ", "ok 26 (FORCE=$FORCE)\n");
   print (($VERBOSE eq "2")     ? "" : "not ", "ok 27 (VERBOSE=$VERBOSE)\n");
   print (($DEBUG eq "")        ? "" : "not ", "ok 28 (DEBUG=$DEBUG)\n");
-  print ((@ARGV == 0)          ? "" : "not ", "ok 29 (ARGV=@ARGV)\n");
+  print ((@ARGV == 0)          ? "" : "not ", "ok 29 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
   print ((!defined $ARGV[0])   ? "" : "not ", "ok 30\n");
 }
 
@@ -117,7 +117,7 @@ print "1..92\n";
   print (($FORCE eq "0")       ? "" : "not ", "ok 32 (FORCE=$FORCE)\n");
   print (($VERBOSE eq "2")     ? "" : "not ", "ok 33 (VERBOSE=$VERBOSE)\n");
   print (($DEBUG eq "")        ? "" : "not ", "ok 34 (DEBUG=$DEBUG)\n");
-  print ((@ARGV == 0)          ? "" : "not ", "ok 35 (ARGV=@ARGV)\n");
+  print ((@ARGV == 0)          ? "" : "not ", "ok 35 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
   print ((!defined $ARGV[0])   ? "" : "not ", "ok 36\n");
   print "ok 37\n";
   print "ok 38\n";
@@ -136,7 +136,7 @@ print "1..92\n";
   print (($FORCE eq "0")       ? "" : "not ", "ok 40 (FORCE=$FORCE)\n");
   print (($VERBOSE eq "2")     ? "" : "not ", "ok 41 (VERBOSE=$VERBOSE)\n");
   print (($DEBUG eq "")        ? "" : "not ", "ok 42 (DEBUG=$DEBUG)\n");
-  print ((@ARGV == 0)          ? "" : "not ", "ok 43 (ARGV=@ARGV)\n");
+  print ((@ARGV == 0)          ? "" : "not ", "ok 43 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
   print ((!defined $ARGV[0])   ? "" : "not ", "ok 44\n");
 }
 
@@ -153,7 +153,7 @@ print "1..92\n";
   print (($FORCE eq "0")       ? "" : "not ", "ok 46 (FORCE=$FORCE)\n");
   print (($VERBOSE eq "2")     ? "" : "not ", "ok 47 (VERBOSE=$VERBOSE)\n");
   print (($DEBUG eq "")        ? "" : "not ", "ok 48 (DEBUG=$DEBUG)\n");
-  print ((@ARGV == 0)          ? "" : "not ", "ok 49 (ARGV=@ARGV)\n");
+  print ((@ARGV == 0)          ? "" : "not ", "ok 49 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
   print ((!defined $ARGV[0])   ? "" : "not ", "ok 50\n");
 }
 
@@ -170,7 +170,7 @@ print "1..92\n";
   print (($FORCE eq "")        ? "" : "not ", "ok 52 (FORCE=$FORCE)\n");
   print (($VERBOSE eq "")      ? "" : "not ", "ok 53 (VERBOSE=$VERBOSE)\n");
   print (($DEBUG eq "")        ? "" : "not ", "ok 54 (DEBUG=$DEBUG)\n");
-  print ((@ARGV == 1)          ? "" : "not ", "ok 55 (ARGV=@ARGV)\n");
+  print ((@ARGV == 1)          ? "" : "not ", "ok 55 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
   print (($ARGV[0] eq "2")     ? "" : "not ", "ok 56\n");
 }
 
@@ -187,7 +187,7 @@ print "1..92\n";
   print (($FORCE eq "")        ? "" : "not ", "ok 58 (FORCE=$FORCE)\n");
   print (($VERBOSE eq "-1")    ? "" : "not ", "ok 59 (VERBOSE=$VERBOSE)\n");
   print (($DEBUG eq "")        ? "" : "not ", "ok 60 (DEBUG=$DEBUG)\n");
-  print ((@ARGV == 0)          ? "" : "not ", "ok 61 (ARGV=@ARGV)\n");
+  print ((@ARGV == 0)          ? "" : "not ", "ok 61 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
   print ((!defined $ARGV[0])   ? "" : "not ", "ok 62\n");
 }
 
@@ -204,7 +204,7 @@ print "1..92\n";
   print (($FORCE eq "")        ? "" : "not ", "ok 64 (FORCE=$FORCE)\n");
   print (($VERBOSE eq "")      ? "" : "not ", "ok 65 (VERBOSE=$VERBOSE)\n");
   print (($DEBUG eq "")        ? "" : "not ", "ok 66 (DEBUG=$DEBUG)\n");
-  print ((@ARGV == 1)          ? "" : "not ", "ok 67 (ARGV=@ARGV)\n");
+  print ((@ARGV == 1)          ? "" : "not ", "ok 67 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
   print (($ARGV[0] eq "-1")    ? "" : "not ", "ok 68\n");
 }
 
@@ -221,7 +221,7 @@ print "1..92\n";
   print (($FORCE eq "")        ? "" : "not ", "ok 70 (FORCE=$FORCE)\n");
   print (($VERBOSE eq "+3")    ? "" : "not ", "ok 71 (VERBOSE=$VERBOSE)\n");
   print (($DEBUG eq "")        ? "" : "not ", "ok 72 (DEBUG=$DEBUG)\n");
-  print ((@ARGV == 0)          ? "" : "not ", "ok 73 (ARGV=@ARGV)\n");
+  print ((@ARGV == 0)          ? "" : "not ", "ok 73 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
   print ((!defined $ARGV[0])   ? "" : "not ", "ok 74\n");
 }
 
@@ -238,7 +238,7 @@ print "1..92\n";
   print (($FORCE eq "")        ? "" : "not ", "ok 76 (FORCE=$FORCE)\n");
   print (($VERBOSE eq "")      ? "" : "not ", "ok 77 (VERBOSE=$VERBOSE)\n");
   print (($DEBUG eq "")        ? "" : "not ", "ok 78 (DEBUG=$DEBUG)\n");
-  print ((@ARGV == 1)          ? "" : "not ", "ok 79 (ARGV=@ARGV)\n");
+  print ((@ARGV == 1)          ? "" : "not ", "ok 79 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
   print (($ARGV[0] eq "+3")    ? "" : "not ", "ok 80\n");
 }
 
@@ -265,7 +265,7 @@ print "1..92\n";
   print (($FORCE eq "")        ? "" : "not ", "ok 82 (FORCE=$FORCE)\n");
   print (($VERBOSE eq "6")     ? "" : "not ", "ok 83 (VERBOSE=$VERBOSE)\n");
   print (($DEBUG eq "")        ? "" : "not ", "ok 84 (DEBUG=$DEBUG)\n");
-  print ((@ARGV == 0)          ? "" : "not ", "ok 85 (ARGV=@ARGV)\n");
+  print ((@ARGV == 0)          ? "" : "not ", "ok 85 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
   print ((!defined $ARGV[0])   ? "" : "not ", "ok 86\n");
 }
 
@@ -282,6 +282,6 @@ print "1..92\n";
   print (($FORCE eq "")        ? "" : "not ", "ok 88 (FORCE=$FORCE)\n");
   print (($VERBOSE eq "-4")    ? "" : "not ", "ok 89 (VERBOSE=$VERBOSE)\n");
   print (($DEBUG eq "")        ? "" : "not ", "ok 90 (DEBUG=$DEBUG)\n");
-  print ((@ARGV == 0)          ? "" : "not ", "ok 91 (ARGV=@ARGV)\n");
+  print ((@ARGV == 0)          ? "" : "not ", "ok 91 (ARGV[@{[ scalar @ARGV ]}]=@ARGV)\n");
   print ((!defined $ARGV[0])   ? "" : "not ", "ok 92\n");
 }
