@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: 
-# Last Modified On: Thu Jun  1 21:39:16 2023
-# Update Count    : 604
+# Last Modified On: Tue Aug  1 17:33:01 2023
+# Update Count    : 608
 # Status          : In progress
 
 ################ No args ################
@@ -1210,6 +1210,31 @@ P: a-b
 A: -a-b foo
 S: linkage
    $opt_a-b 1
+   @ARGV foo
+
+################ Periods in option name ################
+
+T: Periods in option names
+P: a.b \\$v1
+A: -a.b foo
+   $v1 1
+   @ARGV foo
+
+T: Periods in option names
+# Skip this with linkage, since the a.b -> opt_a_b translation doesn't
+# take place.
+P: a.b
+A: -a.b foo
+S: !linkage
+   $opt_a_b 1
+   @ARGV foo
+
+T: Periods in option names
+# This is the variant for the linkage case.
+P: a.b
+A: -a.b foo
+S: linkage
+   $opt_a.b 1
    @ARGV foo
 
 ################ Arguments between options ################

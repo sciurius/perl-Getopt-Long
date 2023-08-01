@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
 # Last Modified By: 
-# Last Modified On: Thu Jun  1 21:33:39 2023
-# Update Count    : 1778
+# Last Modified On: Tue Aug  1 17:24:58 2023
+# Update Count    : 1785
 # Status          : Released
 
 ################ Module Preamble ################
@@ -806,11 +806,15 @@ sub OptCtl ($) {
 sub ParseOptionSpec ($$) {
     my ($opt, $opctl) = @_;
 
+    # Allow period in option name unless passing through,
+    my $op = $passthrough
+      ? qr/(?: \w+[-\w]* )/x : qr/(?: \w+[-.\w]* )/x;
+
     # Match option spec.
     if ( $opt !~ m;^
 		   (
 		     # Option name
-		     (?: \w+[-\w]* )
+		     $op
 		     # Aliases
 		     (?: \| (?: . [^|!+=:]* )? )*
 		   )?
@@ -1942,7 +1946,9 @@ and the argument specification.
 
 The name specification contains the name of the option, optionally
 followed by a list of alternative names separated by vertical bar
-characters.
+characters. The name is made up of alphanumeric characters, hyphens,
+underscores. If C<pass_through> is disabled, a period is also allowed in
+option names.
 
     length	      option name is "length"
     length|size|l     name is "length", aliases are "size" and "l"

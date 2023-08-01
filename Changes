@@ -1,6 +1,11 @@
 Changes in version 2.55
 -----------------------
 
+* Allow periods in option names, e.g. to indicate levels in a
+  hierarchical configuration. Since periods in option names have never
+  been valid, they are now allowed by default unless pass_through is
+  enabled.
+
 * Fix long standing bug that duplicate options were not detected when
   the options differ in case while ignore_case is in effect.
   This will now yield a warning and become a fatal error in a future
