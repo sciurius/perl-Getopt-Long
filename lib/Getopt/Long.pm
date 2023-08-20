@@ -2396,7 +2396,7 @@ POSIXLY_CORRECT has been set, in which case C<getopt_compat> is disabled.
 
 C<gnu_compat> controls whether C<--opt=> is allowed, and what it should
 do. Without C<gnu_compat>, C<--opt=> gives an error. With C<gnu_compat>,
-C<--opt=> will give option C<opt> and empty value.
+C<--opt=> will give option C<opt> an empty value.
 This is the way GNU getopt_long() does it.
 
 Note that C<--opt value> is still accepted, even though GNU
