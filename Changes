@@ -1,6 +1,11 @@
 Changes in version 2.55
 -----------------------
 
+* Move Getopt::Long::Parser to a separate module and add
+  documentation. Note that Getopt::Long uses Getopt::Long::Parser, so
+  programs that use Getopt::Long and call the oo interface will still
+  work.
+
 * Allow periods in option names, e.g. to indicate levels in a
   hierarchical configuration. Since periods in option names have never
   been valid, they are now allowed by default unless pass_through is

@@ -1,9 +1,8 @@
 # Makefile.PL -- Makefile generator for Getopt::Long
 # Author          : Johan Vromans
 # Created On      : Sat Mar 16 11:43:21 1996
-# Last Modified By: 
-# Last Modified On: Thu Jun 15 13:37:58 2023
-# Update Count    : 126
+# Last Modified On: Thu Nov  9 11:01:14 2023
+# Update Count    : 129
 # Status          : Unknown, Use with caution!
 
 use Config;
@@ -11,7 +10,7 @@ use ExtUtils::MakeMaker 5.0;
 
 use lib "./lib";
 use Getopt::Long;
-my $version = "2.54";
+my $version = $Getopt::Long::VERSION;
 
 my $mm_version = $ExtUtils::MakeMaker::VERSION;
 if ($mm_version =~ /_/) {
@@ -97,6 +96,7 @@ WriteMakefile(
 	INSTALLDIRS => ($] < 5.011 ? 'perl' : 'site'),
 	PM 	  => { "lib/newgetopt.pl"   => '$(INST_LIB)/newgetopt.pl',
 		       "lib/Getopt/Long.pm" => '$(INST_LIB)/Getopt/Long.pm',
+		       "lib/Getopt/Long/Parser.pm" => '$(INST_LIB)/Getopt/Long/Parser.pm',
 		     },
 	dist      => { COMPRESS => 'gzip', SUFFIX => 'gz',
 		     },
