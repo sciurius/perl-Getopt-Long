@@ -123,15 +123,13 @@ instantiated, each having their own configuration settings:
     $p2 = Getopt::Long::Parser->new(config => ["posix"]);
     if ($p1->getoptions(...options descriptions...)) ...
 
-## Availability
+## Installation
 
-The official version for module Getopt::Long comes with the Perl 5
+The official version for module Getopt::Long comes pre-installed with the Perl 5
 distribution. 
 Newer versions will be made available on the Comprehensive Perl Archive
 Network (CPAN), see
 [MetaCPAN](https://metacpan.org/release/Getopt-Long).
-
-## Installation
 
 ### From the (cloned) repository
 
