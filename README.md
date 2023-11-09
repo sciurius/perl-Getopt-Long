@@ -14,7 +14,7 @@ GetOptions(). This function implements the POSIX standard for command
 line options, with GNU extensions, while still capable of handling
 the traditional one-letter options.
 In general, this means that command line options can have long names
-instead of single letters, and are introduced with a double dash `--'.
+instead of single letters, and are introduced with a double dash `--`.
 
 Optionally, Getopt::Long can support the traditional bundling of
 single-letter command line options.
@@ -62,8 +62,8 @@ By default, long option names are case insensitive.
 ### Single-letter options and bundling
 
 When single-letter options are requested, Getopt::Long allows the
-option names to be bundled, e.g. "-abc" is equivalent to "-a -b -c".
-In this case, long option names must be introduced with the POSIX "--"
+option names to be bundled, e.g. `-abc` is equivalent to `-a -b -c`.
+In this case, long option names must be introduced with the POSIX `--`
 introducer.
 
 Examples:
@@ -77,11 +77,11 @@ By default, single-letter option names are case sensitive.
 
   - Options can have alternative names, using an alternative name
     will behave as if the primary name was used.
-  - Options can be negatable, e.g. "debug" will switch it on, while
-    "nodebug" will switch it off.    
+  - Options can be negatable, e.g. `--debug` will switch it on, while
+    `--no-debug` will switch it off.  
   - Options can set values, but also add values producing an array
     of values instead of a single scalar value, or set values in a hash.
-  - Options can have multiple values, e.g., "--position 25 624".
+  - Options can have multiple values, e.g., `--position 25 624`.
 
 ### Options linkage
 
@@ -98,7 +98,7 @@ command line options and how they must be handled:
 
 ### Customization:
 
-The module can be customized by specifying settings in the 'use'
+The module can be customized by specifying settings in the `use`
 directive, or by calling a special method, Getopt::Long::Configure.
 For example, the following two cases are functionally equal:
 
@@ -180,14 +180,14 @@ GNUmakefile (for development).
 
 Relevant targets of the GNUmakefile are
 
-* test : runs the standard tests
+* `test` : runs the standard tests
 
-* regtest : runs the extended regression tests
+* `regtest` : runs the extended regression tests
 
-* dist : creates a new tar.gz distribution
+* `dist` : creates a new tar.gz distribution
 
 A Github release is a snapshot of this repository. An
-official CPAN release must be made with the 'dist' target of the
+official CPAN release must be made with the `dist` target of the
 GNUmakefile.
 
 ## Copyright and Disclaimer
