@@ -8,8 +8,7 @@ if ( pipe_from_fork('FH') ) {
     die("res = $res, should be $0\n")
       unless $res eq "$0\n";
     $res = <FH>;
-    my $exp = "(Getopt::Long::GetOptions version ".
-      ($Getopt::Long::VERSION_STRING||$Getopt::Long::VERSION) . "; Perl version " .
+    my $exp = "(Getopt::Long::GetOptions version $Getopt::Long::VERSION, Perl version " .
 	($] >= 5.006 ? sprintf("%vd", $^V) : $]) . ")";
     die("res = $res, should be $exp\n")
       unless $res eq "$exp\n";

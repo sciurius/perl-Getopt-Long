@@ -3,15 +3,14 @@
 # Getopt::Long.pm -- Universal options parsing
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
-# Last Modified On: Thu Nov  9 13:09:00 2023
-# Update Count    : 1800
+# Last Modified On: Thu Nov  9 14:52:56 2023
+# Update Count    : 1802
 # Status          : Released
 
 ################ Module Preamble ################
 
-# There are no CPAN testers for very old versions of Perl.
-# Getopt::Long is reported to run under 5.8.9.
-use 5.008009;
+# Getopt::Long is reported to run under 5.6.1. Thanks Tux!
+use 5.006001;
 
 use strict;
 use warnings;
