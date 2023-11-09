@@ -131,15 +131,13 @@ Newer versions will be made available on the Comprehensive Perl Archive
 Network (CPAN), see
 [MetaCPAN](https://metacpan.org/release/Getopt-Long).
 
-### From the (cloned) repository
+### Install directly from CPAN
 
-`cd` into the checked out repository and issue the following commands:
+Use the `cpan` or `cpanm` tools:
 
-    perl Makefile.PL
-    make all test
-    make install
+    cpan Getopt::Long
 
-### From a CPAN kit
+### Install from a (downloaded) CPAN kit
 
 Unpack the kit and `cd` into the unpacked directory. Issue the
 following commands:
@@ -148,11 +146,13 @@ following commands:
     make all test
     make install
 
-### Directly from CPAN
+### Install from the (cloned) repository
 
-Use the `cpan` or `cpanm` tools:
+`cd` into the checked out repository and issue the following commands:
 
-    cpan Getopt::Long
+    perl Makefile.PL
+    make all test
+    make install
 
 ### Examples
 
