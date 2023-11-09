@@ -53,9 +53,9 @@ Examples (POSIX):
 
 Extensions:
 
-`-long` (convenience)  
-`+width=80` (deprecated)  
-`-height 24` (traditional)
+`-long` (*convenience*)  
+`+width=80` (*deprecated*)  
+`-height 24` (*traditional*)
 
 By default, long option names are case insensitive.
 
@@ -68,8 +68,10 @@ introducer.
 
 Examples:
 
-    -lgAd (bundle) -xw 80 (bundle, w takes a value) -xw80 (same)
-    even -l24w80 (l = 24 and w = 80)
+`-lgAd` (*bundle*)  
+`-xw 80` (*bundle, w takes a value*)  
+`-xw80` (*same*)  
+`-l24w80` (*l = 24 and w = 80*)
 
 By default, single-letter option names are case sensitive.
 
