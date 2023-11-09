@@ -24,7 +24,8 @@ of newgetopt.pl that came with Perl 4. It is fully upward compatible.
 In fact, the Perl 5 version of newgetopt.pl is just a wrapper around
 the module.
 
-For complete documentation, see "https://metacpan.org/release/Getopt-Long"
+For complete documentation, see
+[MetaCPAN](https://metacpan.org/release/Getopt-Long)
 or use the command
 
     perldoc Getopt::Long
@@ -46,11 +47,15 @@ scripts.
 
 Examples (POSIX):
 
-    --long --width=80 --height=24
+`--long`  
+`--width=80`  
+`--height=24`
 
 Extensions:
 
-    -long (convenience) +width=80 (deprecated) -height 24 (traditional)
+`-long` (convenience)  
+`+width=80` (deprecated)  
+`-height 24` (traditional)
 
 By default, long option names are case insensitive.
 
@@ -121,7 +126,8 @@ instantiated, each having their own configuration settings:
 The official version for module Getopt::Long comes with the Perl 5
 distribution. 
 Newer versions will be made available on the Comprehensive Perl Archive
-Network (CPAN), see "https://metacpan.org/release/Getopt-Long".
+Network (CPAN), see
+[MetaCPAN](https://metacpan.org/release/Getopt-Long).
 
 ## Installation
 
@@ -164,7 +170,7 @@ Getopt::Long is a standard Perl5 (core) module, but maintained
 separately.
 
 Development is hosted on Github, 
-https://github.com/sciurius/perl-Getopt-Long.
+https://github.com/sciurius/perl-Getopt-Long .
 Please use the Github bug tracker
 https://github.com/sciurius/perl-Getopt-Long/issues
 to report issues.
