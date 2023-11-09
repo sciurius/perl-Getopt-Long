@@ -1,6 +1,5 @@
 MANIFEST              List of files in this kit
-README                Introductionary text
-INSTALL               Installation information
+README.md             Introductionary text
 Changes               List of changes
 lib/Getopt/Long.pm    Getopt::Long
 lib/Getopt/Long/Parser.pm    Getopt::Long OO Parser
