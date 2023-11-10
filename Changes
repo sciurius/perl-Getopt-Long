@@ -1,3 +1,9 @@
+Changes in version 2.56
+-------------------------
+
+* Do not use Getopt::Long to establish Getopt::Long::Parser version.
+  Packaging changes only, no functional changes.
+
 Changes in version 2.55
 -----------------------
 

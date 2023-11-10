@@ -3,8 +3,8 @@
 # Getopt::Long.pm -- Universal options parsing
 # Author          : Johan Vromans
 # Created On      : Tue Sep 11 15:00:12 1990
-# Last Modified On: Thu Nov  9 14:52:56 2023
-# Update Count    : 1802
+# Last Modified On: Fri Nov 10 10:37:19 2023
+# Update Count    : 1807
 # Status          : Released
 
 ################ Module Preamble ################
@@ -17,7 +17,7 @@ use warnings;
 
 package Getopt::Long;
 
-our $VERSION =  2.55;
+our $VERSION = 2.56;
 
 use Exporter;
 use base qw(Exporter);

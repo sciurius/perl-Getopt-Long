@@ -3,14 +3,13 @@
 # Parser.pm -- Getopt::Long object oriented interface
 # Author          : Johan Vromans
 # Created On      : Thu Nov  9 10:37:00 2023
-# Last Modified On: Thu Nov  9 14:53:19 2023
-# Update Count    : 7
+# Last Modified On: Fri Nov 10 10:37:30 2023
+# Update Count    : 12
 # Status          : Released
 
 package Getopt::Long::Parser;
 
-use Getopt::Long ();
-our $VERSION = 2.55;
+our $VERSION = 2.56;
 
 =head1 NAME
 
@@ -56,6 +55,7 @@ See L<Getopt::Long/"Configuring Getopt::Long"> for all possible settings.
 =cut
 
 # Getopt::Long has a stub for Getopt::Long::Parser::new.
+use Getopt::Long ();
 no warnings 'redefine';
 
 sub new {

@@ -1,8 +1,8 @@
 # Makefile.PL -- Makefile generator for Getopt::Long
 # Author          : Johan Vromans
 # Created On      : Sat Mar 16 11:43:21 1996
-# Last Modified On: Thu Nov  9 11:01:14 2023
-# Update Count    : 129
+# Last Modified On: Thu Nov  9 23:08:55 2023
+# Update Count    : 132
 # Status          : Unknown, Use with caution!
 
 use Config;
@@ -105,6 +105,9 @@ WriteMakefile(
         ($mm_version <= 6.45) ? () : (
             META_MERGE => {
                 'meta-spec' => { version => 2 },
+		no_index => {
+		    package => [ qw(Getopt::Long::CallBack) ],
+		},
                 resources => {
                     repository => {
                         type => "git",
