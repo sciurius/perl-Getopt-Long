@@ -9,6 +9,7 @@
 /Makefile
 /Makefile.old
 /perl-Getopt-Long.spec
+/MYMETA.*
 
 # Miscellaneous files.
 /alpha/
