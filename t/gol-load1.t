@@ -4,11 +4,12 @@
 # until/unless used.
 
 BEGIN {
-    if ($ENV{PERL_CORE}) {
-	@INC = '../lib';
+    if( $ENV{PERL_CORE} ) {
+        chdir 't';
+        @INC = ('../lib', 'lib');
     }
-    if ( -d "t" ) {
-	chdir "t";
+    else {
+        unshift @INC, 't/lib';
     }
 }
 
