@@ -2,7 +2,7 @@
 
 use Getopt::Long;
 
-my $parser = new Getopt::Long::Parser;
+my $parser = Getopt::Long::Parser->new;
 
 $parser->configure("default");
 
