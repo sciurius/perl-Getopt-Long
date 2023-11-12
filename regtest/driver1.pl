@@ -464,7 +464,7 @@ sub exec_plain {
 	local (@ARGV) = @{$t->{argv}};
 
 	if ( $call & S_OO ) {
-	    my $p = new Getopt::Long::Parser ( config => $t->{config} );
+	    my $p = Getopt::Long::Parser->new( config => $t->{config} );
 	    $ret = eval { $p->getoptions(@opts); } || '';
 	    # print STDERR (hdr(), $@) if $@;
 	}
