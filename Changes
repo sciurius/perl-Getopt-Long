@@ -1,3 +1,8 @@
+Changes in version xxxx
+-----------------------
+
+* Be more precise about numeric errors (issue #26).
+
 Changes in version 2.57
 -----------------------
 

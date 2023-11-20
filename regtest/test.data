@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Aug 24 11:23:46 2001
 # Last Modified By: 
-# Last Modified On: Tue Aug  1 17:33:01 2023
-# Update Count    : 608
+# Last Modified On: Mon Nov 20 18:58:46 2023
+# Update Count    : 610
 # Status          : In progress
 
 ################ No args ################
@@ -533,21 +533,21 @@ A: -v1 -6 foo
 
 T: Int opt (mandatory)
 A: -v1 bar foo
-W: Value "bar" invalid for option v1 (number expected)
+W: Value "bar" invalid for option v1 (integer number expected)
 
 T: Int opt (mandatory)
 O: gnu_compat
 
 A: -v1=bar foo
-W: Value "bar" invalid for option v1 (number expected)
+W: Value "bar" invalid for option v1 (integer number expected)
 
 T: Int opt (mandatory)
 A: -v1 -bar foo
-W: Value "-bar" invalid for option v1 (number expected)
+W: Value "-bar" invalid for option v1 (integer number expected)
 
 T: Int opt (mandatory)
 A: -v1 --
-W: Value "--" invalid for option v1 (number expected)
+W: Value "--" invalid for option v1 (integer number expected)
 
 T: Int opt (mandatory)
 A: -v1
@@ -673,15 +673,15 @@ R:
 
 T: Ext Int opt (mandatory)
 A: -v1 019 foo
-W: Value "019" invalid for option v1 (extended number expected)
+W: Value "019" invalid for option v1 (extended integer number expected)
 
 T: Ext Int opt (mandatory)
 A: -v1 0xefg foo
-W: Value "0xefg" invalid for option v1 (extended number expected)
+W: Value "0xefg" invalid for option v1 (extended integer number expected)
 
 T: Ext Int opt (mandatory)
 A: -v1 0b012 foo
-W: Value "0b012" invalid for option v1 (extended number expected)
+W: Value "0b012" invalid for option v1 (extended integer number expected)
 
 # Clear sticky opts.
 P:
@@ -1408,12 +1408,12 @@ A: -a -c-b foo
 T: Bundling
 P: a f=i
 A: -fa
-W: Value "a" invalid for option f (number expected)
+W: Value "a" invalid for option f (integer number expected)
 
 T: Bundling
 P: a f=i
 A: -fx
-W: Value "x" invalid for option f (number expected)
+W: Value "x" invalid for option f (integer number expected)
 W: Unknown option: x
 
 T: Bundling
@@ -1507,7 +1507,7 @@ W: Unknown option: c
 T: Bundling and illegal values
 P: a=i \\$v1 b \\$v2
 A: -acb
-W: Value "cb" invalid for option a (number expected)
+W: Value "cb" invalid for option a (integer number expected)
 W: Unknown option: c
 
 # Clear sticky config.
@@ -1704,7 +1704,7 @@ R:
 T: Hashes
 P: hi=i \\%h1
 A: -hi x1=aa bar
-W: Value "aa" invalid for option hi (number expected)
+W: Value "aa" invalid for option hi (integer number expected)
 
 T: Hashes
 P: hs=s \\%h1
@@ -1744,7 +1744,7 @@ A: -hs x1=x1=x1 bar
 T: Hashes
 P: hi=i \\%h1
 A: -hi x1= bar
-W: Value "" invalid for option hi (number expected)
+W: Value "" invalid for option hi (integer number expected)
 
 T: Hash with default
 P: gsx:5 \\%h1
