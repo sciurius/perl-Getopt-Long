@@ -2,6 +2,7 @@ Changes in version xxxx
 -----------------------
 
 * Be more precise about numeric errors (issue #26).
+* Add strict to G::L::Parser.
 
 Changes in version 2.57
 -----------------------
