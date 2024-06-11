@@ -3,8 +3,8 @@
 # Parser.pm -- Getopt::Long object-oriented interface
 # Author          : Johan Vromans
 # Created On      : Thu Nov  9 10:37:00 2023
-# Last Modified On: Tue Dec 12 22:30:52 2023
-# Update Count    : 15
+# Last Modified On: Tue Jun 11 13:17:57 2024
+# Update Count    : 16
 # Status          : Released
 
 use strict;
@@ -12,7 +12,8 @@ use warnings;
 
 package Getopt::Long::Parser;
 
-our $VERSION = 2.57;
+# Must match Getopt::Long::VERSION!
+our $VERSION = 2.58;
 
 =head1 NAME
 

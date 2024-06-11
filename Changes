@@ -1,4 +1,4 @@
-Changes in version xxxx
+Changes in version 2.58
 -----------------------
 
 * Be more precise about numeric errors (issue #26).
