@@ -20,8 +20,8 @@ package Getopt::Long;
 # Must match Getopt::Long::Parser::VERSION!
 our $VERSION = 2.58;
 
-use Exporter;
-use base qw(Exporter);
+use Exporter qw(import);
+use parent qw(Exporter);
 
 # Exported subroutines.
 sub GetOptions(@);		# always
@@ -1518,12 +1518,12 @@ sub given {
     $self->{given};
 }
 
-use overload
-  # Treat this object as an ordinary string for legacy API.
-  '""'	   => \&name,
-  fallback => 1;
+# use overload
+#   # Treat this object as an ordinary string for legacy API.
+#   '""'	   => \&name,
+#   fallback => 1;
 
-1;
+# 1;
 
 ################ Documentation ################
 
