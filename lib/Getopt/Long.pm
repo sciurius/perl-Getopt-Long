@@ -20,7 +20,7 @@ package Getopt::Long;
 # Must match Getopt::Long::Parser::VERSION!
 our $VERSION = 2.58;
 
-use Exporter qw(import);
+use Exporter 'import';
 use parent qw(Exporter);
 
 # Exported subroutines.
@@ -99,26 +99,26 @@ sub ConfigDefaults() {
 }
 
 # Override import.
-sub import {
-    my $pkg = shift;		# package
-    my @syms = ();		# symbols to import
-    my @config = ();		# configuration
-    my $dest = \@syms;		# symbols first
-    for ( @_ ) {
-	if ( $_ eq ':config' ) {
-	    $dest = \@config;	# config next
-	    next;
-	}
-	push(@$dest, $_);	# push
-    }
-    # Hide one level and call super.
-    local $Exporter::ExportLevel = 1;
-    push(@syms, qw(&GetOptions)) if @syms; # always export GetOptions
-    $requested_version = 0;
-    $pkg->SUPER::import(@syms);
-    # And configure.
-    Configure(@config) if @config;
-}
+# sub import {
+#     my $pkg = shift;		# package
+#     my @syms = ();		# symbols to import
+#     my @config = ();		# configuration
+#     my $dest = \@syms;		# symbols first
+#     for ( @_ ) {
+# 	if ( $_ eq ':config' ) {
+# 	    $dest = \@config;	# config next
+# 	    next;
+# 	}
+# 	push(@$dest, $_);	# push
+#     }
+#     # Hide one level and call super.
+#     local $Exporter::ExportLevel = 1;
+#     push(@syms, qw(&GetOptions)) if @syms; # always export GetOptions
+#     $requested_version = 0;
+#     $pkg->SUPER::import(@syms);
+#     # And configure.
+#     Configure(@config) if @config;
+# }
 
 ################ Initialization ################
 
@@ -148,51 +148,39 @@ use warnings 'redefine';
 
 # Indices in option control info.
 # Note that ParseOptions uses the fields directly. Search for 'hard-wired'.
-use constant CTL_TYPE    => 0;
-#use constant   CTL_TYPE_FLAG   => '';
-#use constant   CTL_TYPE_NEG    => '!';
-#use constant   CTL_TYPE_INCR   => '+';
-#use constant   CTL_TYPE_INT    => 'i';
-#use constant   CTL_TYPE_INTINC => 'I';
-#use constant   CTL_TYPE_XINT   => 'o';
-#use constant   CTL_TYPE_FLOAT  => 'f';
-#use constant   CTL_TYPE_STRING => 's';
+use constant {
+	CTL_TYPE    => 0,
+	CTL_CNAME   => 1,
 
-use constant CTL_CNAME   => 1;
+	CTL_DEFAULT => 2,
 
-use constant CTL_DEFAULT => 2;
+	CTL_DEST    => 3,
+	CTL_DEST_SCALAR => 0,
+	CTL_DEST_ARRAY  => 1,
+	CTL_DEST_HASH   => 2,
+	CTL_DEST_CODE   => 3,
 
-use constant CTL_DEST    => 3;
- use constant   CTL_DEST_SCALAR => 0;
- use constant   CTL_DEST_ARRAY  => 1;
- use constant   CTL_DEST_HASH   => 2;
- use constant   CTL_DEST_CODE   => 3;
+	CTL_AMIN    => 4,
+	CTL_AMAX    => 5,
 
-use constant CTL_AMIN    => 4;
-use constant CTL_AMAX    => 5;
-
-# FFU.
-#use constant CTL_RANGE   => ;
-#use constant CTL_REPEAT  => ;
-
-# Rather liberal patterns to match numbers.
-use constant PAT_INT   => "[-+]?_*[0-9][0-9_]*";
-use constant PAT_XINT  =>
-  "(?:".
-	  "[-+]?_*[1-9][0-9_]*".
-  "|".
-	  "0x_*[0-9a-f][0-9a-f_]*".
-  "|".
-	  "0b_*[01][01_]*".
-  "|".
-	  "0[0-7_]*".
-  ")";
-use constant PAT_FLOAT =>
-  "[-+]?".			# optional sign
-  "(?=\\.?[0-9])".		# must start with digit or dec.point
-  "[0-9_]*".			# digits before the dec.point
-  "(\\.[0-9_]*)?".		# optional fraction
-  "([eE][-+]?[0-9_]+)?";	# optional exponent
+	PAT_INT   => "[-+]?_*[0-9][0-9_]*",
+	PAT_XINT  =>
+	"(?:".
+		"[-+]?_*[1-9][0-9_]*".
+	"|".
+		"0x_*[0-9a-f][0-9a-f_]*".
+	"|".
+		"0b_*[01][01_]*".
+	"|".
+		"0[0-7_]*".
+	")",
+	PAT_FLOAT =>
+	"[-+]?".			# optional sign
+	"(?=\\.?[0-9])".		# must start with digit or dec.point
+	"[0-9_]*".			# digits before the dec.point
+	"(\\.[0-9_]*)?".		# optional fraction
+	"([eE][-+]?[0-9_]+)?"	# optional exponent
+};
 
 sub GetOptions(@) {
     # Shift in default array.
