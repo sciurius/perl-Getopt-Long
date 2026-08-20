@@ -815,8 +815,9 @@ sub ParseOptionSpec ($$) {
     else {
 	my ($mand, $type, $dest) =
 	  $spec =~ /^([=:])([ionfs])([@%])?(\{(\d+)?(,)?(\d+)?\})?$/;
+	# Only single-character options are ever unbundled.
 	return (undef, "Cannot repeat while bundling: \"$opt\"\n")
-	  if $bundling && defined($4);
+	  if $bundling && defined($4) && grep { length($_) == 1 } @names;
 	my ($mi, $cm, $ma) = ($5, $6, $7);
 	return (undef, "{0} is useless in option spec: \"$opt\"\n")
 	  if defined($mi) && !$mi && !defined($ma) && !defined($cm);
