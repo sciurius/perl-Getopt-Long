@@ -20,8 +20,6 @@ package Getopt::Long;
 # Must match Getopt::Long::Parser::VERSION!
 our $VERSION = 2.58;
 
-use Exporter;
-use base qw(Exporter);
 
 # Exported subroutines.
 sub GetOptions(@);		# always
@@ -98,7 +96,7 @@ sub ConfigDefaults() {
     $bundling_values = 0;	# no bundling of values
 }
 
-# Override import.
+# Export our symbols
 sub import {
     my $pkg = shift;		# package
     my @syms = ();		# symbols to import
@@ -111,11 +109,14 @@ sub import {
 	}
 	push(@$dest, $_);	# push
     }
-    # Hide one level and call super.
-    local $Exporter::ExportLevel = 1;
     push(@syms, qw(&GetOptions)) if @syms; # always export GetOptions
     $requested_version = 0;
-    $pkg->SUPER::import(@syms);
+
+    require 'Exporter.pm';
+    # Hide one level
+    local $Exporter::ExportLevel = 1;
+    Exporter::import($pkg, @syms);
+
     # And configure.
     Configure(@config) if @config;
 }
